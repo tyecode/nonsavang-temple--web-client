@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-"use client";
+'use client'
 
-import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ColumnDef } from '@tanstack/react-table'
+import { MoreHorizontal } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,98 +13,98 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import { useIncomesCategoryStore } from "@/stores/useIncomesCategoryStore";
-import { useUsersStore } from "@/stores/useUsersStore";
-import { useToast } from "@/components/ui/use-toast";
-import { User } from "@/types/user";
-import { deleteUser } from "@/actions/users-actions";
+} from '@/components/ui/dropdown-menu'
+import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { useIncomesCategoryStore } from '@/stores/useIncomesCategoryStore'
+import { useUsersStore } from '@/stores/useUsersStore'
+import { useToast } from '@/components/ui/use-toast'
+import { User } from '@/types/user'
+import { deleteUser } from '@/actions/users-actions'
 
 export const columns: ColumnDef<User>[] = [
   {
-    id: "select",
+    id: 'select',
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label='Select all'
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label='Select row'
       />
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: "ID",
+    accessorKey: 'id',
+    header: 'ID',
   },
   {
-    accessorKey: "email",
-    header: "ອີເມວ",
+    accessorKey: 'email',
+    header: 'ອີເມວ',
   },
   {
-    accessorKey: "displayName",
-    header: "ຊື່ ແລະ ນາມສະກຸນ",
+    accessorKey: 'displayName',
+    header: 'ຊື່ ແລະ ນາມສະກຸນ',
   },
   {
-    accessorKey: "role",
-    header: "Role",
+    accessorKey: 'role',
+    header: 'Role',
   },
   {
-    accessorKey: "created_at",
-    header: "Created At",
+    accessorKey: 'created_at',
+    header: 'Created At',
   },
   {
-    id: "actions",
+    id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const current = row.original;
+      const current = row.original
 
-      const users: User[] = useUsersStore((state) => state.users);
-      const updateUsers = useUsersStore((state) => state.updateUsers);
-      const { toast } = useToast();
+      const users: User[] = useUsersStore((state) => state.users)
+      const updateUsers = useUsersStore((state) => state.updateUsers)
+      const { toast } = useToast()
 
       const handleDeleteUser = async (id: string) => {
         try {
-          const res = await deleteUser(id);
+          const res = await deleteUser(id)
 
           if (res.error) {
-            throw new Error(res.message);
+            throw new Error(res.message)
           }
 
-          const newUsers = users.filter((user) => user.id !== id);
+          const newUsers = users.filter((user) => user.id !== id)
 
-          updateUsers(newUsers);
+          updateUsers(newUsers)
 
           toast({
-            description: "Delete select user successful.",
-          });
+            description: 'Delete select user successful.',
+          })
         } catch (error) {
           toast({
-            description: "Failed to delete the selected user.",
-          });
+            description: 'Failed to delete the selected user.',
+          })
         }
-      };
+      }
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="float-right h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
+            <Button variant='ghost' className='float-right h-8 w-8 p-0'>
+              <span className='sr-only'>Open menu</span>
+              <DotsHorizontalIcon className='h-4 w-4' />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align='end'>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(current.id)}
             >
@@ -114,13 +114,13 @@ export const columns: ColumnDef<User>[] = [
             <DropdownMenuItem>ແກ້ໄຂຂໍ້ມູນ</DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleDeleteUser(current.id)}
-              className="text-danger transition-none focus:text-danger"
+              className='text-danger transition-none focus:text-danger'
             >
               ລົບຂໍ້ມູນ
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      );
+      )
     },
   },
-];
+]

@@ -1,18 +1,18 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 
-import { Spinner } from "@nextui-org/react";
-import { navLinks } from "@/constants";
-import LeftBar from "@/components/left-bar";
-import TopBar from "@/components/top-bar";
-import { createClient } from "@/utils/supabase/client";
+import { Spinner } from '@nextui-org/react'
+import { navLinks } from '@/constants'
+import LeftBar from '@/components/left-bar'
+import TopBar from '@/components/top-bar'
+import { createClient } from '@/utils/supabase/client'
 
 const HomePageLayout = ({ children }: { children: React.ReactNode }) => {
-  const router = useRouter();
-  const supabase = createClient();
-  const [isLoading, setLoadingState] = useState(true);
+  const router = useRouter()
+  const supabase = createClient()
+  const [isLoading, setLoadingState] = useState(true)
 
   return (
     <>
@@ -22,16 +22,16 @@ const HomePageLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
       )} */}
 
-      <aside className="h-full w-[18rem] border bg-background">
+      <aside className='h-full w-[18rem] border bg-background'>
         <LeftBar navLinks={navLinks} />
       </aside>
 
-      <main className="flex h-full w-full flex-col">
+      <main className='flex h-full w-full flex-col'>
         <TopBar />
         {children}
       </main>
     </>
-  );
-};
+  )
+}
 
-export default HomePageLayout;
+export default HomePageLayout

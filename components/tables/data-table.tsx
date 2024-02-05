@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { useState } from "react";
+import { useState } from 'react'
 
 import {
   ColumnDef,
@@ -13,19 +13,19 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table'
 
-import AddUserModal from "@/components/modals/add-user-modal";
-import { Button } from "@/components/ui/button";
-import { DataTablePagination } from "@/components/tables/data-table-pagination";
+import AddUserModal from '@/components/modals/add-user-modal'
+import { Button } from '@/components/ui/button'
+import { DataTablePagination } from '@/components/tables/data-table-pagination'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -33,23 +33,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table'
 
-import { usePendingStore } from "@/stores/usePendingStore";
+import { usePendingStore } from '@/stores/usePendingStore'
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<string>("");
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<string>('')
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
 
   const table = useReactTable({
     data,
@@ -74,30 +74,30 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
     },
-  });
+  })
 
-  const isPending = usePendingStore((state) => state.isPending);
+  const isPending = usePendingStore((state) => state.isPending)
 
   return (
     <div>
-      <div className="flex w-full justify-between py-4">
+      <div className='flex w-full justify-between py-4'>
         <Input
-          placeholder="ຄົ້ນຫາ..."
+          placeholder='ຄົ້ນຫາ...'
           value={columnFilters}
           onChange={(event) => setColumnFilters(event.target.value)}
-          className="w-80"
+          className='w-80'
         />
 
-        <div className="flex gap-4">
+        <div className='flex gap-4'>
           <AddUserModal />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size={"sm"} className="ml-auto">
+              <Button variant='outline' size={'sm'} className='ml-auto'>
                 ເລືອກສະແດງຖັນ
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align='end'>
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -105,7 +105,7 @@ export function DataTable<TData, TValue>({
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
+                      className='capitalize'
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
@@ -113,23 +113,23 @@ export function DataTable<TData, TValue>({
                     >
                       {column.id}
                     </DropdownMenuCheckboxItem>
-                  );
+                  )
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className='rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
-                  console.log(header);
+                  console.log(header)
                   return (
                     <TableHead
                       key={header.id}
-                      className={header.id === "id" ? "min-w-40" : ""}
+                      className={header.id === 'id' ? 'min-w-40' : ''}
                     >
                       {header.isPlaceholder
                         ? null
@@ -138,7 +138,7 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -148,15 +148,15 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       <div
                         className={
-                          cell.id.split("_")[1] === "id"
-                            ? "w-40 overflow-hidden block whitespace-nowrap text-ellipsis h-full"
-                            : ""
+                          cell.id.split('_')[1] === 'id'
+                            ? 'block h-full w-40 overflow-hidden text-ellipsis whitespace-nowrap'
+                            : ''
                         }
                       >
                         {flexRender(
@@ -173,20 +173,20 @@ export function DataTable<TData, TValue>({
                 {[...Array(6)].map((array, index) => (
                   <TableRow key={index}>
                     <TableCell></TableCell>
-                    <TableCell className="py-4">
-                      <Skeleton className="h-5 w-full" />
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
                     </TableCell>
-                    <TableCell className="py-4">
-                      <Skeleton className="h-5 w-full" />
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
                     </TableCell>
-                    <TableCell className="py-4">
-                      <Skeleton className="h-5 w-full" />
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
                     </TableCell>
-                    <TableCell className="py-4">
-                      <Skeleton className="h-5 w-full" />
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
                     </TableCell>
-                    <TableCell className="py-4">
-                      <Skeleton className="h-5 w-full" />
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
                     </TableCell>
                     <TableCell></TableCell>
                   </TableRow>
@@ -196,7 +196,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className='h-24 text-center'
                 >
                   ບໍ່ມີຂໍ້ມູນ
                 </TableCell>
@@ -205,9 +205,9 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="mt-6">
+      <div className='mt-6'>
         <DataTablePagination table={table} />
       </div>
     </div>
-  );
+  )
 }
