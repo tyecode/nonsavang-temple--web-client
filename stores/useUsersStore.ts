@@ -1,9 +1,9 @@
-import { UserInterface } from "@/types";
 import { create } from "zustand";
+import { User } from "@/types/user";
 
 interface UsersState {
-  users: UserInterface[];
-  updateUsers: (users: UserInterface[]) => void;
+  users: User[];
+  updateUsers: (users: User[]) => void;
 }
 
 export const useUsersStore = create<UsersState>((set) => ({

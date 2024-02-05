@@ -26,7 +26,7 @@ const UsersPage = () => {
         const res = await getUsers();
 
         if (!res.data) {
-          throw new Error("Failed to fetch users");
+          throw new Error(res.message);
         }
 
         const newUsers = res.data.map((user) => ({

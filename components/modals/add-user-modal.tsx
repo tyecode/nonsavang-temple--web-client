@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import { createUser, getUsers } from "@/actions/users-actions";
 import { formatDate } from "@/lib/date-format";
-import { UserInterface } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,33 +31,46 @@ const AddUserModal = () => {
   const { toast } = useToast();
 
   const handleCreateUser = async (formData: FormData) => {
+    const email = String(formData.get("email"));
+    const password = String(formData.get("password"));
+    const firstname = String(formData.get("firstname"));
+    const lastname = String(formData.get("lastname"));
+
     setPending(true);
+
     try {
-      const res = await createUser(formData);
+      const res = await createUser({ email, password, firstname, lastname });
 
       if (res.error) {
         throw new Error(res.message);
       }
 
-      const users = await getUsers();
+      toast({
+        description: "User creation was successful",
+      });
+    } catch (error) {
+      toast({
+        description: "Failed to create new user",
+      });
+    }
 
-      if (!users.data) {
-        throw new Error("Failed to fetch users");
+    try {
+      const res = await getUsers();
+
+      if (!res.data) {
+        throw new Error(res.message);
       }
 
-      const newUsers = users.data.map((user) => ({
+      const newUsers = res.data.map((user) => ({
         ...user,
         displayName: `${user.firstname} ${user.lastname}`,
         created_at: formatDate(user.created_at),
       }));
 
       updateUsers(newUsers);
-      toast({
-        description: "Create new user successful",
-      });
     } catch (error) {
       toast({
-        description: "Failed to create new user",
+        description: "Failed to fetch users",
       });
     } finally {
       setPending(false);

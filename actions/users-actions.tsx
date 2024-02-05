@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
+import { UserCreationData, UserModificationData } from "@/types/user";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -9,47 +10,24 @@ const supabase = createClient(
 
 export const getUsers = async () => {
   try {
-    const { data: users, error } = await supabase.from("users").select("*");
+    const { data: users } = await supabase.from("users").select("*");
 
     return {
       data: users,
-      message: `Retrieved user`,
+      error: null,
+      message: `User retrieval was successful.`,
     };
   } catch (error) {
     return {
+      data: null,
       error,
-      data: [],
-      message: "Could not retrieve users",
+      message: `Failed to retrieve users. Please try again.`,
     };
   }
 };
 
-// export const getUserOne = async (id: string) => {
-//   try {
-//     const data = await prisma.users.findUnique({
-//       where: {
-//         id,
-//       },
-//     })
-
-//     return {
-//       data: data,
-//       message: `Retrieved user`,
-//     }
-//   } catch (error) {
-//     return {
-//       error,
-//       data: [],
-//       message: 'Could not retrieve users',
-//     }
-//   }
-// }
-
-export const createUser = async (formData: FormData) => {
-  const email = String(formData.get("email"));
-  const password = String(formData.get("password"));
-  const firstname = String(formData.get("firstname"));
-  const lastname = String(formData.get("lastname"));
+export const createUser = async (object: UserCreationData) => {
+  const { email, password, firstname, lastname } = object;
 
   try {
     const {
@@ -61,56 +39,62 @@ export const createUser = async (formData: FormData) => {
     });
 
     if (user) {
-      await updateUserOne(user.id, { firstname, lastname });
+      await updateUser(user.id, { firstname, lastname });
     }
 
     return {
       data: user,
-      message: `Create new user successful`,
+      error: null,
+      message: `User creation was successful.`,
     };
   } catch (error) {
     return {
+      data: null,
       error,
-      data: [],
-      message: `Failed to create a new user`,
+      message: `Failed to create a new user. Please try again.`,
     };
   }
 };
 
-export const updateUserOne = async (where: string, data: any) => {
+export const updateUser = async (
+  where: string,
+  object: UserModificationData
+) => {
   try {
-    const { data: user, error } = await supabase
+    const { data } = await supabase
       .from("users")
-      .update(data)
+      .update(object)
       .eq("id", where)
       .select();
 
     return {
-      data: user,
-      message: `Updated user`,
+      data,
+      error: null,
+      message: `User update was successful.`,
     };
   } catch (error) {
     return {
+      data: null,
       error,
-      data: [],
-      message: "Could not update user",
+      message: "Failed to update the selected user. Please try again.",
     };
   }
 };
 
-// export const deleteUsers = async (id: string) => {
-//   try {
-//     const { data } = await supabase.auth.admin.deleteUser(id)
+export const deleteUser = async (where: string) => {
+  try {
+    const { data } = await supabase.auth.admin.deleteUser(where);
 
-//     return {
-//       data,
-//       message: 'Delete user successful',
-//     }
-//   } catch (error) {
-//     return {
-//       error,
-//       data: [],
-//       message: 'Failed to delete the selected user',
-//     }
-//   }
-// }
+    return {
+      data,
+      error: null,
+      message: "User deletion was successful.",
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error,
+      message: "Failed to delete the selected user. Please try again.",
+    };
+  }
+};

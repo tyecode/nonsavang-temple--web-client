@@ -18,10 +18,10 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useIncomesCategoryStore } from "@/stores/useIncomesCategoryStore";
 import { useUsersStore } from "@/stores/useUsersStore";
 import { useToast } from "@/components/ui/use-toast";
-import { UserInterface } from "@/types";
-// import { deleteUsers } from '@/actions/users-actions'
+import { User } from "@/types/user";
+import { deleteUser } from "@/actions/users-actions";
 
-export const columns: ColumnDef<UserInterface>[] = [
+export const columns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -45,8 +45,12 @@ export const columns: ColumnDef<UserInterface>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+  },
+  {
     accessorKey: "email",
-    header: "Email",
+    header: "ອີເມວ",
   },
   {
     accessorKey: "displayName",
@@ -66,31 +70,30 @@ export const columns: ColumnDef<UserInterface>[] = [
     cell: ({ row }) => {
       const current = row.original;
 
-      const users: UserInterface[] = useUsersStore((state) => state.users);
+      const users: User[] = useUsersStore((state) => state.users);
       const updateUsers = useUsersStore((state) => state.updateUsers);
       const { toast } = useToast();
 
-      const handleDeleteUser = async (props: UserInterface) => {
-        let newUsers: UserInterface[] = [];
+      const handleDeleteUser = async (id: string) => {
+        try {
+          const res = await deleteUser(id);
 
-        // await deleteUsers(props.id).then((res) => {
-        //   if (res.error)
-        //     return toast({
-        //       description: res.message,
-        //     })
+          if (res.error) {
+            throw new Error(res.message);
+          }
 
-        //   users.forEach((user) => {
-        //     if (user.id !== props.id) {
-        //       newUsers = [...newUsers, user]
-        //     }
-        //   })
+          const newUsers = users.filter((user) => user.id !== id);
 
-        //   updateUsers(newUsers)
+          updateUsers(newUsers);
 
-        //   return toast({
-        //     description: 'Delete select user successful',
-        //   })
-        // })
+          toast({
+            description: "Delete select user successful.",
+          });
+        } catch (error) {
+          toast({
+            description: "Failed to delete the selected user.",
+          });
+        }
       };
 
       return (
@@ -110,7 +113,7 @@ export const columns: ColumnDef<UserInterface>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>ແກ້ໄຂຂໍ້ມູນ</DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => handleDeleteUser(current)}
+              onClick={() => handleDeleteUser(current.id)}
               className="text-danger transition-none focus:text-danger"
             >
               ລົບຂໍ້ມູນ

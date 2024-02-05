@@ -47,7 +47,7 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = useState<string>("");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
@@ -58,7 +58,7 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
+    // onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
@@ -69,7 +69,8 @@ export function DataTable<TData, TValue>({
     },
     state: {
       sorting,
-      columnFilters,
+      // columnFilters,
+      globalFilter: columnFilters,
       columnVisibility,
       rowSelection,
     },
@@ -82,10 +83,8 @@ export function DataTable<TData, TValue>({
       <div className="flex w-full justify-between py-4">
         <Input
           placeholder="ຄົ້ນຫາ..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
+          value={columnFilters}
+          onChange={(event) => setColumnFilters(event.target.value)}
           className="w-80"
         />
 
@@ -126,8 +125,12 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  console.log(header);
                   return (
-                    <TableHead key={header.id} className="min-w-[100px]">
+                    <TableHead
+                      key={header.id}
+                      className={header.id === "id" ? "min-w-40" : ""}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -149,10 +152,18 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      <div
+                        className={
+                          cell.id.split("_")[1] === "id"
+                            ? "w-40 overflow-hidden block whitespace-nowrap text-ellipsis h-full"
+                            : ""
+                        }
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>
