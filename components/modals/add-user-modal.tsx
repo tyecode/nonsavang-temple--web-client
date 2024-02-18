@@ -63,7 +63,6 @@ const AddUserModal = () => {
 
       const newUsers = res.data.map((user) => ({
         ...user,
-        displayName: `${user.firstname} ${user.lastname}`,
         created_at: formatDate(user.created_at),
       }))
 

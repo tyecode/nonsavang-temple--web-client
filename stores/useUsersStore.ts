@@ -1,12 +1,18 @@
 import { create } from 'zustand'
 import { User } from '@/types/user'
 
-interface UsersState {
+interface UserState {
   users: User[]
   updateUsers: (users: User[]) => void
 }
 
-export const useUsersStore = create<UsersState>((set) => ({
+export const useUsersStore = create<UserState>((set) => ({
   users: [],
-  updateUsers: (users) => set((state) => ({ users: [...users] })),
+  updateUsers: (users) =>
+    set((state) => ({
+      users: users.map((user, index) => ({
+        ...user,
+        displayName: `${user.firstname} ${user.lastname}`,
+      })),
+    })),
 }))

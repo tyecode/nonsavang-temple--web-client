@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Users } from '@prisma/client'
-import { createUsers, getUsers } from '@/actions/users-actions'
+import { createUser, getUsers } from '@/actions/users-actions'
 import {
   Dialog,
   DialogContent,

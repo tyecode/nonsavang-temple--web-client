@@ -15,7 +15,7 @@ export const getUsers = async () => {
     return {
       data: users,
       error: null,
-      message: `User retrieval was successful.`,
+      message: `Users retrieval was successful.`,
     }
   } catch (error) {
     return {

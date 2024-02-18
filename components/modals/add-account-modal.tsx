@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Accounts, Users } from '@prisma/client'
-import { createUsers, getUsers } from '@/actions/users-actions'
+import { createUser, getUsers } from '@/actions/users-actions'
 import {
   Dialog,
   DialogContent,
@@ -32,7 +31,7 @@ const AddAccountModal = () => {
     const balance = String(formData.get('balance'))
     const remark = String(formData.get('remark'))
 
-    const newAccounts: Accounts = {
+    const newAccounts: any = {
       id: '',
       name: name,
       balance: balance,

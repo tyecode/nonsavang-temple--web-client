@@ -20,6 +20,7 @@ import { useUsersStore } from '@/stores/useUsersStore'
 import { useToast } from '@/components/ui/use-toast'
 import { User } from '@/types/user'
 import { deleteUser } from '@/actions/users-actions'
+import CreateAvatar from '@/lib/create-avatar'
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -48,13 +49,24 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: 'id',
     header: 'ID',
   },
-  {
-    accessorKey: 'email',
-    header: 'ອີເມວ',
-  },
+  // {
+  //   accessorKey: 'no',
+  //   header: 'No.',
+  //   cell: ({ row }) => row.index + 1,
+  // },
   {
     accessorKey: 'displayName',
     header: 'ຊື່ ແລະ ນາມສະກຸນ',
+    cell: ({ row }) => (
+      <span className='flex items-center gap-4'>
+        <CreateAvatar seed={row.original.displayName || ''} />
+        {row.original.displayName}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'email',
+    header: 'ອີເມວ',
   },
   {
     accessorKey: 'role',
