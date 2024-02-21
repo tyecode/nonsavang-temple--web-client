@@ -1,6 +1,5 @@
 'use client'
 
-import { Users } from '@prisma/client'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
 import {
   DropdownMenu,
@@ -10,11 +9,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/use-toast'
-import { deleteUsers } from '@/actions/users-actions'
+// import { deleteUsers } from '@/actions/user-actions'
 import { useAccountsStore } from '@/stores/useAccountsStore'
+import { User } from '@/types/user'
 
 type Props = {
-  user: Users
+  user: User
 }
 
 export const AccountsDropdown = (props: any) => {

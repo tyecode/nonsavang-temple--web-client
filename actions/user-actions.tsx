@@ -1,27 +1,35 @@
 'use server'
 
 import { createClient } from '@supabase/supabase-js'
-import { UserCreationData, UserModificationData } from '@/types/user'
+import { User, UserCreationData, UserModificationData } from '@/types/user'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!
 )
 
-export const getUsers = async () => {
+export const getUser = async (where?: string) => {
   try {
-    const { data: users } = await supabase.from('users').select('*')
+    let query: any = supabase.from('user')
+
+    if (where) {
+      query = query.select('*').eq('id', where)
+    } else {
+      query = query.select('*')
+    }
+
+    const { data } = await query
 
     return {
-      data: users,
+      data,
       error: null,
-      message: `Users retrieval was successful.`,
+      message: `User${where ? '' : 's'} retrieval was successful.`,
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: `Failed to retrieve users. Please try again.`,
+      message: `Failed to retrieve user${where ? '' : 's'}. Please try again.`,
     }
   }
 }
@@ -62,7 +70,7 @@ export const updateUser = async (
 ) => {
   try {
     const { data } = await supabase
-      .from('users')
+      .from('user')
       .update(object)
       .eq('id', where)
       .select()

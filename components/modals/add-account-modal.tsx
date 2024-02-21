@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createUser, getUsers } from '@/actions/users-actions'
+import { createUser, getUser } from '@/actions/user-actions'
 import {
   Dialog,
   DialogContent,

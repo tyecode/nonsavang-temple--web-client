@@ -104,7 +104,7 @@ export function DataTable<TData, TValue>({
               size={'sm'}
               onClick={() => console.log(selectedItems)}
             >
-              ລຶບລາຍການທີ່ເລືອກ
+              {`ລຶບ ${selectedItems.length} ລາຍການ`}
             </Button>
           )}
         </div>
@@ -142,94 +142,94 @@ export function DataTable<TData, TValue>({
           </DropdownMenu>
         </div>
       </div>
-      <div className='overflow-hidden rounded-md border'>
-        <ScrollArea
-          className={
-            table.getRowModel().rows?.length > 6 ? 'h-[64vh]' : 'max-h-[64vh]'
-          }
-        >
-          <Table>
-            <TableHeader className='sticky top-0 bg-background shadow-sm'>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    if (header.id === 'id') return null
+      <ScrollArea
+        className={
+          table.getRowModel().rows?.length > 6
+            ? 'h-[64vh] rounded-md border'
+            : 'max-h-[64vh] rounded-md border'
+        }
+      >
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  if (header.id === 'id') return null
 
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, index) => {
                   return (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
-                    >
-                      {row.getVisibleCells().map((cell) => {
-                        if (cell.id.split('_')[1] === 'id') return null
-
-                        return (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
-                        )
-                      })}
-                    </TableRow>
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
                   )
-                })
-              ) : isPending ? (
-                <>
-                  {[...Array(5)].map((array, index) => (
-                    <TableRow key={index}>
-                      <TableCell></TableCell>
-                      <TableCell className='py-4'>
-                        <Skeleton className='h-5 w-full' />
-                      </TableCell>
-                      <TableCell className='py-4'>
-                        <Skeleton className='h-5 w-full' />
-                      </TableCell>
-                      <TableCell className='py-4'>
-                        <Skeleton className='h-5 w-full' />
-                      </TableCell>
-                      <TableCell className='py-4'>
-                        <Skeleton className='h-5 w-full' />
-                      </TableCell>
-                      <TableCell className='py-4'>
-                        <Skeleton className='h-5 w-full' />
-                      </TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                  ))}
-                </>
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className='h-24 text-center'
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row, index) => {
+                return (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
                   >
-                    ບໍ່ມີຂໍ້ມູນ
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </ScrollArea>
-      </div>
+                    {row.getVisibleCells().map((cell) => {
+                      if (cell.id.split('_')[1] === 'id') return null
+
+                      return (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                )
+              })
+            ) : isPending ? (
+              <>
+                {[...Array(5)].map((array, index) => (
+                  <TableRow key={index}>
+                    <TableCell></TableCell>
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
+                    </TableCell>
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
+                    </TableCell>
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
+                    </TableCell>
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
+                    </TableCell>
+                    <TableCell className='py-4'>
+                      <Skeleton className='h-5 w-full' />
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                ))}
+              </>
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
+                  ບໍ່ມີຂໍ້ມູນ
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </ScrollArea>
       <div className='mt-6'>
         <DataTablePagination table={table} />
       </div>

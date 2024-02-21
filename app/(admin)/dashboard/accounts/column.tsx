@@ -16,10 +16,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useIncomesCategoryStore } from '@/stores/useIncomesCategoryStore'
-import { Accounts } from '@prisma/client'
 import { useUsersStore } from '@/stores/useUsersStore'
 import { useToast } from '@/components/ui/use-toast'
-import { deleteUsers } from '@/actions/users-actions'
+import { deleteUser } from '@/actions/user-actions'
 
 export const columns: ColumnDef<Accounts>[] = [
   {

@@ -3,7 +3,7 @@ import { createAvatar } from '@dicebear/core'
 import { initials } from '@dicebear/collection'
 import Image from 'next/image'
 
-const CreateAvatar = ({ seed }: { seed: string }) => {
+const CreateAvatar = ({ seed, size = 40 }: { seed: string; size?: number }) => {
   const [svg, setSvg] = useState<string>('')
 
   useEffect(() => {
@@ -21,8 +21,10 @@ const CreateAvatar = ({ seed }: { seed: string }) => {
   }, [seed])
 
   return (
-    <div className='aspect-square w-10 overflow-hidden rounded-full bg-red-200'>
-      {svg && <Image src={svg} alt='avatar' width={48} height={48} />}
+    <div
+      className={`aspect-square w-[${size}px] overflow-hidden rounded-full bg-red-200`}
+    >
+      {svg && <Image src={svg} alt='avatar' width={size} height={size} />}
     </div>
   )
 }

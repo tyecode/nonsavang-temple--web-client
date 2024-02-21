@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 
 import { formatDate } from '@/lib/date-format'
-import { getUsers } from '@/actions/users-actions'
+import { getUser } from '@/actions/user-actions'
 
 import { columns } from './column'
 import { DataTable } from '@/components/tables/data-table'
@@ -12,6 +12,7 @@ import { usePendingStore } from '@/stores/usePendingStore'
 import { useUsersStore } from '@/stores/useUsersStore'
 
 import { toast } from '@/components/ui/use-toast'
+import { User } from '@/types/user'
 
 const UsersPage = () => {
   const users = useUsersStore((state) => state.users)
@@ -23,13 +24,13 @@ const UsersPage = () => {
       setPending(true)
 
       try {
-        const res = await getUsers()
+        const res = await getUser()
 
         if (!res.data) {
           throw new Error(res.message)
         }
 
-        const newUsers = res.data.map((user) => ({
+        const newUsers = res.data.map((user: User) => ({
           ...user,
           created_at: formatDate(user.created_at),
         }))

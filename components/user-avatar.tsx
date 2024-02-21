@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   Popover,
@@ -10,39 +10,49 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { IconsCollection } from '@/components/icons/radix-icons-collection'
-import { getAuth } from '@/actions/auth-actions'
+import { getSession, handleLogout } from '@/actions/auth-actions'
 import { useEffect, useState } from 'react'
-// import { getUserOne } from '@/actions/users-actions'
+import { User } from '@/types/user'
+import { getUser } from '@/actions/user-actions'
+import CreateAvatar from '@/lib/create-avatar'
 
 const UserAvatar = () => {
   const router = useRouter()
-  const [user, setUser] = useState<any>()
+  const [user, setUser] = useState<User>()
 
-  // useEffect(() => {
-  //   getAuth()
-  //     .then((res) => res && getUserOne(res.user.id))
-  //     .then((data) => data && setUser(data))
-  // }, [])
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await getSession()
+
+      if (res) {
+        const data = await getUser(res?.user?.id)
+        setUser(data?.data[0])
+      }
+    }
+
+    fetchUser()
+  }, [])
 
   return (
     <Popover>
       <PopoverTrigger>
-        <Avatar className='aspect-square w-10 cursor-pointer'>
-          <AvatarImage src='' alt='user image' />
-          <AvatarFallback>
-            {user?.firstname?.slice(0, 1)}
-            {user?.lastname?.slice(0, 1)}
-          </AvatarFallback>
+        <Avatar className='aspect-square w-10 cursor-pointer bg-gray-200'>
+          {user && (
+            <CreateAvatar
+              seed={`${user?.firstname || ''} ${user?.lastname || ''}`}
+            />
+          )}
         </Avatar>
       </PopoverTrigger>
       <PopoverContent className='flex-center mx-6 my-2 w-80 flex-col gap-4 p-6'>
         <div className='flex-center flex-col gap-4 py-4'>
-          <Avatar className='flex-center h-20 w-20 flex-col'>
-            <AvatarImage src='' alt='user image' />
-            <AvatarFallback className='text-4xl uppercase'>
-              {user?.firstname?.slice(0, 1)}
-              {user?.lastname?.slice(0, 1)}
-            </AvatarFallback>
+          <Avatar className='flex-center h-20 w-20 flex-col bg-gray-200'>
+            {user && (
+              <CreateAvatar
+                seed={`${user?.firstname} ${user?.lastname}`}
+                size={80}
+              />
+            )}
           </Avatar>
           <div className='flex-center flex-col gap-1'>
             <h1 className='text-center text-base font-medium'>
@@ -65,15 +75,14 @@ const UserAvatar = () => {
             </Button>
           </li>
           <li>
-            <form action='/api/logout' method='post'>
-              <Button
-                variant={'ghost'}
-                className='w-full justify-start gap-4 text-sm font-normal'
-              >
-                <IconsCollection icon={'ExitIcon'} />
-                ອອກຈາກລະບົບ
-              </Button>
-            </form>
+            <Button
+              variant={'ghost'}
+              className='w-full justify-start gap-4 text-sm font-normal'
+              onClick={() => handleLogout()}
+            >
+              <IconsCollection icon={'ExitIcon'} />
+              ອອກຈາກລະບົບ
+            </Button>
           </li>
         </ul>
       </PopoverContent>

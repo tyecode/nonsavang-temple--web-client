@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { createUser, getUsers } from '@/actions/users-actions'
+import { createUser, getUser } from '@/actions/user-actions'
 import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
@@ -55,7 +55,7 @@ const AddUserModal = () => {
     }
 
     try {
-      const res = await getUsers()
+      const res = await getUser()
 
       if (!res.data) {
         throw new Error(res.message)

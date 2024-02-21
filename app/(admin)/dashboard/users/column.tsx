@@ -19,7 +19,7 @@ import { useIncomesCategoryStore } from '@/stores/useIncomesCategoryStore'
 import { useUsersStore } from '@/stores/useUsersStore'
 import { useToast } from '@/components/ui/use-toast'
 import { User } from '@/types/user'
-import { deleteUser } from '@/actions/users-actions'
+import { deleteUser } from '@/actions/user-actions'
 import CreateAvatar from '@/lib/create-avatar'
 
 export const columns: ColumnDef<User>[] = [
@@ -31,14 +31,16 @@ export const columns: ColumnDef<User>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value: boolean) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
         aria-label='Select all'
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
         aria-label='Select row'
       />
     ),
@@ -58,10 +60,12 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: 'displayName',
     header: 'ຊື່ ແລະ ນາມສະກຸນ',
     cell: ({ row }) => (
-      <span className='flex items-center gap-4'>
-        <CreateAvatar seed={row.original.displayName || ''} />
+      <div className='flex items-center gap-4'>
+        <div className='min-w-10'>
+          <CreateAvatar seed={row.original.displayName || ''} />
+        </div>
         {row.original.displayName}
-      </span>
+      </div>
     ),
   },
   {
@@ -70,11 +74,11 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: 'role',
-    header: 'Role',
+    header: 'ສິດຜູ້ໃຊ້',
   },
   {
     accessorKey: 'created_at',
-    header: 'Created At',
+    header: 'ສ້າງວັນທີ່',
   },
   {
     id: 'actions',
@@ -120,7 +124,7 @@ export const columns: ColumnDef<User>[] = [
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(current.id)}
             >
-              ຄັດລອກລະຫັດ
+              ຄັດລອກໄອດີ
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>ແກ້ໄຂຂໍ້ມູນ</DropdownMenuItem>

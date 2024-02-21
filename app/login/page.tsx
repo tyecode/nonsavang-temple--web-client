@@ -1,117 +1,54 @@
-import Link from 'next/link'
-import { headers, cookies } from 'next/headers'
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { handleLogin } from '@/actions/auth-actions'
 
 export default function Login({
   searchParams,
 }: {
-  searchParams: { message: string }
+  searchParams: { error: string }
 }) {
-  const signIn = async (formData: FormData) => {
-    'use server'
-
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      return redirect('/login?message=Could not authenticate user')
-    }
-
-    return redirect('/')
-  }
-
-  const signUp = async (formData: FormData) => {
-    'use server'
-
-    const origin = headers().get('origin')
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${origin}/auth/callback`,
-      },
-    })
-
-    if (error) {
-      return redirect('/login?message=Could not authenticate user')
-    }
-
-    return redirect('/login?message=Check email to continue sign in process')
-  }
-
   return (
-    <div className='flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md'>
-      <Link
-        href='/'
-        className='bg-btn-background hover:bg-btn-background-hover group absolute left-8 top-8 flex items-center rounded-md px-4 py-2 text-sm text-foreground no-underline'
-      >
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='24'
-          height='24'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1'
-        >
-          <polyline points='15 18 9 12 15 6' />
-        </svg>{' '}
-        Back
-      </Link>
-
-      <form
-        className='flex w-full flex-1 flex-col justify-center gap-2 text-foreground animate-in'
-        action={signIn}
-      >
-        <label className='text-md' htmlFor='email'>
-          Email
-        </label>
-        <input
-          className='mb-6 rounded-md border bg-inherit px-4 py-2'
-          name='email'
-          placeholder='you@example.com'
-          required
-        />
-        <label className='text-md' htmlFor='password'>
-          Password
-        </label>
-        <input
-          className='mb-6 rounded-md border bg-inherit px-4 py-2'
-          type='password'
-          name='password'
-          placeholder='••••••••'
-          required
-        />
-        <button className='mb-2 rounded-md bg-green-700 px-4 py-2 text-foreground'>
-          Sign In
-        </button>
-        <button
-          formAction={signUp}
-          className='mb-2 rounded-md border border-foreground/20 px-4 py-2 text-foreground'
-        >
-          Sign Up
-        </button>
-        {searchParams?.message && (
-          <p className='mt-4 bg-foreground/10 p-4 text-center text-foreground'>
-            {searchParams.message}
-          </p>
-        )}
+    <div className='absolute left-1/2 top-1/2 w-[25rem] -translate-x-1/2 -translate-y-1/2 p-6'>
+      <form action={handleLogin}>
+        <Card>
+          <CardHeader className='mb-4 space-y-3'>
+            <CardTitle className='text-center text-3xl'>Sign in</CardTitle>
+            <CardDescription className='text-center'>
+              Enter your email and password to login
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='grid gap-4'>
+            <div className='grid gap-2'>
+              <Label htmlFor='email'>Email</Label>
+              <Input name='email' id='email' type='email' required />
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor='password'>Password</Label>
+              <Input name='password' id='password' type='password' required />
+            </div>
+          </CardContent>
+          <CardFooter className='flex flex-col'>
+            <Button className='w-full' type='submit' size={'sm'}>
+              Login
+            </Button>
+          </CardFooter>
+          {searchParams.error && (
+            <p className='py- mb-5 w-full text-center font-noto-lao text-sm text-danger'>
+              {'ອີເມວ ຫລື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ'}
+            </p>
+          )}
+        </Card>
       </form>
     </div>
   )

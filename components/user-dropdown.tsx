@@ -1,6 +1,5 @@
 'use client'
 
-import { Users } from '@prisma/client'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
 import {
   DropdownMenu,
@@ -10,22 +9,23 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/use-toast'
-import { deleteUsers } from '@/actions/users-actions'
+import { deleteUser } from '@/actions/user-actions'
 import { useUsersStore } from '@/stores/useUsersStore'
+import { User } from '@/types/user'
 
 type Props = {
-  user: Users
+  user: User
 }
 
 export const UserDropdown = (props: Props) => {
-  const users: Users[] = useUsersStore((state) => state.users)
+  const users: User[] = useUsersStore((state) => state.users)
   const updateUsers = useUsersStore((state) => state.updateUsers)
   const { toast } = useToast()
 
   const handleDeleteUser = async () => {
-    let newUsers: Users[] = []
+    let newUsers: User[] = []
 
-    await deleteUsers(props.user).then((res) => {
+    await deleteUser(props.user.id).then((res) => {
       if (!res)
         return toast({
           description: 'Could not delete select user',
