@@ -6,13 +6,13 @@ interface UserState {
   updateUsers: (users: User[]) => void
 }
 
-export const useUsersStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>((set) => ({
   users: [],
   updateUsers: (users) =>
     set((state) => ({
       users: users.map((user, index) => ({
         ...user,
-        displayName: `${user.firstname} ${user.lastname}`,
+        display_name: `${user.first_name} ${user.last_name}`,
       })),
     })),
 }))

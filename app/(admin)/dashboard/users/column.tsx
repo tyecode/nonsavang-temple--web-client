@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useIncomesCategoryStore } from '@/stores/useIncomesCategoryStore'
-import { useUsersStore } from '@/stores/useUsersStore'
+import { useUserStore } from '@/stores/useUserStore'
 import { useToast } from '@/components/ui/use-toast'
 import { User } from '@/types/user'
 import { deleteUser } from '@/actions/user-actions'
@@ -51,20 +51,15 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: 'id',
     header: 'ID',
   },
-  // {
-  //   accessorKey: 'no',
-  //   header: 'No.',
-  //   cell: ({ row }) => row.index + 1,
-  // },
   {
-    accessorKey: 'displayName',
+    accessorKey: 'display_name',
     header: 'ຊື່ ແລະ ນາມສະກຸນ',
     cell: ({ row }) => (
       <div className='flex items-center gap-4'>
         <div className='min-w-10'>
-          <CreateAvatar seed={row.original.displayName || ''} />
+          <CreateAvatar seed={row.original.display_name || ''} />
         </div>
-        {row.original.displayName}
+        {row.original.display_name}
       </div>
     ),
   },
@@ -86,8 +81,8 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const current = row.original
 
-      const users: User[] = useUsersStore((state) => state.users)
-      const updateUsers = useUsersStore((state) => state.updateUsers)
+      const users: User[] = useUserStore((state) => state.users)
+      const updateUsers = useUserStore((state) => state.updateUsers)
       const { toast } = useToast()
 
       const handleDeleteUser = async (id: string) => {

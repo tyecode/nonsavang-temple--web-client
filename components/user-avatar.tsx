@@ -39,7 +39,7 @@ const UserAvatar = () => {
         <Avatar className='aspect-square w-10 cursor-pointer bg-gray-200'>
           {user && (
             <CreateAvatar
-              seed={`${user?.firstname || ''} ${user?.lastname || ''}`}
+              seed={`${user?.first_name || ''} ${user?.last_name || ''}`}
             />
           )}
         </Avatar>
@@ -49,14 +49,14 @@ const UserAvatar = () => {
           <Avatar className='flex-center h-20 w-20 flex-col bg-gray-200'>
             {user && (
               <CreateAvatar
-                seed={`${user?.firstname} ${user?.lastname}`}
+                seed={`${user?.first_name} ${user?.last_name}`}
                 size={80}
               />
             )}
           </Avatar>
           <div className='flex-center flex-col gap-1'>
             <h1 className='text-center text-base font-medium'>
-              {user?.firstname} {user?.lastname}
+              {user?.first_name} {user?.last_name}
             </h1>
             <p className='text-sm font-normal lowercase text-foreground/60'>
               {user?.email}

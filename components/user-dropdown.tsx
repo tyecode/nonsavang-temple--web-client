@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/use-toast'
 import { deleteUser } from '@/actions/user-actions'
-import { useUsersStore } from '@/stores/useUsersStore'
+import { useUserStore } from '@/stores/useUserStore'
 import { User } from '@/types/user'
 
 type Props = {
@@ -18,8 +18,8 @@ type Props = {
 }
 
 export const UserDropdown = (props: Props) => {
-  const users: User[] = useUsersStore((state) => state.users)
-  const updateUsers = useUsersStore((state) => state.updateUsers)
+  const users: User[] = useUserStore((state) => state.users)
+  const updateUsers = useUserStore((state) => state.updateUsers)
   const { toast } = useToast()
 
   const handleDeleteUser = async () => {

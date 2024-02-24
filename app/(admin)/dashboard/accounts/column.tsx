@@ -16,11 +16,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useIncomesCategoryStore } from '@/stores/useIncomesCategoryStore'
-import { useUsersStore } from '@/stores/useUsersStore'
+import { useUserStore } from '@/stores/useUserStore'
 import { useToast } from '@/components/ui/use-toast'
 import { deleteUser } from '@/actions/user-actions'
+import { Account } from '@/types/account'
+import { User } from '@/types/user'
 
-export const columns: ColumnDef<Accounts>[] = [
+export const columns: ColumnDef<Account>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -65,14 +67,14 @@ export const columns: ColumnDef<Accounts>[] = [
     cell: ({ row }) => {
       const current = row.original
 
-      const users: UsersInterface[] = useUsersStore((state) => state.users)
-      const updateUsers = useUsersStore((state) => state.updateUsers)
+      const users: User[] = useUserStore((state) => state.users)
+      const updateUsers = useUserStore((state) => state.updateUsers)
       const { toast } = useToast()
 
-      const handleDeleteUser = async (props: UsersInterface) => {
-        let newUsers: UsersInterface[] = []
+      const handleDeleteUser = async (props: User) => {
+        let newUsers: User[] = []
 
-        await deleteUsers(props.id).then((res) => {
+        await deleteUser(props.id).then((res) => {
           if (res.error)
             return toast({
               description: res.message,

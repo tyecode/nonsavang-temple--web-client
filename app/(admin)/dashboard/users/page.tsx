@@ -6,17 +6,17 @@ import { formatDate } from '@/lib/date-format'
 import { getUser } from '@/actions/user-actions'
 
 import { columns } from './column'
-import { DataTable } from '@/components/tables/data-table'
+import { DataTable } from '@/app/(admin)/dashboard/users/data-table'
 
 import { usePendingStore } from '@/stores/usePendingStore'
-import { useUsersStore } from '@/stores/useUsersStore'
+import { useUserStore } from '@/stores/useUserStore'
 
 import { toast } from '@/components/ui/use-toast'
 import { User } from '@/types/user'
 
 const UsersPage = () => {
-  const users = useUsersStore((state) => state.users)
-  const updateUsers = useUsersStore((state) => state.updateUsers)
+  const users = useUserStore((state) => state.users)
+  const updateUsers = useUserStore((state) => state.updateUsers)
   const setPending = usePendingStore((state) => state.setPending)
 
   useEffect(() => {

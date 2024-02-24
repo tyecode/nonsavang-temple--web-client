@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 
 import {
   ColumnDef,
@@ -17,7 +17,7 @@ import {
 
 import AddUserModal from '@/components/modals/add-user-modal'
 import { Button } from '@/components/ui/button'
-import { DataTablePagination } from '@/components/tables/data-table-pagination'
+import { DataTablePagination } from '@/components/data-table-pagination'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -36,7 +36,12 @@ import {
 } from '@/components/ui/table'
 
 import { usePendingStore } from '@/stores/usePendingStore'
-import { ScrollArea } from '../ui/scroll-area'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { User } from '@/types/user'
+import { useUserStore } from '@/stores/useUserStore'
+import { deleteUser } from '@/actions/user-actions'
+import { useToast } from '@/components/ui/use-toast'
+import LoadingButton from '@/components/buttons/loading-button'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -48,11 +53,16 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<string>('')
+  const [globalFilter, setGlobalFilters] = useState<string>('')
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const isPending = usePendingStore((state) => state.isPending)
+  const users = useUserStore((state) => state.users)
+  const updateUsers = useUserStore((state) => state.updateUsers)
+  const { toast } = useToast()
+  const [loading, setLoading] = useState<boolean>(false)
 
   const table = useReactTable({
     data,
@@ -61,26 +71,21 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    // onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    initialState: {
-      // pagination: {
-      //   pageSize: 6,
-      // },
-    },
+    onPaginationChange: setPagination,
     state: {
       sorting,
-      // columnFilters,
-      globalFilter: columnFilters,
+      globalFilter,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   })
 
   useEffect(() => {
-    const selectedItems = table
+    const selectedItems: TData[] = table
       .getRowModel()
       .rows.filter((row) => row.getIsSelected())
       .map((row) => row.original)
@@ -88,24 +93,62 @@ export function DataTable<TData, TValue>({
     setSelectedItems(selectedItems)
   }, [table, rowSelection])
 
+  useEffect(() => {
+    table.toggleAllPageRowsSelected(false)
+  }, [table, pagination])
+
+  const handleDeleteSelected = async (items: User[]) => {
+    setLoading(true)
+
+    try {
+      const res = await Promise.all(items.map((item) => deleteUser(item.id)))
+      const hasError = res.some((r) => r.error)
+
+      if (hasError) {
+        throw new Error(res[0].message)
+      }
+
+      const newUsers = users.filter(
+        (user: User) => !items.some((item) => item.id === user.id)
+      )
+
+      updateUsers(newUsers)
+      toast({
+        description: 'Selected user has been deleted.',
+      })
+    } catch (error) {
+      toast({
+        description: 'Failed to delete selected user.',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div>
       <div className='flex w-full justify-between py-4'>
         <div className='flex gap-4'>
           <Input
             placeholder='ຄົ້ນຫາ...'
-            value={columnFilters}
-            onChange={(event) => setColumnFilters(event.target.value)}
+            value={globalFilter}
+            onChange={(event) => setGlobalFilters(event.target.value)}
             className='w-80'
           />
           {selectedItems.length > 0 && (
-            <Button
-              variant='default'
-              size={'sm'}
-              onClick={() => console.log(selectedItems)}
-            >
-              {`ລຶບ ${selectedItems.length} ລາຍການ`}
-            </Button>
+            <>
+              {!loading ? (
+                <Button
+                  variant='default'
+                  size={'sm'}
+                  onClick={() => handleDeleteSelected(selectedItems as User[])}
+                >
+                  {`ລຶບ ${selectedItems.length} ລາຍການ`}
+                </Button>
+              ) : (
+                <LoadingButton>{`ລຶບ ${selectedItems.length} ລາຍການ`}</LoadingButton>
+              )}
+            </>
           )}
         </div>
 

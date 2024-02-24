@@ -1,19 +1,19 @@
 'use server'
 
 import { createClient } from '@supabase/supabase-js'
-import { User, UserCreationData, UserModificationData } from '@/types/user'
+import { UserCreationData, UserModificationData } from '@/types/user'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!
 )
 
-export const getUser = async (where?: string) => {
+export const getUser = async (id?: string) => {
   try {
     let query: any = supabase.from('user')
 
-    if (where) {
-      query = query.select('*').eq('id', where)
+    if (id) {
+      query = query.select('*').eq('id', id)
     } else {
       query = query.select('*')
     }
@@ -23,19 +23,19 @@ export const getUser = async (where?: string) => {
     return {
       data,
       error: null,
-      message: `User${where ? '' : 's'} retrieval was successful.`,
+      message: `User${id ? '' : 's'} retrieval was successful.`,
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: `Failed to retrieve user${where ? '' : 's'}. Please try again.`,
+      message: `Failed to retrieve user${id ? '' : 's'}. Please try again.`,
     }
   }
 }
 
 export const createUser = async (object: UserCreationData) => {
-  const { email, password, firstname, lastname } = object
+  const { email, password, first_name, last_name } = object
 
   try {
     const {
@@ -44,11 +44,11 @@ export const createUser = async (object: UserCreationData) => {
       email,
       password,
       email_confirm: true,
+      user_metadata: {
+        first_name,
+        last_name,
+      },
     })
-
-    if (user) {
-      await updateUser(user.id, { firstname, lastname })
-    }
 
     return {
       data: user,
@@ -64,15 +64,12 @@ export const createUser = async (object: UserCreationData) => {
   }
 }
 
-export const updateUser = async (
-  where: string,
-  object: UserModificationData
-) => {
+export const updateUser = async (id: string, object: UserModificationData) => {
   try {
     const { data } = await supabase
       .from('user')
       .update(object)
-      .eq('id', where)
+      .eq('id', id)
       .select()
 
     return {
@@ -89,9 +86,9 @@ export const updateUser = async (
   }
 }
 
-export const deleteUser = async (where: string) => {
+export const deleteUser = async (id: string) => {
   try {
-    const { data } = await supabase.auth.admin.deleteUser(where)
+    const { data } = await supabase.auth.admin.deleteUser(id)
 
     return {
       data,

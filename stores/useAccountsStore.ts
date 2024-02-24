@@ -1,12 +1,12 @@
-import { Accounts } from '@prisma/client'
 import { create } from 'zustand'
+import { Account } from '@/types/account'
 
 interface AccountState {
-  accounts: Accounts[]
-  updateAccounts: (accounts: AccountState['accounts']) => void
+  accounts: Account[]
+  updateAccounts: (accounts: Account[]) => void
 }
 
-export const useAccountsStore = create<AccountState>((set) => ({
+export const useAccountStore = create<AccountState>((set) => ({
   accounts: [],
   updateAccounts: (accounts) => set(() => ({ accounts: [...accounts] })),
 }))
