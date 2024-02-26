@@ -2,7 +2,6 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 
 import { Button } from '@/components/ui/button'
@@ -10,12 +9,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
-import { useIncomesCategoryStore } from '@/stores/useIncomesCategoryStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useToast } from '@/components/ui/use-toast'
 import { User } from '@/types/user'
@@ -90,20 +87,21 @@ export const columns: ColumnDef<User>[] = [
           const res = await deleteUser(id)
 
           if (res.error) {
-            throw new Error(res.message)
+            toast({
+              variant: 'destructive',
+              description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນຜູ້ໃຊ້ໄດ້.',
+            })
+            return
           }
 
           const newUsers = users.filter((user) => user.id !== id)
 
           updateUsers(newUsers)
-
           toast({
-            description: 'Delete select user successful.',
+            description: 'ລຶບຂໍ້ມູນຜູ້ໃຊ້ສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          toast({
-            description: 'Failed to delete the selected user.',
-          })
+          console.error('Error deleting user:', error)
         }
       }
 

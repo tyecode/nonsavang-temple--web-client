@@ -22,11 +22,10 @@ import LoadingButton from '@/components/buttons/loading-button'
 import { useUserStore } from '@/stores/useUserStore'
 import { User } from '@/types/user'
 
-const AddUserModal = () => {
+const CreateUserModal = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [isPending, setPending] = useState(false)
+  const [isLoading, setLoading] = useState(false)
 
-  const currentUsers = useUserStore((state) => state.users)
   const updateUsers = useUserStore((state) => state.updateUsers)
 
   const { toast } = useToast()
@@ -37,29 +36,34 @@ const AddUserModal = () => {
     const first_name = String(formData.get('firstname'))
     const last_name = String(formData.get('lastname'))
 
-    setPending(true)
+    setLoading(true)
 
     try {
       const res = await createUser({ email, password, first_name, last_name })
 
       if (res.error) {
-        throw new Error(res.message)
+        toast({
+          variant: 'destructive',
+          description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນຜູ້ໃຊ້ໃໝ່ບໍ່ສຳເລັດ.',
+        })
+        return
       }
 
       toast({
-        description: 'User creation was successful',
+        description: 'ເພີ່ມຂໍ້ມູນຜູ້ໃຊ້ໃໝ່ສຳເລັດແລ້ວ.',
       })
     } catch (error) {
-      toast({
-        description: 'Failed to create new user',
-      })
+      console.error('Failed to create user', error)
     }
 
     try {
       const res = await getUser()
 
-      if (!res.data) {
-        throw new Error(res.message)
+      if (res.error || !res.data) {
+        toast({
+          description: res.message,
+        })
+        return
       }
 
       const newUsers = res.data.map((user: User) => ({
@@ -69,19 +73,17 @@ const AddUserModal = () => {
 
       updateUsers(newUsers)
     } catch (error) {
-      toast({
-        description: 'Failed to fetch users',
-      })
+      console.error('Error fetching users:', error)
     } finally {
-      setPending(false)
+      setLoading(false)
     }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {isPending ? (
-          <LoadingButton />
+        {isLoading ? (
+          <LoadingButton>ເພິ່ມຂໍ້ມູນ</LoadingButton>
         ) : (
           <Button size={'sm'}>ເພິ່ມຂໍ້ມູນ</Button>
         )}
@@ -143,7 +145,7 @@ const AddUserModal = () => {
               className='w-fit'
               onClick={() => setIsOpen(false)}
             >
-              Create user
+              ເພິ່ມຂໍ້ມູນ
             </Button>
           </div>
         </form>
@@ -152,4 +154,4 @@ const AddUserModal = () => {
   )
 }
 
-export default AddUserModal
+export default CreateUserModal

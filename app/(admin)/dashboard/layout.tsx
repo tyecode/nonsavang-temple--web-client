@@ -4,46 +4,78 @@ import LeftBar from '@/components/left-bar'
 import TopBar from '@/components/top-bar'
 import { Toaster } from '@/components/ui/toaster'
 
-const dashboard = [
+export type NavLinkGroup = {
+  id: string
+  links: Link[]
+}
+
+export type Link = {
+  id: string
+  href: string
+  icon?: string
+  title: string
+}
+
+const navLinkGroups: NavLinkGroup[] = [
   {
-    id: 1,
-    title: 'Dashboard',
-    link: '/dashboard/users',
+    id: 'group-1',
+    links: [
+      {
+        id: 'dashboard',
+        title: 'Dashboard',
+        href: '/dashboard/users',
+      },
+    ],
   },
   {
-    id: 2,
-    title: 'ລາຍງານ',
-    link: '/dashboard/reports',
+    id: 'group-2',
+    links: [
+      {
+        id: 'users',
+        title: 'Users',
+        href: '/dashboard/users',
+      },
+      {
+        id: 'donators',
+        title: 'Donators',
+        href: '/dashboard/donators',
+      },
+    ],
   },
   {
-    id: 3,
-    title: 'ຈັດການລາຍຈ່າຍ',
-    link: '/dashboard/expenses',
-  },
-  {
-    id: 4,
-    title: 'ຈັດການລາຍຮັບ',
-    link: '/dashboard/incomes',
-  },
-  {
-    id: 5,
-    title: 'ຈັດການປະເພດລາຍຮັບ',
-    link: '/dashboard/incomes/category',
-  },
-  {
-    id: 6,
-    title: 'ຈັດການບັນຊີ',
-    link: '/dashboard/accounts',
-  },
-  {
-    id: 7,
-    title: 'Users',
-    link: '/dashboard/users',
-  },
-  {
-    id: 8,
-    title: 'Setting',
-    link: '/dashboard/settings',
+    id: 'group-3',
+    links: [
+      {
+        id: 'reports',
+        title: 'ລາຍງານ',
+        href: '/dashboard/reports',
+      },
+      {
+        id: 'expenses',
+        title: 'ຈັດການລາຍຈ່າຍ',
+        href: '/dashboard/expenses',
+      },
+      {
+        id: 'incomes',
+        title: 'ຈັດການລາຍຮັບ',
+        href: '/dashboard/incomes',
+      },
+      {
+        id: 'incomes-category',
+        title: 'ຈັດການປະເພດລາຍຮັບ',
+        href: '/dashboard/incomes/category',
+      },
+      {
+        id: 'accounts',
+        title: 'ຈັດການບັນຊີ',
+        href: '/dashboard/accounts',
+      },
+      {
+        id: 'settings',
+        title: 'Setting',
+        href: '/dashboard/settings',
+      },
+    ],
   },
 ]
 
@@ -51,7 +83,7 @@ const DashboardPageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <aside className='h-full w-[20rem] border bg-background'>
-        <LeftBar navLinks={dashboard} />
+        <LeftBar navLinkGroups={navLinkGroups} />
       </aside>
 
       <main className='flex h-full w-full flex-col'>

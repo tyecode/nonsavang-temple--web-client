@@ -23,7 +23,7 @@ const HomePageLayout = ({ children }: { children: React.ReactNode }) => {
       )} */}
 
       <aside className='h-full w-[18rem] border bg-background'>
-        <LeftBar navLinks={navLinks} />
+        {/* <LeftBar navLinks={navLinks} /> */}
       </aside>
 
       <main className='flex h-full w-full flex-col'>

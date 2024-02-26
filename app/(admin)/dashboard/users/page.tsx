@@ -6,12 +6,11 @@ import { formatDate } from '@/lib/date-format'
 import { getUser } from '@/actions/user-actions'
 
 import { columns } from './column'
-import { DataTable } from '@/app/(admin)/dashboard/users/data-table'
+import { DataTable } from './data-table'
 
 import { usePendingStore } from '@/stores/usePendingStore'
 import { useUserStore } from '@/stores/useUserStore'
 
-import { toast } from '@/components/ui/use-toast'
 import { User } from '@/types/user'
 
 const UsersPage = () => {
@@ -37,8 +36,7 @@ const UsersPage = () => {
 
         updateUsers(newUsers)
       } catch (error) {
-        console.error(error)
-        toast({ description: 'An error occurred while fetching users.' })
+        console.error('Error fetching users:', error)
       } finally {
         setPending(false)
       }

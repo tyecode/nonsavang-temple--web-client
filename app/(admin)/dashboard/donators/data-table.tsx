@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
 import {
   ColumnDef,
   SortingState,
@@ -14,13 +13,15 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
+import { Donator } from '@/types/donator'
 import { User } from '@/types/user'
 
-import { deleteUser } from '@/actions/user-actions'
+import { deleteDonator } from '@/actions/donator-actions'
 
 import { usePendingStore } from '@/stores/usePendingStore'
-import { useUserStore } from '@/stores/useUserStore'
+import { useDonatorStore } from '@/stores/useDonatorStore'
 
+import { CreateDonatorModal } from '@/components/modals/donator'
 import { Button } from '@/components/ui/button'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import {
@@ -40,9 +41,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import CreateUserModal from '@/components/modals/create-user-modal'
-import LoadingButton from '@/components/buttons/loading-button'
 import DataTableSkeleton from '@/components/data-table-skeleton'
+import LoadingButton from '@/components/buttons/loading-button'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -53,17 +53,22 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
+  // State hooks
   const [globalFilter, setGlobalFilters] = useState<string>('')
+  const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  // Store hooks
   const isPending = usePendingStore((state) => state.isPending)
-  const users = useUserStore((state) => state.users)
-  const updateUsers = useUserStore((state) => state.updateUsers)
+  const donators = useDonatorStore((state) => state.donators)
+  const updateDonators = useDonatorStore((state) => state.updateDonators)
+
+  // Toast hook
   const { toast } = useToast()
-  const [loading, setLoading] = useState<boolean>(false)
 
   const table = useReactTable({
     data,
@@ -98,11 +103,11 @@ export function DataTable<TData, TValue>({
     table.toggleAllPageRowsSelected(false)
   }, [table, pagination])
 
-  const handleDeleteSelected = async (items: User[]) => {
-    setLoading(true)
+  const handleDeleteSelected = async (items: Donator[]) => {
+    setIsLoading(true)
 
     try {
-      const res = await Promise.all(items.map((item) => deleteUser(item.id)))
+      const res = await Promise.all(items.map((item) => deleteDonator(item.id)))
       const hasError = res.some((r) => r.error)
 
       if (hasError) {
@@ -113,18 +118,20 @@ export function DataTable<TData, TValue>({
         return
       }
 
-      const newUsers = users.filter(
-        (user: User) => !items.some((item) => item.id === user.id)
+      const newDonators = donators.filter(
+        (donator: Donator) => !items.some((item) => item.id === donator.id)
       )
 
-      updateUsers(newUsers)
+      updateDonators(newDonators)
       toast({
-        description: `ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.`,
+        description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
       })
     } catch (error) {
-      console.error('Error deleting selected users:', error)
+      console.error('Error deleting selected donators:', error)
     } finally {
-      setLoading(false)
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 300)
     }
   }
 
@@ -140,7 +147,7 @@ export function DataTable<TData, TValue>({
           />
           {selectedItems.length > 0 && (
             <>
-              {!loading ? (
+              {!isLoading ? (
                 <Button
                   variant='default'
                   size={'sm'}
@@ -156,7 +163,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         <div className='flex gap-4'>
-          <CreateUserModal />
+          <CreateDonatorModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size={'sm'} className='ml-auto'>
