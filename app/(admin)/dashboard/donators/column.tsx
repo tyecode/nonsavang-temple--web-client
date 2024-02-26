@@ -19,7 +19,6 @@ import { useDonatorStore } from '@/stores/useDonatorStore'
 import { useToast } from '@/components/ui/use-toast'
 import { Donator } from '@/types/donator'
 import { deleteDonator, updateDonator } from '@/actions/donator-actions'
-import { UpdateDonatorModal } from '@/components/modals/donator'
 import {
   Dialog,
   DialogContent,

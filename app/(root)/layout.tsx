@@ -4,10 +4,43 @@ import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { Spinner } from '@nextui-org/react'
-import { navLinks } from '@/constants'
 import LeftBar from '@/components/left-bar'
 import TopBar from '@/components/top-bar'
 import { createClient } from '@/utils/supabase/client'
+import { NavLinkGroup } from '@/types/nav-links'
+
+const navLinkGroups: NavLinkGroup[] = [
+  {
+    id: 'group-1',
+    links: [
+      {
+        id: 'overview',
+        title: 'Overview',
+        href: '/overview',
+      },
+      {
+        id: 'expenses',
+        title: 'Expenses',
+        href: '/expenses',
+      },
+      {
+        id: 'incomes',
+        title: 'Incomes',
+        href: '/incomes',
+      },
+      {
+        id: 'reports',
+        title: 'Reports',
+        href: '/reports',
+      },
+      {
+        id: 'settings',
+        title: 'Settings',
+        href: '/settings',
+      },
+    ],
+  },
+]
 
 const HomePageLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
@@ -23,7 +56,7 @@ const HomePageLayout = ({ children }: { children: React.ReactNode }) => {
       )} */}
 
       <aside className='h-full w-[18rem] border bg-background'>
-        {/* <LeftBar navLinks={navLinks} /> */}
+        <LeftBar navLinkGroups={navLinkGroups} />
       </aside>
 
       <main className='flex h-full w-full flex-col'>
