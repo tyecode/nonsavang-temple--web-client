@@ -3,7 +3,7 @@
 import { useIncomesCategoryStore } from '@/stores/useIncomesCategoryStore'
 import { columns } from './column'
 import { DataTable } from './data-table'
-import { getIncomesCategory } from '@/actions/incomes-category-actions'
+// import { getIncomesCategory } from '@/actions/income-category-actions'
 import { useEffect } from 'react'
 
 export default function AdminIncomesCategory() {
@@ -14,7 +14,7 @@ export default function AdminIncomesCategory() {
   )
 
   useEffect(() => {
-    getIncomesCategory().then((res) => updateCategory(res))
+    // getIncomesCategory().then((res) => updateCategory(res))
   }, [updateCategory])
 
   return (

@@ -4,7 +4,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { IconsCollection } from '@/components/icons/radix-icons-collection'
 import { useRouter } from 'next/navigation'
-import { Link, NavLinkGroup } from '@/types/nav-links'
+import { Link, NavLinkGroup } from '@/types/nav-link'
 
 const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
   const router = useRouter()

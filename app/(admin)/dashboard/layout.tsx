@@ -3,7 +3,7 @@
 import LeftBar from '@/components/left-bar'
 import TopBar from '@/components/top-bar'
 import { Toaster } from '@/components/ui/toaster'
-import { NavLinkGroup } from '@/types/nav-links'
+import { NavLinkGroup } from '@/types/nav-link'
 
 const navLinkGroups: NavLinkGroup[] = [
   {

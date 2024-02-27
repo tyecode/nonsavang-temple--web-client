@@ -1,6 +1,9 @@
 'use server'
 
-import { DonatorCreationData, DonatorModificationData } from '@/types/donator'
+import {
+  CurrencyCreationData,
+  CurrencyModificationData,
+} from '@/types/currency'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -8,9 +11,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!
 )
 
-export const getDonator = async (id?: string) => {
+export const getCurrency = async (id?: string) => {
   try {
-    let query: any = supabase.from('donator')
+    let query: any = supabase.from('currency')
 
     if (id) {
       query = query.select('*').eq('id', id)
@@ -23,42 +26,42 @@ export const getDonator = async (id?: string) => {
     return {
       data,
       error: null,
-      message: `Donator${id ? '' : 's'} retrieval was successful.`,
+      message: `Currency${id ? '' : 's'} retrieval was successful.`,
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: `Failed to retrieve donator${id ? '' : 's'}. Please try again.`,
+      message: `Failed to retrieve currency${id ? '' : 's'}. Please try again.`,
     }
   }
 }
 
-export const createDonator = async (object: DonatorCreationData) => {
+export const createCurrency = async (object: CurrencyCreationData) => {
   try {
-    const { data } = await supabase.from('donator').insert(object).select()
+    const { data } = await supabase.from('currency').insert(object).select()
 
     return {
       data,
       error: null,
-      message: 'Donator was created successfully.',
+      message: 'Currency was created successfully.',
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: 'Failed to create donator. Please try again.',
+      message: 'Failed to create currency. Please try again.',
     }
   }
 }
 
-export const updateDonator = async (
+export const updateCurrency = async (
   id: string,
-  object: DonatorModificationData
+  object: CurrencyModificationData
 ) => {
   try {
     const { data } = await supabase
-      .from('donator')
+      .from('currency')
       .update(object)
       .eq('id', id)
       .select()
@@ -66,21 +69,21 @@ export const updateDonator = async (
     return {
       data,
       error: null,
-      message: 'Donator was updated successfully.',
+      message: 'Currency was updated successfully.',
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: 'Failed to update donator. Please try again.',
+      message: 'Failed to update currency. Please try again.',
     }
   }
 }
 
-export const deleteDonator = async (id: string) => {
+export const deleteCurrency = async (id: string) => {
   try {
     const { data } = await supabase
-      .from('donator')
+      .from('currency')
       .delete()
       .eq('id', id)
       .select()
@@ -88,13 +91,13 @@ export const deleteDonator = async (id: string) => {
     return {
       data,
       error: null,
-      message: 'Donator was deleted successfully.',
+      message: 'Currency was deleted successfully.',
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: 'Failed to delete donator. Please try again.',
+      message: 'Failed to delete currency. Please try again.',
     }
   }
 }

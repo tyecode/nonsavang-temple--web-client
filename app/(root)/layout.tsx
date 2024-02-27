@@ -7,7 +7,7 @@ import { Spinner } from '@nextui-org/react'
 import LeftBar from '@/components/left-bar'
 import TopBar from '@/components/top-bar'
 import { createClient } from '@/utils/supabase/client'
-import { NavLinkGroup } from '@/types/nav-links'
+import { NavLinkGroup } from '@/types/nav-link'
 
 const navLinkGroups: NavLinkGroup[] = [
   {

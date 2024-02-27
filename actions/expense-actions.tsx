@@ -1,6 +1,6 @@
 'use server'
 
-import { DonatorCreationData, DonatorModificationData } from '@/types/donator'
+import { ExpenseCreationData, ExpenseModificationData } from '@/types/expense'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -8,9 +8,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!
 )
 
-export const getDonator = async (id?: string) => {
+export const getExpense = async (id?: string) => {
   try {
-    let query: any = supabase.from('donator')
+    let query: any = supabase.from('expense')
 
     if (id) {
       query = query.select('*').eq('id', id)
@@ -23,42 +23,42 @@ export const getDonator = async (id?: string) => {
     return {
       data,
       error: null,
-      message: `Donator${id ? '' : 's'} retrieval was successful.`,
+      message: `Expense${id ? '' : 's'} retrieval was successful.`,
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: `Failed to retrieve donator${id ? '' : 's'}. Please try again.`,
+      message: `Failed to retrieve expense${id ? '' : 's'}. Please try again.`,
     }
   }
 }
 
-export const createDonator = async (object: DonatorCreationData) => {
+export const createExpense = async (object: ExpenseCreationData) => {
   try {
-    const { data } = await supabase.from('donator').insert(object).select()
+    const { data } = await supabase.from('expense').insert(object).select()
 
     return {
       data,
       error: null,
-      message: 'Donator was created successfully.',
+      message: 'Expense was created successfully.',
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: 'Failed to create donator. Please try again.',
+      message: 'Failed to create expense. Please try again.',
     }
   }
 }
 
-export const updateDonator = async (
+export const updateExpense = async (
   id: string,
-  object: DonatorModificationData
+  object: ExpenseModificationData
 ) => {
   try {
     const { data } = await supabase
-      .from('donator')
+      .from('expense')
       .update(object)
       .eq('id', id)
       .select()
@@ -66,21 +66,21 @@ export const updateDonator = async (
     return {
       data,
       error: null,
-      message: 'Donator was updated successfully.',
+      message: 'Expense was updated successfully.',
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: 'Failed to update donator. Please try again.',
+      message: 'Failed to update expense. Please try again.',
     }
   }
 }
 
-export const deleteDonator = async (id: string) => {
+export const deleteExpense = async (id: string) => {
   try {
     const { data } = await supabase
-      .from('donator')
+      .from('expense')
       .delete()
       .eq('id', id)
       .select()
@@ -88,13 +88,13 @@ export const deleteDonator = async (id: string) => {
     return {
       data,
       error: null,
-      message: 'Donator was deleted successfully.',
+      message: 'Expense was deleted successfully.',
     }
   } catch (error) {
     return {
       data: null,
       error,
-      message: 'Failed to delete donator. Please try again.',
+      message: 'Failed to delete expense. Please try again.',
     }
   }
 }
