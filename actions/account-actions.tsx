@@ -10,7 +10,15 @@ const supabase = createClient(
 
 export const getAccount = async () => {
   try {
-    const { data } = await supabase.from('account').select('*')
+    const { data } = await supabase.from('account').select(`
+    id,
+    user (id, email, first_name, last_name, role),
+    currency (id, code, name, symbol),
+    balance,
+    remark,
+    created_at,
+    updated_at
+    `)
 
     return {
       data,

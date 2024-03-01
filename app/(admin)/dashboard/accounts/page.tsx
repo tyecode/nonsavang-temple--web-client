@@ -1,44 +1,51 @@
 'use client'
 
-import { useEffect, useTransition } from 'react'
-// import { useAccountsStore } from '@/stores/useAccountsStore'
+import { useEffect } from 'react'
+
 import { DataTable } from './data-table'
 import { columns } from './column'
-import {
-  createAccount,
-  deleteAccount,
-  getAccount,
-  updateAccount,
-} from '@/actions/account-actions'
-import { toast } from '@/components/ui/use-toast'
-import { usePendingStore } from '@/stores/usePendingStore'
-import { AccountCreationData, AccountModificationData } from '@/types/account'
-import { Button } from '@/components/ui/button'
+
+import { Account } from '@/types/account'
+
+import { getAccount } from '@/actions/account-actions'
+
+import { usePendingStore, useAccountStore } from '@/stores'
+
+import { formatDate } from '@/lib/date-format'
 
 const AdminAccounts = () => {
-  // const accounts = useAccountsStore((state) => state.accounts)
-  // const updateAccounts = useAccountsStore((state) => state.updateAccounts)
+  const accounts = useAccountStore((state) => state.accounts)
+  const setAccounts = useAccountStore((state) => state.setAccounts)
   const setPending = usePendingStore((state) => state.setPending)
 
-  const handle = async () => {
-    const object: AccountCreationData = {
-      user_id: '5deec04b-928c-4934-a4ae-bfcbae5d3827',
-      name: 'Test Account',
-      balance: 1000000,
-      currency_id: 'cef11010-d3c6-4b5b-9599-9e023878ea6f',
-      remark: 'Test remark',
+  useEffect(() => {
+    const fetchData = async () => {
+      setPending(true)
+
+      try {
+        const res = await getAccount()
+
+        if (res.error || !res.data) return
+
+        const newAccounts = res.data.map((item) => ({
+          ...item,
+          created_at: formatDate(item.created_at),
+          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
+        }))
+
+        setAccounts(newAccounts as unknown as Account[])
+      } catch (error) {
+        console.error('Error fetching accounts', error)
+      } finally {
+        setPending(false)
+      }
     }
-
-    const { data, error, message } = await deleteAccount(
-      '007d09a2-e990-402a-a00c-c706f2d5543e'
-    )
-
-    console.log(data, error, message)
-  }
+    fetchData()
+  }, [setAccounts, setPending])
 
   return (
     <section className='container'>
-      <Button onClick={handle}>Click</Button>
+      <DataTable columns={columns} data={accounts} />
     </section>
   )
 }

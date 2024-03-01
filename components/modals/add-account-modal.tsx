@@ -13,14 +13,14 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { useAccountsStore } from '@/stores/useAccountsStore'
+import { useAccountStore } from '@/stores/useAccountStore'
 import { Textarea } from '../ui/textarea'
 import { CurrencyCombo } from '../combos/currency-combo'
 import { useCurrencyStore } from '@/stores/useCurrencyStore'
 
 const AddAccountModal = () => {
-  const updateAccounts = useAccountsStore((state) => state.updateAccounts)
-  const getAccounts = useAccountsStore((state) => state.accounts)
+  const setAccounts = useAccountStore((state) => state.setAccounts)
+  const accounts = useAccountStore((state) => state.accounts)
   const currency = useCurrencyStore((state) => state.currency)
 
   const [isOpen, setIsOpen] = useState(false)
@@ -39,7 +39,7 @@ const AddAccountModal = () => {
       remark: remark,
     }
 
-    updateAccounts([...getAccounts, newAccounts])
+    setAccounts([...accounts, newAccounts])
 
     return toast({
       description: 'Create new Account successful',

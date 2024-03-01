@@ -3,10 +3,10 @@ import { Account } from '@/types/account'
 
 interface AccountState {
   accounts: Account[]
-  updateAccounts: (accounts: Account[]) => void
+  setAccounts: (state: Account[]) => void
 }
 
 export const useAccountStore = create<AccountState>((set) => ({
   accounts: [],
-  updateAccounts: (accounts) => set(() => ({ accounts: [...accounts] })),
+  setAccounts: (state) => set(() => ({ accounts: state })),
 }))

@@ -239,7 +239,7 @@ export function DataTable<TData, TValue>({
                 )
               })
             ) : isPending ? (
-              <DataTableSkeleton />
+              <DataTableSkeleton columns={columns.length} />
             ) : (
               <TableRow>
                 <TableCell

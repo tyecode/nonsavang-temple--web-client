@@ -1,24 +1,24 @@
+import { Currency } from './currency'
+import { User } from './user'
+
 export type Account = {
   id: string
-  user_id: string
-  name: string
+  user: Omit<User, 'created_at' | 'updated_at'>
   balance: number
-  currency_id: string
-  created_at: Date
-  updated_at?: Date
+  currency: Omit<Currency, 'created_at' | 'updated_at'>
+  created_at: Date | string
+  updated_at?: Date | string
   remark?: string
 }
 
 export type AccountCreationData = {
   user_id: string
-  name: string
   balance: number
   currency_id: string
   remark?: string
 }
 
 export type AccountModificationData = {
-  name?: string
   balance?: number
   updated_at?: Date
   remark?: string
