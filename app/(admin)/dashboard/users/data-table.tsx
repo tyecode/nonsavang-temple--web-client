@@ -16,7 +16,7 @@ import {
 
 import { User } from '@/types/user'
 
-import { deleteUser, getUser } from '@/actions/user-actions'
+import { deleteUser } from '@/actions/user-actions'
 
 import { usePendingStore } from '@/stores/usePendingStore'
 import { useUserStore } from '@/stores/useUserStore'
@@ -43,7 +43,7 @@ import { useToast } from '@/components/ui/use-toast'
 import LoadingButton from '@/components/buttons/loading-button'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { UserCreateModal } from '@/components/modals/user'
-import { formatDate } from '@/lib/date-format'
+import { deleteImage } from '@/actions/image-actions'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -57,12 +57,16 @@ export function DataTable<TData, TValue>({
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilters] = useState<string>('')
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
+
   const [rowSelection, setRowSelection] = useState({})
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
+
   const isPending = usePendingStore((state) => state.isPending)
+  const users = useUserStore((state) => state.users)
   const setUsers = useUserStore((state) => state.setUsers)
   const { toast } = useToast()
+
   const [isLoading, startTransition] = useTransition()
 
   const table = useReactTable({
@@ -112,15 +116,15 @@ export function DataTable<TData, TValue>({
           return
         }
 
-        const users = await getUser()
+        await Promise.all(
+          items.map((item) =>
+            deleteImage(item.image && item.image.split('/').pop())
+          )
+        )
 
-        if (users.error || !users.data) return
-
-        const newUsers = users.data.map((item: User) => ({
-          ...item,
-          created_at: formatDate(item.created_at),
-          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
-        }))
+        const newUsers = users.filter(
+          (user: User) => !items.map((item) => item.id).includes(user.id)
+        )
 
         setUsers(newUsers)
         toast({

@@ -5,8 +5,8 @@ import { ChangeEvent, useState, useTransition } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import { DotsHorizontalIcon, UploadIcon } from '@radix-ui/react-icons'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -227,10 +227,10 @@ export const columns: ColumnDef<User>[] = [
               throw new Error('Image upload failed')
             }
 
-            const data = users.find((user) => user.id === current.id)
+            const user = users.find((user) => user.id === current.id)
 
-            if (data?.image) {
-              const imageName = data.image.split('/').pop()
+            if (user?.image) {
+              const imageName = user.image.split('/').pop()
 
               if (imageName) {
                 await deleteImage(imageName)
@@ -254,6 +254,16 @@ export const columns: ColumnDef<User>[] = [
               description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນຜູ້ໃຊ້ໄດ້.',
             })
             return
+          }
+
+          const user = users.find((user) => user.id === current.id)
+
+          if (user?.image) {
+            const imageName = user.image.split('/').pop()
+
+            if (imageName) {
+              await deleteImage(imageName)
+            }
           }
 
           const newUsers = users.filter((user) => user.id !== id)

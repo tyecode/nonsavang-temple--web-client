@@ -107,6 +107,7 @@ const UserCreateModal = () => {
         console.error('Failed to create user', error)
       } finally {
         setIsOpen(false)
+        form.reset()
       }
     })
   }
@@ -187,7 +188,7 @@ const UserCreateModal = () => {
               )}
             />
 
-            <div className='flex w-full justify-end'>
+            <div className='mt-2 flex w-full justify-end'>
               {!isLoading ? (
                 <Button type='submit' size={'sm'} className='w-fit'>
                   ເພິ່ມຂໍ້ມູນ

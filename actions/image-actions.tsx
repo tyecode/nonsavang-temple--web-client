@@ -32,8 +32,16 @@ export const uploadImage = async (file: File) => {
   }
 }
 
-export const deleteImage = async (key: string) => {
+export const deleteImage = async (key: string | undefined) => {
   const bucket = 'images'
+
+  if (!key) {
+    return {
+      data: null,
+      error: null,
+      message: 'No image to delete.',
+    }
+  }
 
   const { data, error } = await supabase.storage.from(bucket).remove([key])
 
