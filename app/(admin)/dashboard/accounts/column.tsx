@@ -281,6 +281,7 @@ export const columns: ColumnDef<Account>[] = [
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
           <DialogContent className='sm:max-w-[425px]'>
             <DialogHeader>
               <DialogTitle>ແກ້ໄຂຂໍ້ມູນບັນຊີ</DialogTitle>

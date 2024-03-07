@@ -3,14 +3,14 @@ import { User } from '@/types/user'
 
 interface UserState {
   users: User[]
-  updateUsers: (users: User[]) => void
+  setUsers: (state: User[]) => void
 }
 
 export const useUserStore = create<UserState>((set) => ({
   users: [],
-  updateUsers: (users) =>
-    set((state) => ({
-      users: users.map((user, index) => ({
+  setUsers: (state) =>
+    set(() => ({
+      users: state.map((user) => ({
         ...user,
         display_name: `${user.first_name} ${user.last_name}`,
       })),

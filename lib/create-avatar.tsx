@@ -1,9 +1,24 @@
-import { useEffect, useState } from 'react'
-import { createAvatar } from '@dicebear/core'
-import { initials } from '@dicebear/collection'
 import Image from 'next/image'
 
-const CreateAvatar = ({ seed, size = 40 }: { seed: string; size?: number }) => {
+import { useEffect, useState } from 'react'
+
+import { createAvatar } from '@dicebear/core'
+import { initials } from '@dicebear/collection'
+
+interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
+  seed: string
+  src?: string
+  size?: number
+  className?: string
+}
+
+const CreateAvatar = ({
+  seed,
+  src,
+  size = 40,
+  className,
+  ...rest
+}: AvatarProps) => {
   const [svg, setSvg] = useState<string>('')
 
   useEffect(() => {
@@ -20,11 +35,28 @@ const CreateAvatar = ({ seed, size = 40 }: { seed: string; size?: number }) => {
     getAvatar()
   }, [seed])
 
-  return (
+  return src ? (
     <div
-      className={`aspect-square w-[${size}px] overflow-hidden rounded-full bg-red-200`}
+      className={`aspect-square w-[${size.toString()}px] relative overflow-hidden rounded-full ${className}`}
+      {...rest}
     >
-      {svg && <Image src={svg} alt='avatar' width={size} height={size} />}
+      <Image
+        src={src}
+        alt={`avatar-${seed}`}
+        className='object-cover'
+        width={size}
+        height={size}
+        priority
+      />
+    </div>
+  ) : (
+    <div
+      className={`aspect-square w-[${size.toString()}px] overflow-hidden rounded-full ${className}`}
+      {...rest}
+    >
+      {svg && (
+        <Image src={svg} alt={`avatar-${seed}`} width={size} height={size} />
+      )}
     </div>
   )
 }

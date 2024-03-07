@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 
 import {
   ColumnDef,
@@ -16,7 +16,7 @@ import {
 
 import { User } from '@/types/user'
 
-import { deleteUser } from '@/actions/user-actions'
+import { deleteUser, getUser } from '@/actions/user-actions'
 
 import { usePendingStore } from '@/stores/usePendingStore'
 import { useUserStore } from '@/stores/useUserStore'
@@ -40,9 +40,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import CreateUserModal from '@/components/modals/create-user-modal'
 import LoadingButton from '@/components/buttons/loading-button'
 import DataTableSkeleton from '@/components/data-table-skeleton'
+import { UserCreateModal } from '@/components/modals/user'
+import { formatDate } from '@/lib/date-format'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -60,10 +61,9 @@ export function DataTable<TData, TValue>({
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const isPending = usePendingStore((state) => state.isPending)
-  const users = useUserStore((state) => state.users)
-  const updateUsers = useUserStore((state) => state.updateUsers)
+  const setUsers = useUserStore((state) => state.setUsers)
   const { toast } = useToast()
-  const [loading, setLoading] = useState<boolean>(false)
+  const [isLoading, startTransition] = useTransition()
 
   const table = useReactTable({
     data,
@@ -99,33 +99,37 @@ export function DataTable<TData, TValue>({
   }, [table, pagination])
 
   const handleDeleteSelected = async (items: User[]) => {
-    setLoading(true)
+    startTransition(async () => {
+      try {
+        const res = await Promise.all(items.map((item) => deleteUser(item.id)))
+        const hasError = res.some((r) => r.error)
 
-    try {
-      const res = await Promise.all(items.map((item) => deleteUser(item.id)))
-      const hasError = res.some((r) => r.error)
+        if (hasError) {
+          toast({
+            variant: 'destructive',
+            description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນທີ່ເລືອກໄດ້.',
+          })
+          return
+        }
 
-      if (hasError) {
+        const users = await getUser()
+
+        if (users.error || !users.data) return
+
+        const newUsers = users.data.map((item: User) => ({
+          ...item,
+          created_at: formatDate(item.created_at),
+          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
+        }))
+
+        setUsers(newUsers)
         toast({
-          variant: 'destructive',
-          description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນທີ່ເລືອກໄດ້.',
+          description: `ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.`,
         })
-        return
+      } catch (error) {
+        console.error('Error deleting selected users:', error)
       }
-
-      const newUsers = users.filter(
-        (user: User) => !items.some((item) => item.id === user.id)
-      )
-
-      updateUsers(newUsers)
-      toast({
-        description: `ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.`,
-      })
-    } catch (error) {
-      console.error('Error deleting selected users:', error)
-    } finally {
-      setLoading(false)
-    }
+    })
   }
 
   return (
@@ -140,7 +144,7 @@ export function DataTable<TData, TValue>({
           />
           {selectedItems.length > 0 && (
             <>
-              {!loading ? (
+              {!isLoading ? (
                 <Button
                   variant='default'
                   size={'sm'}
@@ -156,7 +160,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         <div className='flex gap-4'>
-          <CreateUserModal />
+          <UserCreateModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size={'sm'} className='ml-auto'>

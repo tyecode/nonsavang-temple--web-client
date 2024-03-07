@@ -120,7 +120,7 @@ export function DataTable<TData, TValue>({
 
         if (accounts.error || !accounts.data) return
 
-        const newAccounts = accounts.data.map((item) => ({
+        const newAccounts = accounts.data.map((item: any) => ({
           ...item,
           created_at: formatDate(item.created_at),
           updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,

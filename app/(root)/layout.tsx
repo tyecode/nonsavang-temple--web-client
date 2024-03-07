@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
 
 import { Spinner } from '@nextui-org/react'
 import LeftBar from '@/components/left-bar'
@@ -43,7 +42,6 @@ const navLinkGroups: NavLinkGroup[] = [
 ]
 
 const HomePageLayout = ({ children }: { children: React.ReactNode }) => {
-  const router = useRouter()
   const supabase = createClient()
   const [isLoading, setLoadingState] = useState(true)
 

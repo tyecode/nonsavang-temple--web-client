@@ -6,8 +6,8 @@ export type User = {
   last_name: string
   display_name?: string
   image?: string
-  created_at: Date
-  updated_at?: Date
+  created_at: Date | string
+  updated_at?: Date | string | null
 }
 
 export type UserCreationData = {
@@ -21,6 +21,6 @@ export type UserModificationData = {
   role?: string
   first_name?: string
   last_name?: string
-  image?: string
-  updated_at?: Date
+  image?: string | null
+  updated_at?: Date | string | null
 }

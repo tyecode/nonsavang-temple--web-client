@@ -1,9 +1,9 @@
 export type NavLinkGroup = {
   id: string
-  links: Link[]
+  links: NavLink[]
 }
 
-export type Link = {
+export type NavLink = {
   id: string
   href: string
   icon?: string

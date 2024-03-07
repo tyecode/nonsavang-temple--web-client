@@ -15,7 +15,7 @@ import { User } from '@/types/user'
 
 const UsersPage = () => {
   const users = useUserStore((state) => state.users)
-  const updateUsers = useUserStore((state) => state.updateUsers)
+  const setUsers = useUserStore((state) => state.setUsers)
   const setPending = usePendingStore((state) => state.setPending)
 
   useEffect(() => {
@@ -29,12 +29,13 @@ const UsersPage = () => {
           throw new Error(res.message)
         }
 
-        const newUsers = res.data.map((user: User) => ({
-          ...user,
-          created_at: formatDate(user.created_at),
+        const newUsers = res.data.map((item: User) => ({
+          ...item,
+          created_at: formatDate(item.created_at),
+          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
         }))
 
-        updateUsers(newUsers)
+        setUsers(newUsers)
       } catch (error) {
         console.error('Error fetching users:', error)
       } finally {
@@ -43,7 +44,7 @@ const UsersPage = () => {
     }
 
     fetchData()
-  }, [updateUsers, setPending])
+  }, [setPending, setUsers])
 
   return (
     <section className='container'>
