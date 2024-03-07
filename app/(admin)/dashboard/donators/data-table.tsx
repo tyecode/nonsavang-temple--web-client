@@ -151,7 +151,9 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant='default'
                   size={'sm'}
-                  onClick={() => handleDeleteSelected(selectedItems as User[])}
+                  onClick={() =>
+                    handleDeleteSelected(selectedItems as Donator[])
+                  }
                 >
                   {`ລຶບ ${selectedItems.length} ລາຍການ`}
                 </Button>
@@ -246,7 +248,7 @@ export function DataTable<TData, TValue>({
                 )
               })
             ) : isPending ? (
-              <DataTableSkeleton />
+              <DataTableSkeleton columns={columns.length} />
             ) : (
               <TableRow>
                 <TableCell

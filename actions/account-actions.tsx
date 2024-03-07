@@ -11,13 +11,13 @@ const supabase = createClient(
 export const getAccount = async () => {
   try {
     const { data } = await supabase.from('account').select(`
-    id,
-    user (id, email, first_name, last_name, role),
-    currency (id, code, name, symbol),
-    balance,
-    remark,
-    created_at,
-    updated_at
+      id,
+      user (id, email, first_name, last_name, role),
+      currency (id, code, name, symbol),
+      balance,
+      remark,
+      created_at,
+      updated_at
     `)
 
     return {
@@ -36,7 +36,15 @@ export const getAccount = async () => {
 
 export const createAccount = async (object: AccountCreationData) => {
   try {
-    const { data } = await supabase.from('account').insert(object).select()
+    const { data } = await supabase.from('account').insert(object).select(`
+      id,
+      user (id, email, first_name, last_name, role),
+      currency (id, code, name, symbol),
+      balance,
+      remark,
+      created_at,
+      updated_at
+  `)
 
     return {
       data,
@@ -57,11 +65,16 @@ export const updateAccount = async (
   object: AccountModificationData
 ) => {
   try {
-    const { data } = await supabase
-      .from('account')
-      .update(object)
-      .eq('id', id)
-      .select()
+    const { data } = await supabase.from('account').update(object).eq('id', id)
+      .select(`
+        id,
+        user (id, email, first_name, last_name, role),
+        currency (id, code, name, symbol),
+        balance,
+        remark,
+        created_at,
+        updated_at
+      `)
 
     return {
       data,

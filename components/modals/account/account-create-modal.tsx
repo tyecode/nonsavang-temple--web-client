@@ -122,13 +122,13 @@ const AccountCreateModal = () => {
 
       if (accounts.error || !accounts.data) return
 
-      const newAccounts = accounts.data.map((item) => ({
+      const newAccounts: any = accounts.data.map((item) => ({
         ...item,
         created_at: formatDate(item.created_at),
         updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
       }))
 
-      setAccounts(newAccounts as unknown as Account[])
+      setAccounts(newAccounts as Account[])
       toast({
         description: 'ເພີ່ມຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
       })
@@ -136,6 +136,7 @@ const AccountCreateModal = () => {
       console.error('Error creating donator:', error)
     } finally {
       setIsOpen(false)
+      form.reset()
     }
   }
 

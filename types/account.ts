@@ -1,5 +1,5 @@
-import { Currency } from './currency'
 import { User } from './user'
+import { Currency } from './currency'
 
 export type Account = {
   id: string

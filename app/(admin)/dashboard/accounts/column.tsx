@@ -11,11 +11,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Account } from '@/types/account'
 import { Currency } from '@/types/currency'
 
-import {
-  deleteAccount,
-  getAccount,
-  updateAccount,
-} from '@/actions/account-actions'
+import { deleteAccount, updateAccount } from '@/actions/account-actions'
 import { getCurrency } from '@/actions/currency-actions'
 
 import { useAccountStore } from '@/stores/useAccountStore'
@@ -141,6 +137,7 @@ export const columns: ColumnDef<Account>[] = [
       const [options, setOptions] = useState<Currency[]>([])
       const [isPending, startTransition] = useTransition()
 
+      const accounts = useAccountStore((state) => state.accounts)
       const setAccounts = useAccountStore((state) => state.setAccounts)
 
       const { toast } = useToast()
@@ -197,19 +194,25 @@ export const columns: ColumnDef<Account>[] = [
               return
             }
 
-            const accounts = await getAccount()
+            const newAccounts = accounts.map((account: Account) => {
+              const updatedAccount: any = res.data?.find(
+                (item) => item.id === account.id
+              )
 
-            if (accounts.error || !accounts.data) return
+              if (updatedAccount) {
+                return {
+                  ...updatedAccount,
+                  created_at: formatDate(updatedAccount.created_at),
+                  updated_at: updatedAccount.updated_at
+                    ? formatDate(updatedAccount.updated_at)
+                    : undefined,
+                }
+              }
 
-            const newAccounts = accounts.data.map((item) => ({
-              ...item,
-              created_at: formatDate(item.created_at),
-              updated_at: item.updated_at
-                ? formatDate(item.updated_at)
-                : undefined,
-            }))
+              return account
+            })
 
-            setAccounts(newAccounts as unknown as Account[])
+            setAccounts(newAccounts as Account[])
             toast({
               description: 'ແກ້ໄຂຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
             })
@@ -233,19 +236,9 @@ export const columns: ColumnDef<Account>[] = [
             return
           }
 
-          const accounts = await getAccount()
+          const newAccounts = accounts.filter((account) => account.id !== id)
 
-          if (accounts.error || !accounts.data) return
-
-          const newAccounts = accounts.data.map((item) => ({
-            ...item,
-            created_at: formatDate(item.created_at),
-            updated_at: item.updated_at
-              ? formatDate(item.updated_at)
-              : undefined,
-          }))
-
-          setAccounts(newAccounts as unknown as Account[])
+          setAccounts(newAccounts)
           toast({
             description: 'ລຶບຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
           })
