@@ -21,12 +21,12 @@ const navLinkGroups: NavLinkGroup[] = [
     links: [
       {
         id: 'users',
-        title: 'Users',
+        title: 'ຈັດການຜູ້ໃຊ້',
         href: '/dashboard/users',
       },
       {
         id: 'donators',
-        title: 'Donators',
+        title: 'ຈັດການຜູ້ບໍລິຈາກ',
         href: '/dashboard/donators',
       },
     ],
@@ -60,9 +60,9 @@ const navLinkGroups: NavLinkGroup[] = [
         href: '/dashboard/accounts',
       },
       {
-        id: 'settings',
-        title: 'Setting',
-        href: '/dashboard/settings',
+        id: 'currencies',
+        title: 'ຈັດການສະກຸນເງິນ',
+        href: '/dashboard/currencies',
       },
     ],
   },

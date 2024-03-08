@@ -1,21 +1,21 @@
-import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/utils/supabase/middleware'
+import { NextMiddleware } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  try {
-    const { supabase, response } = createClient(request)
+import { stackMiddleware } from '@/utils/middlewares/stack-middleware'
+import { supabaseMiddleware } from '@/utils/middlewares/supabase-middleware'
+import { authorizeMiddleware } from '@/utils/middlewares/authorize-middleware'
+import { authenticateMiddleware } from '@/utils/middlewares/authenticate-middleware'
+import { rewriteMiddleware } from './utils/middlewares/rewrite-middleware'
 
-    await supabase.auth.getSession()
+type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware
 
-    return response
-  } catch (e) {
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    })
-  }
-}
+const middlewares: MiddlewareFactory[] = [
+  supabaseMiddleware,
+  authorizeMiddleware,
+  authenticateMiddleware,
+  rewriteMiddleware,
+]
+
+export default stackMiddleware(middlewares)
 
 export const config = {
   matcher: [
