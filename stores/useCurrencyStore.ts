@@ -1,11 +1,12 @@
 import { create } from 'zustand'
+import { Currency } from '@/types/currency'
 
 interface CurrencyState {
-  currency: string
-  updateCurrency: (currency: string) => void
+  currencies: Currency[]
+  setCurrencies: (currency: Currency[]) => void
 }
 
 export const useCurrencyStore = create<CurrencyState>((set) => ({
-  currency: 'lak',
-  updateCurrency: (currency) => set(() => ({ currency: currency })),
+  currencies: [],
+  setCurrencies: (currency) => set(() => ({ currencies: currency })),
 }))

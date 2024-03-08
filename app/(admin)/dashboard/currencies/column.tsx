@@ -1,21 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ColumnDef } from '@tanstack/react-table'
-
-import { Account } from '@/types/account'
-import { Currency } from '@/types/currency'
-
-import { deleteAccount, updateAccount } from '@/actions/account-actions'
-import { getCurrency } from '@/actions/currency-actions'
-
-import { useAccountStore } from '@/stores/useAccountStore'
-import { formatDate } from '@/lib/date-format'
+import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -42,33 +33,31 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/components/ui/use-toast'
 import LoadingButton from '@/components/buttons/loading-button'
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { useToast } from '@/components/ui/use-toast'
+
+import { Currency } from '@/types/currency'
+
+import { deleteCurrency, updateCurrency } from '@/actions/currency-actions'
+import { useCurrencyStore } from '@/stores'
+
+import { formatDate } from '@/lib/date-format'
 
 const formSchema: any = z.object({
-  balance: z
+  code: z
     .string()
-    .nonempty('ປ້ອນຈຳນວນເງິນ.')
-    .regex(/^[-]?\d+$/, {
-      message: 'ຈຳນວນເງິນຕ້ອງເປັນຕົວເລກເທົ່ານັ້ນ.',
+    .min(1, {
+      message: 'ກະລຸນາປ້ອນລະຫັດສະກຸນເງິນ.',
     })
-    .refine((value) => Number(value) >= 0, {
-      message: 'ປ້ອນຈຳນວນເງິນບໍ່ຖືກຕ້ອງ.',
+    .regex(/^[A-Z]{3}$/, {
+      message: 'ລະຫັດສະກຸນເງິນຕ້ອງມີຕົວອັກສອນ 3 ຕົວເທົ່ານັ້ນ.',
     }),
-  currency: z.string(),
-  remark: z.string(),
+  name: z.string().min(1, {
+    message: 'ກະລຸນາປ້ອນສະກຸນເງິນ.',
+  }),
 })
 
-export const columns: ColumnDef<Account>[] = [
+export const columns: ColumnDef<Currency>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -98,28 +87,12 @@ export const columns: ColumnDef<Account>[] = [
     header: 'ID',
   },
   {
-    accessorKey: 'user',
-    header: 'ເຈົ້າຂອງບັນຊີ',
-    cell: ({ row }) => {
-      const current = row.original
-      return current.user
-        ? `${current.user.first_name} ${current.user.last_name}`
-        : ''
-    },
+    accessorKey: 'code',
+    header: 'ລະຫັດ',
   },
   {
-    accessorKey: 'balance',
-    header: 'ຈຳນວນ',
-    cell: ({ row }) => {
-      const current = row.original
-      return current.currency && current.currency.name
-        ? `${current.balance} ${current.currency.name}`
-        : ''
-    },
-  },
-  {
-    accessorKey: 'remark',
-    header: 'ໝາຍເຫດ',
+    accessorKey: 'name',
+    header: 'ຊື່ສະກຸນເງິນ',
   },
   {
     accessorKey: 'created_at',
@@ -134,11 +107,10 @@ export const columns: ColumnDef<Account>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const [isOpen, setIsOpen] = useState(false)
-      const [options, setOptions] = useState<Currency[]>([])
       const [isPending, startTransition] = useTransition()
 
-      const accounts = useAccountStore((state) => state.accounts)
-      const setAccounts = useAccountStore((state) => state.setAccounts)
+      const currencies = useCurrencyStore((state) => state.currencies)
+      const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
 
       const { toast } = useToast()
 
@@ -147,103 +119,79 @@ export const columns: ColumnDef<Account>[] = [
       const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-          balance: current.balance.toString(),
-          currency: current.currency.code,
-          remark: current.remark,
+          code: current.code,
+          name: current.name,
         },
       })
-
-      useEffect(() => {
-        const getCurrencyData = async () => {
-          try {
-            const res = await getCurrency()
-
-            if (res.error || !res.data) return
-
-            const sortedData = res.data.sort(
-              (a: { code: string }, b: { code: string }) =>
-                a.code.localeCompare(b.code)
-            )
-            setOptions(sortedData)
-          } catch (error) {
-            console.error('Error fetching currency:', error)
-          }
-        }
-
-        if (options.length > 0) return
-
-        getCurrencyData()
-      }, [options])
 
       const onSubmit = (values: z.infer<typeof formSchema>) => {
         startTransition(async () => {
           try {
-            const accountData = {
-              balance: current.balance,
-              currency_id: current.currency.id,
-              remark: values.remark,
+            const res = await updateCurrency(current.id, {
+              code: values.code,
+              name: values.name,
               updated_at: new Date(),
-            }
-
-            const res = await updateAccount(current.id, accountData)
+            })
 
             if (res.error || !res.data) {
               toast({
-                description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດແກ້ໄຂຂໍ້ມູນບັນຊີໄດ້.',
+                description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດແກ້ໄຂຂໍ້ມູນສະກຸນເງິນໄດ້.',
               })
               return
             }
 
-            const newAccounts = accounts.map((account: Account) => {
-              const updatedAccount: any = res.data?.find(
-                (item) => item.id === account.id
+            const newCurrencies = currencies.map((currency: Currency) => {
+              const updatedCurrency: Currency = res.data?.find(
+                (item) => item.id === currency.id
               )
 
-              if (updatedAccount) {
+              if (updatedCurrency) {
                 return {
-                  ...updatedAccount,
-                  created_at: formatDate(updatedAccount.created_at),
-                  updated_at: updatedAccount.updated_at
-                    ? formatDate(updatedAccount.updated_at)
+                  ...updatedCurrency,
+                  created_at: formatDate(updatedCurrency.created_at),
+                  updated_at: updatedCurrency.updated_at
+                    ? formatDate(updatedCurrency.updated_at)
                     : undefined,
                 }
               }
 
-              return account
+              return currency
             })
 
-            setAccounts(newAccounts as Account[])
+            setCurrencies(newCurrencies as Currency[])
             toast({
-              description: 'ແກ້ໄຂຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
+              description: 'ແກ້ໄຂຂໍ້ມູນສະກຸນເງິນສຳເລັດແລ້ວ.',
             })
           } catch (error) {
-            console.error('Error updating account:', error)
+            console.error('Error updating currency:', error)
           } finally {
             setIsOpen(false)
           }
         })
       }
 
-      const handleDeleteAccount = async (id: string) => {
+      const handleDeleteCurrency = async (id: string) => {
         try {
-          const res = await deleteAccount(id)
+          const res = await deleteCurrency(id)
 
           if (res.error) {
             toast({
               variant: 'destructive',
-              description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນບັນຊີໄດ້.',
+              description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນສະກຸນເງິນໄດ້.',
             })
             return
           }
 
-          const newAccounts = accounts.filter((account) => account.id !== id)
+          const newCurrencies = currencies.filter(
+            (currency) => currency.id !== id
+          )
 
-          setAccounts(newAccounts)
+          setCurrencies(newCurrencies)
           toast({
-            description: 'ລຶບຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
+            description: 'ລຶບຂໍ້ມູນສະກຸນເງິນສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error deleting account:', error)
+          console.error('Error deleting currency:', error)
         }
       }
 
@@ -267,7 +215,7 @@ export const columns: ColumnDef<Account>[] = [
                 <DropdownMenuItem>ແກ້ໄຂຂໍ້ມູນ</DropdownMenuItem>
               </DialogTrigger>
               <DropdownMenuItem
-                onClick={() => handleDeleteAccount(current.id)}
+                onClick={() => handleDeleteCurrency(current.id)}
                 className='text-danger transition-none focus:text-danger'
               >
                 ລົບຂໍ້ມູນ
@@ -277,75 +225,48 @@ export const columns: ColumnDef<Account>[] = [
 
           <DialogContent className='sm:max-w-[425px]'>
             <DialogHeader>
-              <DialogTitle>ແກ້ໄຂຂໍ້ມູນບັນຊີ</DialogTitle>
+              <DialogTitle>ແກ້ໄຂຂໍ້ມູນສະກຸນເງິນ</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className='grid gap-4 py-4'
+                className='grid gap-2 py-4'
               >
-                <div className='flex gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='balance'
-                    render={({ field }) => (
-                      <FormItem className='flex-1'>
-                        <FormLabel>ຈຳນວນເງິນ</FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name='currency'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ສະກຸນເງິນ</FormLabel>
-                        <Select
-                          disabled={isPending}
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className='w-32' disabled>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {options.map((option, index) => (
-                              <SelectItem
-                                key={`option-${index}`}
-                                value={option.code}
-                              >
-                                {option.code}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
                 <FormField
                   control={form.control}
-                  name='remark'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>ໝາຍເຫດ</FormLabel>
-                      <Textarea className='col-span-3' {...field} />
+                  name='code'
+                  render={({ field: { onChange, value, ...rest } }) => (
+                    <FormItem className='flex-1'>
+                      <FormLabel>ລະຫັດ</FormLabel>
+                      <FormControl>
+                        <Input
+                          onChange={(e) =>
+                            onChange(e.target.value.toUpperCase())
+                          }
+                          value={value.toUpperCase()}
+                          {...rest}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <div className='flex w-full justify-end'>
+                <FormField
+                  control={form.control}
+                  name='name'
+                  render={({ field }) => (
+                    <FormItem className='flex-1'>
+                      <FormLabel>ຊື່ສະກຸນເງິນ</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className='mt-2 flex w-full justify-end'>
                   {!isPending ? (
                     <Button type='submit' size={'sm'} className='w-fit'>
                       ແກ້ໄຂຂໍ້ມູນ

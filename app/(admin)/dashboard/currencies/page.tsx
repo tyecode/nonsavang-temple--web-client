@@ -2,20 +2,17 @@
 
 import { useEffect } from 'react'
 
-import { DataTable } from './data-table'
-import { columns } from './column'
-
-import { Account } from '@/types/account'
-
-import { getAccount } from '@/actions/account-actions'
-
-import { usePendingStore, useAccountStore } from '@/stores'
-
+import { Currency } from '@/types/currency'
+import { getCurrency } from '@/actions/currency-actions'
+import { usePendingStore, useCurrencyStore } from '@/stores'
 import { formatDate } from '@/lib/date-format'
 
-const AdminAccounts = () => {
-  const accounts = useAccountStore((state) => state.accounts)
-  const setAccounts = useAccountStore((state) => state.setAccounts)
+import { columns } from './column'
+import { DataTable } from './data-table'
+
+const AdminCurrencies = () => {
+  const currencies = useCurrencyStore((state) => state.currencies)
+  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
   const setPending = usePendingStore((state) => state.setPending)
 
   useEffect(() => {
@@ -23,17 +20,21 @@ const AdminAccounts = () => {
       setPending(true)
 
       try {
-        const res = await getAccount()
+        const res = await getCurrency()
 
         if (res.error || !res.data) return
 
-        const newAccounts: any = res.data.map((item) => ({
-          ...item,
-          created_at: formatDate(item.created_at),
-          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
-        }))
+        const newCurrencies: Currency[] = res.data.map(
+          (currency: Currency) => ({
+            ...currency,
+            created_at: formatDate(currency.created_at),
+            updated_at: currency.updated_at
+              ? formatDate(currency.updated_at)
+              : undefined,
+          })
+        )
 
-        setAccounts(newAccounts as Account[])
+        setCurrencies(newCurrencies)
       } catch (error) {
         console.error('Error fetching accounts', error)
       } finally {
@@ -41,13 +42,13 @@ const AdminAccounts = () => {
       }
     }
     fetchData()
-  }, [setAccounts, setPending])
+  }, [setCurrencies, setPending])
 
   return (
     <section className='container'>
-      <DataTable columns={columns} data={accounts} />
+      <DataTable columns={columns} data={currencies} />
     </section>
   )
 }
 
-export default AdminAccounts
+export default AdminCurrencies

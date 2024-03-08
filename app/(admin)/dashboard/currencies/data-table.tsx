@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
-
 import {
   ColumnDef,
   SortingState,
@@ -14,14 +13,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { Account } from '@/types/account'
-
-import { usePendingStore, useAccountStore } from '@/stores'
-
-import { deleteAccount, getAccount } from '@/actions/account-actions'
-
-import { AccountCreateModal } from '@/components/modals/account'
 import { Button } from '@/components/ui/button'
+import { CurrencyCreateModal } from '@/components/modals/currency'
+import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import {
   DropdownMenu,
@@ -30,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import LoadingButton from '@/components/buttons/loading-button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Table,
@@ -40,10 +35,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import DataTableSkeleton from '@/components/data-table-skeleton'
-import LoadingButton from '@/components/buttons/loading-button'
 
-import { formatDate } from '@/lib/date-format'
+import { Currency } from '@/types/currency'
+import { deleteCurrency } from '@/actions/currency-actions'
+import { usePendingStore, useCurrencyStore } from '@/stores'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -63,7 +58,8 @@ export function DataTable<TData, TValue>({
   const [isLoading, startTransition] = useTransition()
 
   const isPending = usePendingStore((state) => state.isPending)
-  const setAccounts = useAccountStore((state) => state.setAccounts)
+  const currencies = useCurrencyStore((state) => state.currencies)
+  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
 
   const { toast } = useToast()
 
@@ -100,11 +96,11 @@ export function DataTable<TData, TValue>({
     table.toggleAllPageRowsSelected(false)
   }, [table, pagination])
 
-  const handleDeleteSelected = async (items: Account[]) => {
+  const handleDeleteSelected = async (items: Currency[]) => {
     startTransition(async () => {
       try {
         const res = await Promise.all(
-          items.map((item) => deleteAccount(item.id))
+          items.map((item) => deleteCurrency(item.id))
         )
         const hasError = res.some((r) => r.error)
 
@@ -116,22 +112,16 @@ export function DataTable<TData, TValue>({
           return
         }
 
-        const accounts = await getAccount()
+        const newCurrencies = currencies.filter(
+          (currency: Currency) => !items.some((item) => item.id === currency.id)
+        )
 
-        if (accounts.error || !accounts.data) return
-
-        const newAccounts = accounts.data.map((item: any) => ({
-          ...item,
-          created_at: formatDate(item.created_at),
-          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
-        }))
-
-        setAccounts(newAccounts as unknown as Account[])
+        setCurrencies(newCurrencies)
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected accounts:', error)
+        console.error('Error deleting selected currencies:', error)
       }
     })
   }
@@ -153,7 +143,7 @@ export function DataTable<TData, TValue>({
                   variant='default'
                   size={'sm'}
                   onClick={() =>
-                    handleDeleteSelected(selectedItems as Account[])
+                    handleDeleteSelected(selectedItems as Currency[])
                   }
                 >
                   {`ລຶບ ${selectedItems.length} ລາຍການ`}
@@ -166,7 +156,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         <div className='flex gap-4'>
-          <AccountCreateModal />
+          <CurrencyCreateModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size={'sm'} className='ml-auto'>
