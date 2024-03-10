@@ -40,7 +40,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import LoadingButton from '@/components/buttons/loading-button'
+import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { UserCreateModal } from '@/components/modals/user'
 import { deleteImage } from '@/actions/image-actions'

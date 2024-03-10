@@ -41,7 +41,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import LoadingButton from '@/components/buttons/loading-button'
+import { LoadingButton } from '@/components/buttons'
 
 import { toast } from '@/components/ui/use-toast'
 

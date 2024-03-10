@@ -51,7 +51,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
-import LoadingButton from '@/components/buttons/loading-button'
+import { LoadingButton } from '@/components/buttons'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
 const formSchema: any = z.object({

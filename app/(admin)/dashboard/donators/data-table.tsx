@@ -42,7 +42,7 @@ import {
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
 import DataTableSkeleton from '@/components/data-table-skeleton'
-import LoadingButton from '@/components/buttons/loading-button'
+import { LoadingButton } from '@/components/buttons'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

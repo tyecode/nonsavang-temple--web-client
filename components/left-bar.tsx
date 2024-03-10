@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 import { Button } from '@/components/ui/button'
 import { IconsCollection } from '@/components/icons/radix-icons-collection'
@@ -30,13 +31,19 @@ const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
   )
 
   return (
-    <nav className='px-8'>
-      <Link href='/'>
-        <h1 className='cursor-pointer px-4 py-6 font-nunito text-2xl font-bold text-foreground'>
-          Abbeyard
-        </h1>
-      </Link>
-      <ul className='flex flex-col border-t py-4 font-noto-lao'>
+    <nav>
+      <div className='flex-center w-full p-4'>
+        <Link href='/'>
+          <Image
+            src={'/logo.png'}
+            alt={'logo'}
+            width={80}
+            height={80}
+            className='object-cover'
+          />
+        </Link>
+      </div>
+      <ul className='flex flex-col px-6 py-4 font-noto-lao'>
         {navLinkGroups.map((group: NavLinkGroup, index: number) => (
           <React.Fragment key={`group-${group.id}`}>
             {group.links.map((link: NavLink) => (

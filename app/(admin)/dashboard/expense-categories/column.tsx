@@ -35,7 +35,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-import LoadingButton from '@/components/buttons/loading-button'
+import { LoadingButton } from '@/components/buttons'
 import { useToast } from '@/components/ui/use-toast'
 
 import { formatDate } from '@/lib/date-format'

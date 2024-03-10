@@ -34,7 +34,7 @@ import {
 
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
-import LoadingButton from '@/components/buttons/loading-button'
+import { LoadingButton } from '@/components/buttons'
 import { useToast } from '@/components/ui/use-toast'
 
 import { useExpenseCategoryStore, usePendingStore } from '@/stores'

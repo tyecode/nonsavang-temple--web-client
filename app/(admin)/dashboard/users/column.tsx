@@ -46,7 +46,7 @@ import { User } from '@/types/user'
 import { deleteUser, updateUser } from '@/actions/user-actions'
 import { uploadImage, deleteImage } from '@/actions/image-actions'
 import CreateAvatar from '@/lib/create-avatar'
-import LoadingButton from '@/components/buttons/loading-button'
+import { LoadingButton } from '@/components/buttons'
 import { formatDate } from '@/lib/date-format'
 
 const formSchema: any = z.object({

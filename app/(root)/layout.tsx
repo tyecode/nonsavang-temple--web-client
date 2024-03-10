@@ -14,28 +14,43 @@ const navLinkGroups: NavLinkGroup[] = [
     links: [
       {
         id: 'overview',
-        title: 'Overview',
+        title: 'ພາບລວມ',
         href: '/overview',
       },
       {
-        id: 'expenses',
-        title: 'Expenses',
-        href: '/expenses',
+        id: 'reports',
+        title: 'ລາຍງານ',
+        href: '/reports',
+      },
+    ],
+  },
+  {
+    id: 'group-2',
+    links: [
+      {
+        id: 'users',
+        title: 'ຜູ້ໃຊ້',
+        href: '/users',
       },
       {
+        id: 'donators',
+        title: 'ຜູ້ບໍລິຈາກ',
+        href: '/donators',
+      },
+    ],
+  },
+  {
+    id: 'group-3',
+    links: [
+      {
         id: 'incomes',
-        title: 'Incomes',
+        title: 'ລາຍຮັບ',
         href: '/incomes',
       },
       {
-        id: 'reports',
-        title: 'Reports',
-        href: '/reports',
-      },
-      {
-        id: 'settings',
-        title: 'Settings',
-        href: '/settings',
+        id: 'expenses',
+        title: 'ລາຍຈ່າຍ',
+        href: '/expenses',
       },
     ],
   },

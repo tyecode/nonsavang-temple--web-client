@@ -3,13 +3,12 @@ import { ThemeProvider } from '@/components/providers/theme-provider'
 import './globals.css'
 
 export const metadata = {
-  metadataBase: new URL('https://localhost:3000/'),
-  title: 'Abbeyard',
-  description: 'The fastest and easiest way to manage your ledger',
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL,
+  title: 'ວັດໂນນສະຫວ່າງ | Nonsavang Temple',
+  description: 'ເວັບໄຊຈັດການລາຍຮັບ-ລາຍຈ່າຍວັດໂນນສະຫວ່າງ',
   alternates: {
     canonical: '/',
     languages: {
-      'en-US': '/en-US',
       'lo-LA': '/lo-LA',
     },
   },

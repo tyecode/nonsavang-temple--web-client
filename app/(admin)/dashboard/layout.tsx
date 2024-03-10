@@ -3,6 +3,7 @@
 import LeftBar from '@/components/left-bar'
 import TopBar from '@/components/top-bar'
 import { Toaster } from '@/components/ui/toaster'
+
 import { NavLinkGroup } from '@/types/nav-link'
 
 const navLinkGroups: NavLinkGroup[] = [
@@ -10,9 +11,14 @@ const navLinkGroups: NavLinkGroup[] = [
     id: 'group-1',
     links: [
       {
-        id: 'dashboard',
-        title: 'Dashboard',
-        href: '/dashboard/users',
+        id: 'overview',
+        title: 'ພາບລວມ',
+        href: '/dashboard/overview',
+      },
+      {
+        id: 'reports',
+        title: 'ລາຍງານ',
+        href: '/dashboard/reports',
       },
     ],
   },
@@ -35,19 +41,14 @@ const navLinkGroups: NavLinkGroup[] = [
     id: 'group-3',
     links: [
       {
-        id: 'reports',
-        title: 'ລາຍງານ',
-        href: '/dashboard/reports',
+        id: 'incomes',
+        title: 'ຈັດການລາຍຮັບ',
+        href: '/dashboard/incomes',
       },
       {
         id: 'expenses',
         title: 'ຈັດການລາຍຈ່າຍ',
         href: '/dashboard/expenses',
-      },
-      {
-        id: 'incomes',
-        title: 'ຈັດການລາຍຮັບ',
-        href: '/dashboard/incomes',
       },
       {
         id: 'income-categories',
