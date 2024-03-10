@@ -45,7 +45,7 @@ import {
   updateExpenseCategory,
 } from '@/actions/expense-category-actions'
 
-import { useExpenseCategoryStore } from '@/stores/useExpenseCategoryStore'
+import { useExpenseCategoryStore } from '@/stores'
 
 import { Category } from '@/types/category'
 
@@ -220,7 +220,7 @@ export const columns: ColumnDef<Category>[] = [
 
           <DialogContent className='sm:max-w-[425px]'>
             <DialogHeader>
-              <DialogTitle>ແກ້ໄຂຂໍ້ມູນສະກຸນເງິນ</DialogTitle>
+              <DialogTitle>ແກ້ໄຂຂໍ້ມູນປະເພດລາຍຈ່າຍ</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form
@@ -232,7 +232,7 @@ export const columns: ColumnDef<Category>[] = [
                   name='name'
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ຊື່ສະກຸນເງິນ</FormLabel>
+                      <FormLabel>ຊື່ປະເພດລາຍຈ່າຍ</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>

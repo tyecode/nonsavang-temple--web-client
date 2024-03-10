@@ -29,18 +29,18 @@ import { useToast } from '@/components/ui/use-toast'
 
 import { formatDate } from '@/lib/date-format'
 
-import { useExpenseCategoryStore } from '@/stores'
+import { useIncomeCategoryStore } from '@/stores'
 
 import { Category } from '@/types/category'
 
 import {
-  createExpenseCategory,
-  getExpenseCategory,
-} from '@/actions/expense-category-actions'
+  createIncomeCategory,
+  getIncomeCategory,
+} from '@/actions/income-category-actions'
 
 const formSchema: any = z.object({
   name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນປະເພດລາຍຈ່າຍ.',
+    message: 'ກະລຸນາປ້ອນປະເພດລາຍຮັບ.',
   }),
 })
 
@@ -48,7 +48,7 @@ const CategoryCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, startTransition] = useTransition()
 
-  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
+  const setCategories = useIncomeCategoryStore((state) => state.setCategories)
 
   const { toast } = useToast()
 
@@ -62,19 +62,19 @@ const CategoryCreateModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
       try {
-        const res = await createExpenseCategory({
+        const res = await createIncomeCategory({
           name: values.name,
         })
 
         if (res.error || !res.data) {
           toast({
             variant: 'destructive',
-            description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນປະເພດລາຍຈ່າຍບໍ່ສຳເລັດ.',
+            description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນປະເພດລາຍຮັບບໍ່ສຳເລັດ.',
           })
           return
         }
 
-        const categories = await getExpenseCategory()
+        const categories = await getIncomeCategory()
 
         if (categories.error || !categories.data) return
 
@@ -88,10 +88,10 @@ const CategoryCreateModal = () => {
 
         setCategories(newCategories)
         toast({
-          description: 'ເພີ່ມຂໍ້ມູນປະເພດລາຍຈ່າຍສຳເລັດແລ້ວ.',
+          description: 'ເພີ່ມຂໍ້ມູນປະເພດລາຍຮັບສຳເລັດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Failed to create expense category', error)
+        console.error('Failed to create income category', error)
       } finally {
         setIsOpen(false)
         form.reset()
@@ -110,7 +110,7 @@ const CategoryCreateModal = () => {
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>ເພິ່ມຂໍ້ມູນປະເພດລາຍຈ່າຍ</DialogTitle>
+          <DialogTitle>ເພິ່ມຂໍ້ມູນປະເພດລາຍຮັບ</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -122,7 +122,7 @@ const CategoryCreateModal = () => {
               name='name'
               render={({ field }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ຊື່ປະເພດລາຍຈ່າຍ</FormLabel>
+                  <FormLabel>ຊື່ປະເພດລາຍຮັບ</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

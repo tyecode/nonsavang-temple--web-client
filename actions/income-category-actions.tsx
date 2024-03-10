@@ -1,6 +1,9 @@
 'use server'
 
-import { CategoryCreationData } from '@/types/category'
+import {
+  CategoryCreationData,
+  CategoryModificationData,
+} from '@/types/category'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -57,7 +60,7 @@ export const createIncomeCategory = async (object: CategoryCreationData) => {
 
 export const updateIncomeCategory = async (
   id: string,
-  object: CategoryCreationData
+  object: CategoryModificationData
 ) => {
   try {
     const { data } = await supabase

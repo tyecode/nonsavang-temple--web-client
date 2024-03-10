@@ -35,15 +35,14 @@ import {
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import LoadingButton from '@/components/buttons/loading-button'
-import CategoryCreateModal from '@/components/modals/expense-category/category-create-modal'
 import { useToast } from '@/components/ui/use-toast'
 
-import { usePendingStore } from '@/stores'
-import { useExpenseCategoryStore } from '@/stores/useExpenseCategoryStore'
+import { useExpenseCategoryStore, usePendingStore } from '@/stores'
 
 import { deleteExpenseCategory } from '@/actions/expense-category-actions'
 
 import { Category } from '@/types/category'
+import { CategoryCreateModal } from '@/components/modals/expense-category'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

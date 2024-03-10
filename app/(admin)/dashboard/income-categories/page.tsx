@@ -2,18 +2,20 @@
 
 import { useEffect } from 'react'
 
-import { usePendingStore } from '@/stores'
 import { formatDate } from '@/lib/date-format'
+
+import { useIncomeCategoryStore, usePendingStore } from '@/stores'
+
+import { getIncomeCategory } from '@/actions/income-category-actions'
+
+import { Category } from '@/types/category'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
-import { useExpenseCategoryStore } from '@/stores/useExpenseCategoryStore'
-import { getExpenseCategory } from '@/actions/expense-category-actions'
-import { Category } from '@/types/category'
 
-const AdminExpenseCategory = () => {
-  const categories = useExpenseCategoryStore((state) => state.categories)
-  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
+const AdminIncomeCategory = () => {
+  const categories = useIncomeCategoryStore((state) => state.categories)
+  const setCategories = useIncomeCategoryStore((state) => state.setCategories)
   const setPending = usePendingStore((state) => state.setPending)
 
   useEffect(() => {
@@ -21,7 +23,7 @@ const AdminExpenseCategory = () => {
       setPending(true)
 
       try {
-        const res = await getExpenseCategory()
+        const res = await getIncomeCategory()
 
         if (res.error || !res.data) return
 
@@ -37,7 +39,7 @@ const AdminExpenseCategory = () => {
 
         setCategories(newCategories)
       } catch (error) {
-        console.error('Error fetching expense category', error)
+        console.error('Error fetching income category', error)
       } finally {
         setPending(false)
       }
@@ -52,4 +54,4 @@ const AdminExpenseCategory = () => {
   )
 }
 
-export default AdminExpenseCategory
+export default AdminIncomeCategory

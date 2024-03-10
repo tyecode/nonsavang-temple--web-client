@@ -35,23 +35,21 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-import LoadingButton from '@/components/buttons/loading-button'
+import { LoadingButton } from '@/components/buttons'
 import { useToast } from '@/components/ui/use-toast'
 
 import { formatDate } from '@/lib/date-format'
 
-import {
-  deleteExpenseCategory,
-  updateExpenseCategory,
-} from '@/actions/expense-category-actions'
-
-import { useExpenseCategoryStore } from '@/stores/useExpenseCategoryStore'
-
 import { Category } from '@/types/category'
+import { useIncomeCategoryStore } from '@/stores'
+import {
+  deleteIncomeCategory,
+  updateIncomeCategory,
+} from '@/actions/income-category-actions'
 
 const formSchema: any = z.object({
   name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນປະເພດລາຍຈ່າຍ.',
+    message: 'ກະລຸນາປ້ອນປະເພດລາຍຮັບ.',
   }),
 })
 
@@ -86,7 +84,7 @@ export const columns: ColumnDef<Category>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'ຊື່ປະເພດລາຍຈ່າຍ',
+    header: 'ຊື່ປະເພດລາຍຮັບ',
   },
   {
     accessorKey: 'created_at',
@@ -103,8 +101,8 @@ export const columns: ColumnDef<Category>[] = [
       const [isOpen, setIsOpen] = useState(false)
       const [isPending, startTransition] = useTransition()
 
-      const categories = useExpenseCategoryStore((state) => state.categories)
-      const setCategories = useExpenseCategoryStore(
+      const categories = useIncomeCategoryStore((state) => state.categories)
+      const setCategories = useIncomeCategoryStore(
         (state) => state.setCategories
       )
 
@@ -122,7 +120,7 @@ export const columns: ColumnDef<Category>[] = [
       const onSubmit = (values: z.infer<typeof formSchema>) => {
         startTransition(async () => {
           try {
-            const res = await updateExpenseCategory(current.id, {
+            const res = await updateIncomeCategory(current.id, {
               name: values.name,
               updated_at: new Date(),
             })
@@ -130,7 +128,7 @@ export const columns: ColumnDef<Category>[] = [
             if (res.error || !res.data) {
               toast({
                 variant: 'destructive',
-                description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດແກ້ໄຂຂໍ້ມູນປະເພດລາຍຈ່າຍໄດ້.',
+                description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດແກ້ໄຂຂໍ້ມູນປະເພດລາຍຮັບໄດ້.',
               })
               return
             }
@@ -155,10 +153,10 @@ export const columns: ColumnDef<Category>[] = [
 
             setCategories(newCategories)
             toast({
-              description: 'ແກ້ໄຂຂໍ້ມູນປະເພດລາຍຈ່າຍສຳເລັດແລ້ວ.',
+              description: 'ແກ້ໄຂຂໍ້ມູນປະເພດລາຍຮັບສຳເລັດແລ້ວ.',
             })
           } catch (error) {
-            console.error('Error updating expense category:', error)
+            console.error('Error updating income category:', error)
           } finally {
             setIsOpen(false)
           }
@@ -167,12 +165,12 @@ export const columns: ColumnDef<Category>[] = [
 
       const handleDeleteCategory = async (id: string) => {
         try {
-          const res = await deleteExpenseCategory(id)
+          const res = await deleteIncomeCategory(id)
 
           if (res.error || !res.data) {
             toast({
               variant: 'destructive',
-              description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນປະເພດລາຍຈ່າຍໄດ້.',
+              description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນປະເພດລາຍຮັບໄດ້.',
             })
             return
           }
@@ -183,10 +181,10 @@ export const columns: ColumnDef<Category>[] = [
 
           setCategories(newCategories)
           toast({
-            description: 'ລຶບຂໍ້ມູນປະເພດລາຍຈ່າຍສຳເລັດແລ້ວ.',
+            description: 'ລຶບຂໍ້ມູນປະເພດລາຍຮັບສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error deleting expense category:', error)
+          console.error('Error deleting income category:', error)
         }
       }
 
@@ -220,7 +218,7 @@ export const columns: ColumnDef<Category>[] = [
 
           <DialogContent className='sm:max-w-[425px]'>
             <DialogHeader>
-              <DialogTitle>ແກ້ໄຂຂໍ້ມູນສະກຸນເງິນ</DialogTitle>
+              <DialogTitle>ແກ້ໄຂຂໍ້ມູນປະເພດລາຍຮັບ</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form
@@ -232,7 +230,7 @@ export const columns: ColumnDef<Category>[] = [
                   name='name'
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ຊື່ສະກຸນເງິນ</FormLabel>
+                      <FormLabel>ຊື່ປະເພດລາຍຮັບ</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>

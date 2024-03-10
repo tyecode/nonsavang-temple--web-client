@@ -34,16 +34,14 @@ import {
 
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
-import LoadingButton from '@/components/buttons/loading-button'
-import CategoryCreateModal from '@/components/modals/expense-category/category-create-modal'
+import { LoadingButton } from '@/components/buttons'
+import { CategoryCreateModal } from '@/components/modals/income-category'
 import { useToast } from '@/components/ui/use-toast'
 
-import { usePendingStore } from '@/stores'
-import { useExpenseCategoryStore } from '@/stores/useExpenseCategoryStore'
-
-import { deleteExpenseCategory } from '@/actions/expense-category-actions'
+import { useIncomeCategoryStore, usePendingStore } from '@/stores'
 
 import { Category } from '@/types/category'
+import { deleteIncomeCategory } from '@/actions/income-category-actions'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -63,8 +61,8 @@ export function DataTable<TData, TValue>({
   const [isLoading, startTransition] = useTransition()
 
   const isPending = usePendingStore((state) => state.isPending)
-  const categories = useExpenseCategoryStore((state) => state.categories)
-  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
+  const categories = useIncomeCategoryStore((state) => state.categories)
+  const setCategories = useIncomeCategoryStore((state) => state.setCategories)
 
   const { toast } = useToast()
 
@@ -105,7 +103,7 @@ export function DataTable<TData, TValue>({
     startTransition(async () => {
       try {
         const res = await Promise.all(
-          items.map((item) => deleteExpenseCategory(item.id))
+          items.map((item) => deleteIncomeCategory(item.id))
         )
         const hasError = res.some((r) => r.error)
 
@@ -126,7 +124,7 @@ export function DataTable<TData, TValue>({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected expense categories:', error)
+        console.error('Error deleting selected income categories:', error)
       }
     })
   }
