@@ -14,15 +14,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { Account } from '@/types/account'
-
-import { usePendingStore, useAccountStore } from '@/stores'
-
-import { deleteAccount, getAccount } from '@/actions/account-actions'
-
-import { AccountCreateModal } from '@/components/modals/account'
 import { Button } from '@/components/ui/button'
-import { DataTablePagination } from '@/components/data-table-pagination'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -39,11 +31,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useToast } from '@/components/ui/use-toast'
-import DataTableSkeleton from '@/components/data-table-skeleton'
-import LoadingButton from '@/components/buttons/loading-button'
 
-import { formatDate } from '@/lib/date-format'
+import DataTableSkeleton from '@/components/data-table-skeleton'
+import { DataTablePagination } from '@/components/data-table-pagination'
+import LoadingButton from '@/components/buttons/loading-button'
+import CategoryCreateModal from '@/components/modals/expense-category/category-create-modal'
+import { useToast } from '@/components/ui/use-toast'
+
+import { usePendingStore } from '@/stores'
+import { useExpenseCategoryStore } from '@/stores/useExpenseCategoryStore'
+
+import { deleteExpenseCategory } from '@/actions/expense-category-actions'
+
+import { Category } from '@/types/category'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -63,7 +63,8 @@ export function DataTable<TData, TValue>({
   const [isLoading, startTransition] = useTransition()
 
   const isPending = usePendingStore((state) => state.isPending)
-  const setAccounts = useAccountStore((state) => state.setAccounts)
+  const categories = useExpenseCategoryStore((state) => state.categories)
+  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
 
   const { toast } = useToast()
 
@@ -100,11 +101,11 @@ export function DataTable<TData, TValue>({
     table.toggleAllPageRowsSelected(false)
   }, [table, pagination])
 
-  const handleDeleteSelected = async (items: Account[]) => {
+  const handleDeleteSelected = async (items: Category[]) => {
     startTransition(async () => {
       try {
         const res = await Promise.all(
-          items.map((item) => deleteAccount(item.id))
+          items.map((item) => deleteExpenseCategory(item.id))
         )
         const hasError = res.some((r) => r.error)
 
@@ -116,24 +117,16 @@ export function DataTable<TData, TValue>({
           return
         }
 
-        const accounts = await getAccount()
+        const newCategories = categories.filter(
+          (category: Category) => !items.some((item) => item.id === category.id)
+        )
 
-        if (accounts.error || !accounts.data) return
-
-        const newAccounts = accounts.data.map((account: Account) => ({
-          ...account,
-          created_at: formatDate(account.created_at),
-          updated_at: account.updated_at
-            ? formatDate(account.updated_at)
-            : undefined,
-        }))
-
-        setAccounts(newAccounts)
+        setCategories(newCategories)
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected accounts:', error)
+        console.error('Error deleting selected expense categories:', error)
       }
     })
   }
@@ -155,7 +148,7 @@ export function DataTable<TData, TValue>({
                   variant='default'
                   size={'sm'}
                   onClick={() =>
-                    handleDeleteSelected(selectedItems as Account[])
+                    handleDeleteSelected(selectedItems as Category[])
                   }
                 >
                   {`ລຶບ ${selectedItems.length} ລາຍການ`}
@@ -168,7 +161,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         <div className='flex gap-4'>
-          <AccountCreateModal />
+          <CategoryCreateModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size={'sm'} className='ml-auto'>

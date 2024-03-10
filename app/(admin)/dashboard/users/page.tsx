@@ -29,10 +29,10 @@ const UsersPage = () => {
           throw new Error(res.message)
         }
 
-        const newUsers = res.data.map((item: User) => ({
-          ...item,
-          created_at: formatDate(item.created_at),
-          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
+        const newUsers = res.data.map((user: User) => ({
+          ...user,
+          created_at: formatDate(user.created_at),
+          updated_at: user.updated_at ? formatDate(user.updated_at) : undefined,
         }))
 
         setUsers(newUsers)

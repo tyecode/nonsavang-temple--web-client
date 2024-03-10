@@ -1,7 +1,7 @@
 import { useAccountStore } from './useAccountStore'
 import { useCurrencyStore } from './useCurrencyStore'
 import { useDonatorStore } from './useDonatorStore'
-import { useIncomesCategoryStore } from './useIncomesCategoryStore'
+import { useIncomeCategoryStore } from './useIncomeCategoryStore'
 import { usePendingStore } from './usePendingStore'
 import { useSelectedStore } from './useSelectedStore'
 import { useUserStore } from './useUserStore'
@@ -10,7 +10,7 @@ export {
   useAccountStore,
   useCurrencyStore,
   useDonatorStore,
-  useIncomesCategoryStore,
+  useIncomeCategoryStore,
   usePendingStore,
   useSelectedStore,
   useUserStore,

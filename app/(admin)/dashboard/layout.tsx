@@ -50,9 +50,14 @@ const navLinkGroups: NavLinkGroup[] = [
         href: '/dashboard/incomes',
       },
       {
-        id: 'incomes-category',
+        id: 'income-categories',
         title: 'ຈັດການປະເພດລາຍຮັບ',
-        href: '/dashboard/incomes/category',
+        href: '/dashboard/income-categories',
+      },
+      {
+        id: 'expense-categories',
+        title: 'ຈັດການປະເພດລາຍຈ່າຍ',
+        href: '/dashboard/expense-categories',
       },
       {
         id: 'accounts',

@@ -1,6 +1,10 @@
 'use server'
 
-import { AccountCreationData, AccountModificationData } from '@/types/account'
+import {
+  Account,
+  AccountCreationData,
+  AccountModificationData,
+} from '@/types/account'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -10,15 +14,9 @@ const supabase = createClient(
 
 export const getAccount = async () => {
   try {
-    const { data } = await supabase.from('account').select(`
-      id,
-      user (id, email, first_name, last_name, role),
-      currency (id, code, name, symbol),
-      balance,
-      remark,
-      created_at,
-      updated_at
-    `)
+    const { data } = await supabase
+      .from('account')
+      .select('*, user: user_id (*), currency: currency_id (*)')
 
     return {
       data,
@@ -36,15 +34,10 @@ export const getAccount = async () => {
 
 export const createAccount = async (object: AccountCreationData) => {
   try {
-    const { data } = await supabase.from('account').insert(object).select(`
-      id,
-      user (id, email, first_name, last_name, role),
-      currency (id, code, name, symbol),
-      balance,
-      remark,
-      created_at,
-      updated_at
-  `)
+    const { data } = await supabase
+      .from('account')
+      .insert(object)
+      .select('*, user: user_id (*), currency: currency_id (*)')
 
     return {
       data,
@@ -65,16 +58,11 @@ export const updateAccount = async (
   object: AccountModificationData
 ) => {
   try {
-    const { data } = await supabase.from('account').update(object).eq('id', id)
-      .select(`
-        id,
-        user (id, email, first_name, last_name, role),
-        currency (id, code, name, symbol),
-        balance,
-        remark,
-        created_at,
-        updated_at
-      `)
+    const { data } = await supabase
+      .from('account')
+      .update(object)
+      .eq('id', id)
+      .select('*, user: user_id (*), currency: currency_id (*)')
 
     return {
       data,
@@ -96,7 +84,7 @@ export const deleteAccount = async (id: string) => {
       .from('account')
       .delete()
       .eq('id', id)
-      .select()
+      .select('*, user: user_id (*), currency: currency_id (*)')
 
     return {
       data,

@@ -27,13 +27,16 @@ const AdminAccounts = () => {
 
         if (res.error || !res.data) return
 
-        const newAccounts: any = res.data.map((item) => ({
-          ...item,
-          created_at: formatDate(item.created_at),
-          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
+        const newAccounts: Account[] = res.data.map((account: Account) => ({
+          ...account,
+          created_at: formatDate(account.created_at),
+          updated_at: account.updated_at
+            ? formatDate(account.updated_at)
+            : undefined,
         }))
 
-        setAccounts(newAccounts as Account[])
+        console.log('newAccounts', newAccounts)
+        setAccounts(newAccounts)
       } catch (error) {
         console.error('Error fetching accounts', error)
       } finally {

@@ -36,7 +36,7 @@ const AdminCurrencies = () => {
 
         setCurrencies(newCurrencies)
       } catch (error) {
-        console.error('Error fetching accounts', error)
+        console.error('Error fetching currencies', error)
       } finally {
         setPending(false)
       }

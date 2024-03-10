@@ -48,7 +48,7 @@ import { toast } from '@/components/ui/use-toast'
 const formSchema: any = z.object({
   balance: z
     .string()
-    .nonempty('ປ້ອນຈຳນວນເງິນ.')
+    .min(1, 'ປ້ອນຈຳນວນເງິນ.')
     .regex(/^[-]?\d+$/, {
       message: 'ຈຳນວນເງິນຕ້ອງເປັນຕົວເລກເທົ່ານັ້ນ.',
     })
@@ -122,13 +122,15 @@ const AccountCreateModal = () => {
 
       if (accounts.error || !accounts.data) return
 
-      const newAccounts: any = accounts.data.map((item) => ({
-        ...item,
-        created_at: formatDate(item.created_at),
-        updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
+      const newAccounts: Account[] = accounts.data.map((account: Account) => ({
+        ...account,
+        created_at: formatDate(account.created_at),
+        updated_at: account.updated_at
+          ? formatDate(account.updated_at)
+          : undefined,
       }))
 
-      setAccounts(newAccounts as Account[])
+      setAccounts(newAccounts)
       toast({
         description: 'ເພີ່ມຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
       })
@@ -145,16 +147,17 @@ const AccountCreateModal = () => {
 
     if (!session || options.length === 0) return
 
-    startTransition(() =>
-      createNewAccount(
-        values,
-        {
-          id: session.user.id,
-          first_name: session.user.user_metadata.first_name,
-          last_name: session.user.user_metadata.last_name,
-        },
-        options.find((item) => item.code === values.currency)!
-      )
+    startTransition(
+      async () =>
+        await createNewAccount(
+          values,
+          {
+            id: session.user.id,
+            first_name: session.user.user_metadata.first_name,
+            last_name: session.user.user_metadata.last_name,
+          },
+          options.find((item) => item.code === values.currency)!
+        )
     )
   }
 

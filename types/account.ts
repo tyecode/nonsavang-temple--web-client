@@ -3,9 +3,9 @@ import { Currency } from './currency'
 
 export type Account = {
   id: string
-  user: Omit<User, 'created_at' | 'updated_at'>
+  user: User
   balance: number
-  currency: Omit<Currency, 'created_at' | 'updated_at'>
+  currency: Currency
   created_at: Date | string
   updated_at?: Date | string
   remark?: string

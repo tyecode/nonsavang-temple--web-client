@@ -1,13 +1,35 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
+import { User } from '@/types/user'
+
+import { getSession } from '@/actions/auth-actions'
+import { getUser } from '@/actions/user-actions'
+
 import { ModeToggle } from '@/components/mode-toggle'
-import UserAvatar from './user-avatar'
+
+import UserAvatar from '@/components/user-avatar'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const TopBar = () => {
   const pathname = usePathname()
   const title = pathname.split('/')[1]
+  const [user, setUser] = useState<User>()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const session = await getSession()
+
+      if (session?.user?.id) {
+        const { data } = await getUser(session.user.id)
+        setUser(data[0])
+      }
+    }
+
+    fetchUser()
+  }, [])
 
   return (
     <section className='w-full border bg-background'>
@@ -18,14 +40,20 @@ const TopBar = () => {
           </span>
         ) : (
           <div className='flex flex-col text-xs font-normal capitalize'>
-            Welcome back,{' '}
-            <span className='text-xl font-semibold'>Sengphachanh</span>
+            ຍິນດີຕ້ອນຮັບ,{' '}
+            <span className='text-xl font-semibold'>
+              {user ? (
+                `${user.first_name} ${user.last_name}`
+              ) : (
+                <Skeleton className='mt-2 h-5 w-40' />
+              )}
+            </span>
           </div>
         )}
 
         <div className='flex items-center gap-4'>
           <ModeToggle />
-          <UserAvatar />
+          <UserAvatar user={user} />
         </div>
       </div>
     </section>

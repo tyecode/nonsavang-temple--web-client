@@ -189,6 +189,7 @@ export const columns: ColumnDef<Account>[] = [
 
             if (res.error || !res.data) {
               toast({
+                variant: 'destructive',
                 description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດແກ້ໄຂຂໍ້ມູນບັນຊີໄດ້.',
               })
               return
