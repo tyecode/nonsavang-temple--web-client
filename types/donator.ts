@@ -3,7 +3,9 @@ export type Donator = {
   first_name: string
   last_name: string
   display_name?: string
-  address?: string
+  village?: string
+  district?: string
+  province?: string
   created_at: Date
   updated_at?: Date
 }
@@ -17,6 +19,8 @@ export type DonatorCreationData = {
 export type DonatorModificationData = {
   first_name?: string
   last_name?: string
-  address?: string
+  village?: string
+  district?: string
+  province?: string
   updated_at?: Date
 }

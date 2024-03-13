@@ -114,6 +114,7 @@ const AccountCreateModal = () => {
 
       if (res.error || !res.data) {
         toast({
+          variant: 'destructive',
           description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນບັນຊີບໍ່ສຳເລັດ.',
         })
         return

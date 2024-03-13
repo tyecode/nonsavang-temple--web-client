@@ -135,6 +135,7 @@ export const columns: ColumnDef<Currency>[] = [
 
             if (res.error || !res.data) {
               toast({
+                variant: 'destructive',
                 description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດແກ້ໄຂຂໍ້ມູນສະກຸນເງິນໄດ້.',
               })
               return

@@ -106,6 +106,7 @@ export const columns: ColumnDef<Donator>[] = [
 
             if (res.error || !res.data) {
               toast({
+                variant: 'destructive',
                 description: 'ມີຂໍ້ຜິດພາດ! ແກ້ໄຂຂໍ້ມູນຜູ້ບໍລິຈາກບໍ່ສຳເລັດ.',
               })
               return

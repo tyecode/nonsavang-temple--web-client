@@ -1,5 +1,11 @@
 'use client'
 
+import { useTransition, useState } from 'react'
+
+import Image from 'next/image'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+
 import {
   Card,
   CardContent,
@@ -11,6 +17,8 @@ import {
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { LoadingButton } from '@/components/buttons'
+
 import { handleLogin } from '@/actions/auth-actions'
 
 export default function Login({
@@ -18,34 +26,75 @@ export default function Login({
 }: {
   searchParams: { error: string }
 }) {
+  const [isPending, startTransition] = useTransition()
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
-    <div className='absolute left-1/2 top-1/2 w-[25rem] -translate-x-1/2 -translate-y-1/2 p-6'>
-      <form action={handleLogin}>
+    <div className='absolute left-1/2 top-1/2 w-[27rem] -translate-x-1/2 -translate-y-1/2 p-6'>
+      <form
+        action={(formData: FormData) =>
+          startTransition(async () => await handleLogin(formData))
+        }
+      >
         <Card>
           <CardHeader className='mb-4 space-y-3'>
-            <CardTitle className='text-center text-3xl'>Sign in</CardTitle>
-            <CardDescription className='text-center'>
-              Enter your email and password to login
+            <CardTitle className='flex-center flex-col text-center text-3xl'>
+              <Image src='/logo.png' alt='logo' width={84} height={84} />
+              <span className='mt-4 text-2xl font-bold'>ວັດໂນນສະຫວ່າງ</span>
+            </CardTitle>
+            <CardDescription className='!mt-2 text-center'>
+              ປ້ອນອີເມວ ແລະ ລະຫັດຜ່ານເພື່ອເຂົ້າສູ່ລະບົບ
             </CardDescription>
           </CardHeader>
           <CardContent className='grid gap-4'>
             <div className='grid gap-2'>
-              <Label htmlFor='email'>Email</Label>
+              <Label htmlFor='email'>ອີເມວ</Label>
               <Input name='email' id='email' type='email' required />
             </div>
             <div className='grid gap-2'>
-              <Label htmlFor='password'>Password</Label>
-              <Input name='password' id='password' type='password' required />
+              <Label htmlFor='password'>ລະຫັດຜ່ານ</Label>
+              <div className='group relative'>
+                <Input
+                  name='password'
+                  id='password'
+                  type={isOpen ? 'text' : 'password'}
+                  required
+                  className='pr-12'
+                />
+                <span className='absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer opacity-0 duration-200 group-hover:opacity-100'>
+                  {isOpen ? (
+                    <FontAwesomeIcon
+                      icon={faEye}
+                      width={20}
+                      height={20}
+                      className='text-foreground/50'
+                      onClick={() => setIsOpen(!isOpen)}
+                    />
+                  ) : (
+                    <FontAwesomeIcon
+                      icon={faEyeSlash}
+                      width={20}
+                      height={20}
+                      className='text-foreground/50'
+                      onClick={() => setIsOpen(!isOpen)}
+                    />
+                  )}
+                </span>
+              </div>
             </div>
           </CardContent>
           <CardFooter className='flex flex-col'>
-            <Button className='w-full' type='submit' size={'sm'}>
-              Login
-            </Button>
+            {!isPending ? (
+              <Button className='w-full' type='submit' size={'sm'}>
+                ເຂົ້າສູ່ລະບົບ
+              </Button>
+            ) : (
+              <LoadingButton className='w-full'>ເຂົ້າສູ່ລະບົບ</LoadingButton>
+            )}
           </CardFooter>
           {searchParams.error && (
             <p className='py- mb-5 w-full text-center font-noto-lao text-sm text-danger'>
-              {'ອີເມວ ຫລື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ'}
+              {'ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ'}
             </p>
           )}
         </Card>

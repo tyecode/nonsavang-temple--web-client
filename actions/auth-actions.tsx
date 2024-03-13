@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { getUser } from './user-actions'
 
 export const handleLogin = async (formData: FormData) => {
+  console.log('formData', formData)
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const cookieStore = cookies()
@@ -28,7 +29,7 @@ export const handleLogin = async (formData: FormData) => {
 
   const role = userResponse.data[0]?.role
 
-  return redirect(role === 'ADMIN' ? '/dashboard/users' : '/')
+  return redirect(role === 'ADMIN' || role === 'HOLDER' ? '/dashboard' : '/')
 }
 
 export const handleLogout = async () => {

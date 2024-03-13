@@ -143,6 +143,7 @@ const ExpenseCreateModal = () => {
 
       if (res.error || !res.data) {
         toast({
+          variant: 'destructive',
           description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນລາຍຈ່າຍບໍ່ສຳເລັດ.',
         })
         return
@@ -274,7 +275,7 @@ const ExpenseCreateModal = () => {
                 name='category'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>ເລືອກປະເພດ</FormLabel>
+                    <FormLabel>ເລືອກປະເພດລາຍຈ່າຍ</FormLabel>
                     <Select
                       disabled={isPending}
                       onValueChange={field.onChange}
