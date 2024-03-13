@@ -24,5 +24,5 @@ export type AccountModificationData = {
   name?: string
   balance?: number
   remark?: string
-  updated_at?: Date | string | null
+  updated_at: Date | string | null
 }

@@ -11,5 +11,5 @@ export type CategoryCreationData = {
 
 export type CategoryModificationData = {
   name?: string
-  updated_at?: Date | string | null
+  updated_at: Date | string | null
 }

@@ -8,9 +8,9 @@ export type Income = {
   amount: number
   remark?: string
   status: string
-  created_at: Date
-  approved_at?: Date
-  rejected_at?: Date
+  created_at: Date | string
+  approved_at?: Date | string | null
+  rejected_at?: Date | string | null
 }
 
 export type IncomeCreationData = {
@@ -25,6 +25,6 @@ export type IncomeCreationData = {
 
 export type IncomeModificationData = {
   status?: string
-  approved_at?: Date
-  rejected_at?: Date
+  approved_at?: Date | string | null
+  rejected_at?: Date | string | null
 }

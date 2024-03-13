@@ -14,7 +14,7 @@ export type Expense = {
   remark?: string
   status: string
   created_at: Date | string
-  approved_at?: Date | string
+  approved_at?: Date | string | null
   rejected_at?: Date | string | null
 }
 

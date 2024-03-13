@@ -253,7 +253,7 @@ const ExpenseCreateModal = () => {
                       value={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className='flex-full'>
+                        <SelectTrigger className='flex-1'>
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
@@ -283,7 +283,7 @@ const ExpenseCreateModal = () => {
                       value={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className='flex-full'>
+                        <SelectTrigger className='flex-1'>
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>

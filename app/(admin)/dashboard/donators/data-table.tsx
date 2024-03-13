@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
+
 import {
   ColumnDef,
   SortingState,
@@ -13,16 +14,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { Donator } from '@/types/donator'
-import { User } from '@/types/user'
-
-import { deleteDonator } from '@/actions/donator-actions'
-
-import { usePendingStore } from '@/stores/usePendingStore'
-import { useDonatorStore } from '@/stores/useDonatorStore'
-
-import { CreateDonatorModal } from '@/components/modals/donator'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { useToast } from '@/components/ui/use-toast'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import {
   DropdownMenu,
@@ -30,8 +25,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Table,
   TableBody,
@@ -40,9 +33,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useToast } from '@/components/ui/use-toast'
-import DataTableSkeleton from '@/components/data-table-skeleton'
 import { LoadingButton } from '@/components/buttons'
+import DataTableSkeleton from '@/components/data-table-skeleton'
+import { DonatorCreateModal } from '@/components/modals/donator'
+
+import { useDonatorStore, usePendingStore } from '@/stores'
+
+import { deleteDonator } from '@/actions/donator-actions'
+
+import { User } from '@/types/user'
+import { Donator } from '@/types/donator'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -53,22 +53,19 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  // State hooks
-  const [globalFilter, setGlobalFilters] = useState<string>('')
-  const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [globalFilter, setGlobalFilters] = useState<string>('')
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [rowSelection, setRowSelection] = useState({})
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [sorting, setSorting] = useState<SortingState>([])
 
-  // Store hooks
-  const isPending = usePendingStore((state) => state.isPending)
   const donators = useDonatorStore((state) => state.donators)
-  const updateDonators = useDonatorStore((state) => state.updateDonators)
+  const isPending = usePendingStore((state) => state.isPending)
+  const setDonators = useDonatorStore((state) => state.setDonators)
 
-  // Toast hook
   const { toast } = useToast()
+  const [isLoading, startTransition] = useTransition()
 
   const table = useReactTable({
     data,
@@ -103,36 +100,35 @@ export function DataTable<TData, TValue>({
     table.toggleAllPageRowsSelected(false)
   }, [table, pagination])
 
-  const handleDeleteSelected = async (items: Donator[]) => {
-    setIsLoading(true)
+  const handleDeleteSelected = async (items: User[]) => {
+    startTransition(async () => {
+      try {
+        const res = await Promise.all(
+          items.map((item) => deleteDonator(item.id))
+        )
+        const hasError = res.some((r) => r.error)
 
-    try {
-      const res = await Promise.all(items.map((item) => deleteDonator(item.id)))
-      const hasError = res.some((r) => r.error)
+        if (hasError) {
+          toast({
+            variant: 'destructive',
+            description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນທີ່ເລືອກໄດ້.',
+          })
+          return
+        }
 
-      if (hasError) {
+        const newDonators = donators.filter(
+          (donator: Donator) =>
+            !items.map((item) => item.id).includes(donator.id)
+        )
+
+        setDonators(newDonators)
         toast({
-          variant: 'destructive',
-          description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນທີ່ເລືອກໄດ້.',
+          description: `ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.`,
         })
-        return
+      } catch (error) {
+        console.error('Error deleting selected donators:', error)
       }
-
-      const newDonators = donators.filter(
-        (donator: Donator) => !items.some((item) => item.id === donator.id)
-      )
-
-      updateDonators(newDonators)
-      toast({
-        description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
-      })
-    } catch (error) {
-      console.error('Error deleting selected donators:', error)
-    } finally {
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 300)
-    }
+    })
   }
 
   return (
@@ -151,9 +147,7 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant='default'
                   size={'sm'}
-                  onClick={() =>
-                    handleDeleteSelected(selectedItems as Donator[])
-                  }
+                  onClick={() => handleDeleteSelected(selectedItems as User[])}
                 >
                   {`ລຶບ ${selectedItems.length} ລາຍການ`}
                 </Button>
@@ -165,7 +159,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         <div className='flex gap-4'>
-          <CreateDonatorModal />
+          <DonatorCreateModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size={'sm'} className='ml-auto'>

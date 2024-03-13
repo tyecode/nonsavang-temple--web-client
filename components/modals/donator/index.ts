@@ -1,3 +1,3 @@
-import CreateDonatorModal from './create-donator-modal'
+import DonatorCreateModal from './donator-create-modal'
 
-export { CreateDonatorModal }
+export { DonatorCreateModal }

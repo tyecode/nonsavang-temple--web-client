@@ -14,5 +14,5 @@ export type CurrencyCreationData = {
 export type CurrencyModificationData = {
   code?: string
   name?: string
-  updated_at?: Date | string | null
+  updated_at: Date | string | null
 }
