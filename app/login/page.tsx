@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button'
 import { LoadingButton } from '@/components/buttons'
 
 import { handleLogin } from '@/actions/auth-actions'
+import { ModeToggle } from '@/components/mode-toggle'
 
 export default function Login({
   searchParams,
@@ -38,9 +39,12 @@ export default function Login({
       >
         <Card>
           <CardHeader className='mb-4 space-y-3'>
-            <CardTitle className='flex-center flex-col text-center text-3xl'>
+            <CardTitle className='flex-center relative flex-col text-center text-3xl'>
               <Image src='/logo.png' alt='logo' width={84} height={84} />
               <span className='mt-4 text-2xl font-bold'>ວັດໂນນສະຫວ່າງ</span>
+              <div className='absolute right-0 top-0'>
+                <ModeToggle />
+              </div>
             </CardTitle>
             <CardDescription className='!mt-2 text-center'>
               ປ້ອນອີເມວ ແລະ ລະຫັດຜ່ານເພື່ອເຂົ້າສູ່ລະບົບ
