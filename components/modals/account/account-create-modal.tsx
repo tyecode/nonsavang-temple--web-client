@@ -103,6 +103,7 @@ const AccountCreateModal = () => {
   ) => {
     try {
       const accountData = {
+        name: '',
         balance: Number(values.balance),
         currency_id: currency.id,
         remark: values.remark,

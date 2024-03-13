@@ -13,9 +13,22 @@ export const getExpense = async (id?: string) => {
     let query: any = supabase.from('expense')
 
     if (id) {
-      query = query.select('*').eq('id', id)
+      query = query
+        .select(
+          `*, 
+          category: category_id (*), 
+          currency: currency_id (*), 
+          user: user_id (*), 
+          account: account_id (*)`
+        )
+        .eq('id', id)
     } else {
-      query = query.select('*')
+      query = query.select(
+        `*, 
+        category: category_id (*), 
+        user: user_id (*), 
+        account: account_id (*, currency: currency_id (*))`
+      )
     }
 
     const { data } = await query
@@ -36,7 +49,15 @@ export const getExpense = async (id?: string) => {
 
 export const createExpense = async (object: ExpenseCreationData) => {
   try {
-    const { data } = await supabase.from('expense').insert(object).select()
+    const { data } = await supabase
+      .from('expense')
+      .insert(object)
+      .select(
+        `*, 
+      category: category_id (*), 
+      user: user_id (*), 
+      account: account_id (*, currency: currency_id (*))`
+      )
 
     return {
       data,

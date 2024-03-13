@@ -37,9 +37,10 @@ const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
           <Image
             src={'/logo.png'}
             alt={'logo'}
-            width={80}
-            height={80}
+            width={86}
+            height={86}
             className='object-cover'
+            priority
           />
         </Link>
       </div>

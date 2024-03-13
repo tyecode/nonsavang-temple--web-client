@@ -35,6 +35,11 @@ const navLinkGroups: NavLinkGroup[] = [
         title: 'ຈັດການຜູ້ບໍລິຈາກ',
         href: '/dashboard/donators',
       },
+      {
+        id: 'approvals',
+        title: 'ຈັດການການອະນຸມັດ',
+        href: '/dashboard/approvals',
+      },
     ],
   },
   {

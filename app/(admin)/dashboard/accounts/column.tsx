@@ -108,8 +108,12 @@ export const columns: ColumnDef<Account>[] = [
     },
   },
   {
+    accessorKey: 'name',
+    header: 'ຊື່ບັນຊີ',
+  },
+  {
     accessorKey: 'balance',
-    header: 'ຈຳນວນ',
+    header: 'ຈຳນວນເງິນ',
     cell: ({ row }) => {
       const current = row.original
       return current.currency && current.currency.name
