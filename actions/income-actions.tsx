@@ -13,9 +13,23 @@ export const getIncome = async (id?: string) => {
     let query: any = supabase.from('income')
 
     if (id) {
-      query = query.select('*').eq('id', id)
+      query = query
+        .select(
+          `*, 
+          category: category_id (*), 
+          user: user_id (*), 
+          account: account_id (*, currency: currency_id (*)), 
+          donator: donator_id (*)`
+        )
+        .eq('id', id)
     } else {
-      query = query.select('*')
+      query = query.select(
+        `*, 
+        category: category_id (*), 
+        user: user_id (*), 
+        account: account_id (*, currency: currency_id (*)), 
+        donator: donator_id (*)`
+      )
     }
 
     const { data } = await query
@@ -36,11 +50,20 @@ export const getIncome = async (id?: string) => {
 
 export const createIncome = async (object: IncomeCreationData) => {
   try {
-    const { data } = await supabase.from('income').insert(object).select()
+    const { data, error } = await supabase
+      .from('income')
+      .insert(object)
+      .select(
+        `*, 
+        category: category_id (*), 
+        user: user_id (*), 
+        account: account_id (*, currency: currency_id (*)), 
+        donator: donator_id (*)`
+      )
 
     return {
       data,
-      error: null,
+      error,
       message: 'Income was created successfully.',
     }
   } catch (error) {
@@ -61,7 +84,13 @@ export const updateIncome = async (
       .from('income')
       .update(object)
       .eq('id', id)
-      .select()
+      .select(
+        `*, 
+        category: category_id (*), 
+        user: user_id (*), 
+        account: account_id (*, currency: currency_id (*)), 
+        donator: donator_id (*)`
+      )
 
     return {
       data,
@@ -83,7 +112,7 @@ export const deleteIncome = async (id: string) => {
       .from('income')
       .delete()
       .eq('id', id)
-      .select()
+      .select('*')
 
     return {
       data,

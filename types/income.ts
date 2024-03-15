@@ -1,10 +1,16 @@
+import { Account } from './account'
+import { Category } from './category'
+import { Currency } from './currency'
+import { Donator } from './donator'
+import { User } from './user'
+
 export type Income = {
   id: string
-  user_id: string
-  account_id: string
-  category_id: string
-  currency_id: string
-  donator_id?: string
+  user: User
+  account: Account
+  category: Category
+  currency: Currency
+  donator: Donator | null
   amount: number
   remark?: string
   status: string

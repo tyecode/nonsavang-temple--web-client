@@ -53,7 +53,13 @@ export default function Login({
           <CardContent className='grid gap-4'>
             <div className='grid gap-2'>
               <Label htmlFor='email'>ອີເມວ</Label>
-              <Input name='email' id='email' type='email' required />
+              <Input
+                name='email'
+                id='email'
+                type='email'
+                required
+                disabled={isPending}
+              />
             </div>
             <div className='grid gap-2'>
               <Label htmlFor='password'>ລະຫັດຜ່ານ</Label>
@@ -64,6 +70,7 @@ export default function Login({
                   type={isOpen ? 'text' : 'password'}
                   required
                   className='pr-12'
+                  disabled={isPending}
                 />
                 <span className='absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer opacity-0 duration-200 group-hover:opacity-100'>
                   {isOpen ? (

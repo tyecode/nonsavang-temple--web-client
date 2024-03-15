@@ -52,7 +52,7 @@ const formSchema: any = z.object({
   province: z.string(),
 })
 
-const DonatorCreateModal = () => {
+const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -118,7 +118,17 @@ const DonatorCreateModal = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {isPending ? (
+        {asChild ? (
+          <Button
+            type='submit'
+            variant={'outline'}
+            size={'sm'}
+            className='w-full'
+            onClick={() => setIsOpen(true)}
+          >
+            {'ເພິ່ມຂໍ້ມູນຜູ້ບໍລິຈາກ'}
+          </Button>
+        ) : isPending ? (
           <LoadingButton>ເພິ່ມຂໍ້ມູນ</LoadingButton>
         ) : (
           <Button size={'sm'}>ເພິ່ມຂໍ້ມູນ</Button>
