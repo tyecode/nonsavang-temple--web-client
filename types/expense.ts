@@ -9,6 +9,7 @@ export type Expense = {
   account: Account
   category: Category
   currency: Currency
+  drawer: User
   image?: string
   amount: number
   remark?: string
@@ -23,6 +24,7 @@ export type ExpenseCreationData = {
   account_id: string
   category_id: string
   currency_id: string
+  drawer_id: string
   image?: string
   amount: number
   remark?: string

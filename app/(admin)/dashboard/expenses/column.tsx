@@ -5,6 +5,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -53,7 +54,7 @@ export const columns: ColumnDef<Expense>[] = [
     header: 'ID',
   },
   {
-    accessorKey: 'account',
+    accessorKey: 'account.name',
     header: 'ບັນຊີ',
     cell: ({ row }) => (
       <span
@@ -68,7 +69,7 @@ export const columns: ColumnDef<Expense>[] = [
     ),
   },
   {
-    accessorKey: 'category',
+    accessorKey: 'category.name',
     header: 'ປະເພດ',
     cell: ({ row }) => (
       <span
@@ -81,6 +82,25 @@ export const columns: ColumnDef<Expense>[] = [
         {row.original.category.name}
       </span>
     ),
+  },
+  {
+    accessorKey: 'drawer.display_name',
+    header: 'ຜູ້ເບີກຈ່າຍ',
+    cell: ({ row }) => {
+      const drawer = row.original.drawer
+
+      return (
+        <span
+          className='cursor-pointer'
+          onClick={() => {
+            navigator.clipboard.writeText(drawer.id)
+            toast({ description: 'ຄັດລອກໄອດີລົງໃນຄລິບບອດແລ້ວ' })
+          }}
+        >
+          {drawer.display_name}
+        </span>
+      )
+    },
   },
   {
     accessorKey: 'amount',
@@ -111,6 +131,23 @@ export const columns: ColumnDef<Expense>[] = [
   {
     accessorKey: 'remark',
     header: 'ໝາຍເຫດ',
+  },
+  {
+    accessorKey: 'status',
+    header: 'ສະຖານະ',
+    cell: ({ row }) => (
+      <>
+        {row.original.status === 'PENDING' && (
+          <Badge variant={'warning'}>ລໍຖ້າການອະນຸມັດ</Badge>
+        )}
+        {row.original.status === 'APPROVED' && (
+          <Badge variant={'success'}>ອະນຸມັດແລ້ວ</Badge>
+        )}
+        {row.original.status === 'REJECTED' && (
+          <Badge variant={'danger'}>ຖືກປະຕິເສດ</Badge>
+        )}
+      </>
+    ),
   },
   {
     accessorKey: 'created_at',

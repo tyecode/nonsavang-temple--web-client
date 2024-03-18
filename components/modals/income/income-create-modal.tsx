@@ -84,7 +84,7 @@ const IncomeCreateModal = () => {
   const [isDonate, setIsDonate] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [open, setOpen] = useState(false)
+  const [openDonator, setOpenDonator] = useState(false)
   const [openAccount, setOpenAccount] = useState(false)
   const [openCategory, setOpenCategory] = useState(false)
   const [openCurrency, setOpenCurrency] = useState(false)
@@ -241,7 +241,7 @@ const IncomeCreateModal = () => {
                             disabled={isPending}
                             variant='outline'
                             role='combobox'
-                            aria-expanded={open}
+                            aria-expanded={openAccount}
                             className='w-full justify-between'
                           >
                             {field.value
@@ -257,7 +257,7 @@ const IncomeCreateModal = () => {
                       <FormMessage />
                       <PopoverContent className='w-[180px] p-0'>
                         <Command>
-                          <CommandGroup>
+                          <CommandGroup className='max-h-[200px] overflow-y-scroll'>
                             {accounts.map((account: Account) => (
                               <CommandItem
                                 key={account.id}
@@ -303,7 +303,7 @@ const IncomeCreateModal = () => {
                             disabled={isPending}
                             variant='outline'
                             role='combobox'
-                            aria-expanded={open}
+                            aria-expanded={openCategory}
                             className='w-full justify-between'
                           >
                             {field.value
@@ -319,7 +319,7 @@ const IncomeCreateModal = () => {
                       <FormMessage />
                       <PopoverContent className='w-[180px] p-0'>
                         <Command>
-                          <CommandGroup>
+                          <CommandGroup className='max-h-[200px] overflow-y-scroll'>
                             {categories.map((category: Category) => (
                               <CommandItem
                                 key={category.id}
@@ -421,7 +421,7 @@ const IncomeCreateModal = () => {
                             disabled={isPending || !currencies.length}
                             variant='outline'
                             role='combobox'
-                            aria-expanded={open}
+                            aria-expanded={openCurrency}
                             className='w-full justify-between'
                           >
                             {field.value
@@ -437,7 +437,7 @@ const IncomeCreateModal = () => {
                       <FormMessage />
                       <PopoverContent className='w-[180px] p-0'>
                         <Command>
-                          <CommandGroup>
+                          <CommandGroup className='max-h-[200px] overflow-y-scroll'>
                             {currencies.map((currency: Currency) => (
                               <CommandItem
                                 key={currency.id}
@@ -475,14 +475,14 @@ const IncomeCreateModal = () => {
                   <FormLabel className='pointer-events-none my-[5px]'>
                     ຜູ້ບໍລິຈາກ
                   </FormLabel>
-                  <Popover open={open} onOpenChange={setOpen}>
+                  <Popover open={openDonator} onOpenChange={setOpenDonator}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           disabled={isPending || !isDonate}
                           variant='outline'
                           role='combobox'
-                          aria-expanded={open}
+                          aria-expanded={openDonator}
                           className='w-full justify-between'
                         >
                           {field.value && field.value !== 'donate'
@@ -501,17 +501,20 @@ const IncomeCreateModal = () => {
                           placeholder='ຄົ້ນຫາລາຍຊື່ຜູ້ບໍລິຈາກ...'
                           className='h-9'
                         />
-                        <CommandEmpty className='flex-center p-1'>
+                        <CommandEmpty className='flex-center flex-col p-1'>
+                          <span className='p-3 text-sm text-foreground/60'>
+                            ບໍ່ພົບລາຍຊື່ຜູ້ບໍລິຈາກທີ່ຄົ້ນຫາ.
+                          </span>
                           <DonatorCreateModal asChild />
                         </CommandEmpty>
-                        <CommandGroup>
+                        <CommandGroup className='max-h-[200px] overflow-y-scroll'>
                           {donators.map((donator: Donator) => (
                             <CommandItem
                               key={donator.id}
                               value={donator.display_name}
                               onSelect={() => {
                                 field.onChange(donator.id)
-                                setOpen(false)
+                                setOpenDonator(false)
                               }}
                             >
                               {donator.display_name}

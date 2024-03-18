@@ -35,7 +35,6 @@ const AdminAccounts = () => {
             : undefined,
         }))
 
-        console.log('newAccounts', newAccounts)
         setAccounts(newAccounts)
       } catch (error) {
         console.error('Error fetching accounts', error)

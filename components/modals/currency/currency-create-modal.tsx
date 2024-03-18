@@ -46,7 +46,7 @@ const formSchema: any = z.object({
 
 const CurrencyCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoading, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition()
 
   const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
 
@@ -104,7 +104,7 @@ const CurrencyCreateModal = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {isLoading ? (
+        {isPending ? (
           <LoadingButton>ເພິ່ມຂໍ້ມູນ</LoadingButton>
         ) : (
           <Button size={'sm'}>ເພິ່ມຂໍ້ມູນ</Button>
@@ -124,9 +124,10 @@ const CurrencyCreateModal = () => {
               name='code'
               render={({ field: { onChange, value, ...rest } }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ລະຫັດ</FormLabel>
+                  <FormLabel>ລະຫັດສະກຸນເງິນ</FormLabel>
                   <FormControl>
                     <Input
+                      disabled={isPending}
                       onChange={(e) => onChange(e.target.value.toUpperCase())}
                       value={value.toUpperCase()}
                       {...rest}
@@ -144,7 +145,7 @@ const CurrencyCreateModal = () => {
                 <FormItem className='flex-1'>
                   <FormLabel>ຊື່ສະກຸນເງິນ</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,7 +153,7 @@ const CurrencyCreateModal = () => {
             />
 
             <div className='mt-2 flex w-full justify-end'>
-              {!isLoading ? (
+              {!isPending ? (
                 <Button type='submit' size={'sm'} className='w-fit'>
                   ເພິ່ມຂໍ້ມູນ
                 </Button>

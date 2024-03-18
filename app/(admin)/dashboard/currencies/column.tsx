@@ -238,9 +238,10 @@ export const columns: ColumnDef<Currency>[] = [
                   name='code'
                   render={({ field: { onChange, value, ...rest } }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ລະຫັດ</FormLabel>
+                      <FormLabel>ລະຫັດສະກຸນເງິນ</FormLabel>
                       <FormControl>
                         <Input
+                          disabled={isPending}
                           onChange={(e) =>
                             onChange(e.target.value.toUpperCase())
                           }
@@ -260,7 +261,7 @@ export const columns: ColumnDef<Currency>[] = [
                     <FormItem className='flex-1'>
                       <FormLabel>ຊື່ສະກຸນເງິນ</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input disabled={isPending} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

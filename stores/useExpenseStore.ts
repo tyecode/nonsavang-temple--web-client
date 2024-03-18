@@ -8,5 +8,14 @@ interface ExpenseState {
 
 export const useExpenseStore = create<ExpenseState>((set) => ({
   expenses: [],
-  setExpenses: (state) => set(() => ({ expenses: state })),
+  setExpenses: (state) =>
+    set(() => ({
+      expenses: state.map((expense) => ({
+        ...expense,
+        drawer: expense.drawer && {
+          ...expense.drawer,
+          display_name: `${expense.drawer.first_name} ${expense.drawer.last_name}`,
+        },
+      })),
+    })),
 }))

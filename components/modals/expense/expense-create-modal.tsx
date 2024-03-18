@@ -2,25 +2,39 @@
 
 import { ChangeEvent, useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 
-import { Currency } from '@/types/currency'
 import { Account } from '@/types/account'
-import { Expense } from '@/types/expense'
 import { Category } from '@/types/category'
+import { Currency } from '@/types/currency'
+import { Expense } from '@/types/expense'
+import { User } from '@/types/user'
 
-import { getAccount } from '@/actions/account-actions'
-import { getSession } from '@/actions/auth-actions'
 import { createExpense, getExpense } from '@/actions/expense-actions'
+import { getAccount } from '@/actions/account-actions'
 import { getExpenseCategory } from '@/actions/expense-category-actions'
+import { getSession } from '@/actions/auth-actions'
+import { getUser } from '@/actions/user-actions'
 import { uploadExpenseImage } from '@/actions/image-actions'
 
-import { useExpenseStore } from '@/stores'
+import { useExpenseStore, useUserStore } from '@/stores'
 
+import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/date-format'
 
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { LoadingButton } from '@/components/buttons'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -37,16 +51,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { LoadingButton } from '@/components/buttons'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { toast } from '@/components/ui/use-toast'
 
 const formSchema: any = z.object({
@@ -62,6 +70,7 @@ const formSchema: any = z.object({
       message: 'ປ້ອນຈຳນວນເງິນບໍ່ຖືກຕ້ອງ.',
     }),
   currency: z.string().min(1, 'ກະລຸນາເລືອກສະກຸນເງິນ.'),
+  drawer: z.string().min(1, 'ກະລຸນາເລືອກຜູ້ເບີກຈ່າຍ.'),
   image: z
     .custom<FileList>()
     .transform((file) => file.length > 0 && file.item(0))
@@ -75,12 +84,19 @@ const formSchema: any = z.object({
 })
 
 const ExpenseCreateModal = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isPending, startTransition] = useTransition()
   const [accounts, setAccounts] = useState<Account[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [currency, setCurrency] = useState<Currency[]>([])
+  const [currencies, setCurrencies] = useState<Currency[]>([])
+  const [isOpen, setIsOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const [openAccount, setOpenAccount] = useState(false)
+  const [openCategory, setOpenCategory] = useState(false)
+  const [openCurrency, setOpenCurrency] = useState(false)
+  const [openDrawer, setOpenDrawer] = useState(false)
+
   const setExpenses = useExpenseStore((state) => state.setExpenses)
+  const users = useUserStore((state) => state.users)
+  const setUsers = useUserStore((state) => state.setUsers)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -89,6 +105,7 @@ const ExpenseCreateModal = () => {
       category: '',
       amount: '0',
       currency: '',
+      drawer: '',
       image: '',
       remark: '',
     },
@@ -122,6 +139,20 @@ const ExpenseCreateModal = () => {
     fetchCategories()
   }, [categories.length])
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (users.length > 0) return
+
+      const res = await getUser()
+
+      if (res.error || !res.data) return
+
+      setUsers(res.data)
+    }
+
+    fetchUsers()
+  }, [users.length, setUsers])
+
   const createNewExpense = async (
     values: z.infer<typeof formSchema>,
     uploadData?: { data: any; error?: null; message?: string }
@@ -133,6 +164,7 @@ const ExpenseCreateModal = () => {
         category_id: values.category,
         amount: Number(values.amount),
         currency_id: values.currency,
+        drawer_id: values.drawer,
         image: uploadData
           ? `${process.env.NEXT_PUBLIC_BUCKET_PATH}/${uploadData.data.path}`
           : undefined,
@@ -236,36 +268,60 @@ const ExpenseCreateModal = () => {
                 control={form.control}
                 name='account'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ເລືອກບັນຊີ</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={(value) => {
-                        field.onChange(value)
-
-                        const account = accounts.find((acc) => acc.id === value)
-                        if (!account) return
-
-                        setCurrency([account.currency])
-                        form.setValue('currency', '')
-                      }}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className='flex-1'>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {accounts?.map((account) => (
-                          <SelectItem key={account.id} value={account.id}>
-                            {account.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
+                  <FormItem className='flex flex-col'>
+                    <FormLabel className='pointer-events-none my-[5px]'>
+                      ບັນຊີ
+                    </FormLabel>
+                    <Popover open={openAccount} onOpenChange={setOpenAccount}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            disabled={isPending}
+                            variant='outline'
+                            role='combobox'
+                            aria-expanded={openAccount}
+                            className='w-full justify-between'
+                          >
+                            {field.value
+                              ? accounts.find(
+                                  (account: Account) =>
+                                    account.id === field.value
+                                )?.name
+                              : 'ເລືອກບັນຊີ...'}
+                            <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <FormMessage />
+                      <PopoverContent className='w-[180px] p-0'>
+                        <Command>
+                          <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                            {accounts.map((account: Account) => (
+                              <CommandItem
+                                key={account.id}
+                                value={account.name}
+                                onSelect={() => {
+                                  field.onChange(account.id)
+                                  setCurrencies([account.currency])
+                                  form.setValue('currency', account.currency.id)
+                                  setOpenAccount(false)
+                                }}
+                              >
+                                {account.name}
+                                <CheckIcon
+                                  className={cn(
+                                    'ml-auto h-4 w-4',
+                                    field.value === account.id
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormItem>
                 )}
               />
@@ -274,31 +330,58 @@ const ExpenseCreateModal = () => {
                 control={form.control}
                 name='category'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ເລືອກປະເພດລາຍຈ່າຍ</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className='flex-1'>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categories?.map((category, index) => (
-                          <SelectItem
-                            key={`category-${index}`}
-                            value={category.id}
+                  <FormItem className='flex flex-col'>
+                    <FormLabel className='pointer-events-none my-[5px]'>
+                      ປະເພດລາຍຈ່າຍ
+                    </FormLabel>
+                    <Popover open={openCategory} onOpenChange={setOpenCategory}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            disabled={isPending}
+                            variant='outline'
+                            role='combobox'
+                            aria-expanded={openCategory}
+                            className='w-full justify-between'
                           >
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
+                            {field.value
+                              ? categories.find(
+                                  (category: Category) =>
+                                    category.id === field.value
+                                )?.name
+                              : 'ເລືອກປະເພດລາຍຈ່າຍ...'}
+                            <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <FormMessage />
+                      <PopoverContent className='w-[180px] p-0'>
+                        <Command>
+                          <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                            {categories.map((category: Category) => (
+                              <CommandItem
+                                key={category.id}
+                                value={category.name}
+                                onSelect={() => {
+                                  field.onChange(category.id)
+                                  setOpenCategory(false)
+                                }}
+                              >
+                                {category.name}
+                                <CheckIcon
+                                  className={cn(
+                                    'ml-auto h-4 w-4',
+                                    field.value === category.id
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormItem>
                 )}
               />
@@ -310,9 +393,12 @@ const ExpenseCreateModal = () => {
                 name='amount'
                 render={({ field: { onChange, ...rest } }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>ຈຳນວນເງິນ</FormLabel>
+                    <FormLabel className='pointer-events-none'>
+                      ຈຳນວນເງິນ
+                    </FormLabel>
                     <FormControl>
                       <Input
+                        disabled={isPending}
                         onChange={(event: any) => {
                           const value = event.target.value
                           const data = event.nativeEvent.data
@@ -341,34 +427,58 @@ const ExpenseCreateModal = () => {
                 control={form.control}
                 name='currency'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ສະກຸນເງິນ</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger
-                          className='w-full'
-                          disabled={currency.length === 0}
-                        >
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {currency.map((currency, index) => (
-                          <SelectItem
-                            key={`currency-${index}`}
-                            value={currency.id}
+                  <FormItem className='flex flex-col'>
+                    <FormLabel className='pointer-events-none my-[5px]'>
+                      ສະກຸນເງິນ
+                    </FormLabel>
+                    <Popover open={openCurrency} onOpenChange={setOpenCurrency}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            disabled={isPending || !currencies.length}
+                            variant='outline'
+                            role='combobox'
+                            aria-expanded={openCurrency}
+                            className='w-full justify-between'
                           >
-                            {currency.code}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
+                            {field.value
+                              ? currencies.find(
+                                  (currency: Currency) =>
+                                    currency.id === field.value
+                                )?.code
+                              : 'ເລືອກສະກຸນເງິນ...'}
+                            <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <FormMessage />
+                      <PopoverContent className='w-[180px] p-0'>
+                        <Command>
+                          <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                            {currencies.map((currency: Currency) => (
+                              <CommandItem
+                                key={currency.id}
+                                value={currency.code}
+                                onSelect={() => {
+                                  field.onChange(currency.id)
+                                  setOpenCurrency(false)
+                                }}
+                              >
+                                {currency.code}
+                                <CheckIcon
+                                  className={cn(
+                                    'ml-auto h-4 w-4',
+                                    field.value === currency.id
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormItem>
                 )}
               />
@@ -376,16 +486,83 @@ const ExpenseCreateModal = () => {
 
             <FormField
               control={form.control}
+              name='drawer'
+              render={({ field }) => (
+                <FormItem className='flex flex-col'>
+                  <FormLabel className='pointer-events-none my-[5px]'>
+                    ຜູ້ເບີກຈ່າຍ
+                  </FormLabel>
+                  <Popover open={openDrawer} onOpenChange={setOpenDrawer} modal>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          disabled={isPending}
+                          variant='outline'
+                          role='combobox'
+                          aria-expanded={openDrawer}
+                          className='w-full justify-between'
+                        >
+                          {field.value
+                            ? users.find(
+                                (user: User) => user.id === field.value
+                              )?.display_name
+                            : 'ເລືອກຜູ້ເບີກຈ່າຍ...'}
+                          <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <FormMessage />
+                    <PopoverContent className='w-[376px] p-0'>
+                      <Command>
+                        <CommandInput
+                          placeholder='ຄົ້ນຫາລາຍຊື່ຜູ້ໃຊ້...'
+                          className='h-9'
+                        />
+                        <CommandEmpty className='flex-center p-4 text-sm text-foreground/60'>
+                          ບໍ່ພົບລາຍຊື່ຜູ້ໃຊ້ທີ່ຄົ້ນຫາ.
+                        </CommandEmpty>
+                        <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                          {users.map((user: User) => (
+                            <CommandItem
+                              key={user.id}
+                              value={user.display_name}
+                              onSelect={() => {
+                                field.onChange(user.id)
+                                setOpenDrawer(false)
+                              }}
+                            >
+                              {user.display_name}
+                              <CheckIcon
+                                className={cn(
+                                  'ml-auto h-4 w-4',
+                                  field.value === user.id
+                                    ? 'opacity-100'
+                                    : 'opacity-0'
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name='image'
               render={({ field: { onChange, value, ...rest } }) => (
                 <FormItem>
-                  <FormLabel>ຮູບພາບ</FormLabel>
+                  <FormLabel className='pointer-events-none'>ຮູບພາບ</FormLabel>
                   <FormControl>
                     <Input
                       type='file'
                       accept='image/*'
+                      className='cursor-pointer'
                       onChange={(event) => {
-                        const { files, displayUrl } = getImageData(event)
+                        const { files } = getImageData(event)
                         onChange(files)
                       }}
                       {...rest}
@@ -401,7 +578,7 @@ const ExpenseCreateModal = () => {
               name='remark'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ໝາຍເຫດ</FormLabel>
+                  <FormLabel className='pointer-events-none'>ໝາຍເຫດ</FormLabel>
                   <Textarea className='col-span-3' {...field} />
                   <FormMessage />
                 </FormItem>

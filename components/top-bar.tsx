@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 const TopBar = () => {
   const pathname = usePathname()
-  const title = pathname.split('/')[1]
+  const title = pathname.split('/').pop()
   const [user, setUser] = useState<User>()
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const TopBar = () => {
     }
 
     fetchUser()
-  }, [])
+  }, [pathname])
 
   return (
     <section className='w-full border bg-background'>

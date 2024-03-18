@@ -55,6 +55,7 @@ const UserCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, startTransition] = useTransition()
 
+  const users = useUserStore((state) => state.users)
   const setUsers = useUserStore((state) => state.setUsers)
 
   const { toast } = useToast()
@@ -89,15 +90,18 @@ const UserCreateModal = () => {
           return
         }
 
-        const users = await getUser()
-
-        if (users.error || !users.data) return
-
-        const newUsers = users.data.map((item: User) => ({
-          ...item,
-          created_at: formatDate(item.created_at),
-          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
-        }))
+        const newUsers = [
+          ...users,
+          {
+            id: res.data.id,
+            first_name: res.data.user_metadata.first_name,
+            last_name: res.data.user_metadata.last_name,
+            email: res.data.email,
+            role: 'USER',
+            created_at: formatDate(res.data.created_at),
+            updated_at: undefined,
+          } as User,
+        ]
 
         setUsers(newUsers)
         toast({

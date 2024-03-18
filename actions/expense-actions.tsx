@@ -19,7 +19,8 @@ export const getExpense = async (id?: string) => {
           category: category_id (*), 
           currency: currency_id (*), 
           user: user_id (*), 
-          account: account_id (*)`
+          account: account_id (*, currency: currency_id (*)), 
+          drawer: drawer_id (*)`
         )
         .eq('id', id)
     } else {
@@ -27,7 +28,8 @@ export const getExpense = async (id?: string) => {
         `*, 
         category: category_id (*), 
         user: user_id (*), 
-        account: account_id (*, currency: currency_id (*))`
+        account: account_id (*, currency: currency_id (*)), 
+        drawer: drawer_id (*)`
       )
     }
 
@@ -54,9 +56,10 @@ export const createExpense = async (object: ExpenseCreationData) => {
       .insert(object)
       .select(
         `*, 
-      category: category_id (*), 
-      user: user_id (*), 
-      account: account_id (*, currency: currency_id (*))`
+        category: category_id (*), 
+        user: user_id (*), 
+        account: account_id (*, currency: currency_id (*)), 
+        drawer: drawer_id (*)`
       )
 
     return {

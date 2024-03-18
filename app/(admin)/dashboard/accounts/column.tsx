@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { ColumnDef } from '@tanstack/react-table'
 
 import { Account } from '@/types/account'
@@ -14,11 +15,14 @@ import { Currency } from '@/types/currency'
 import { deleteAccount, updateAccount } from '@/actions/account-actions'
 import { getCurrency } from '@/actions/currency-actions'
 
-import { useAccountStore } from '@/stores/useAccountStore'
+import { useAccountStore } from '@/stores'
+
+import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -43,28 +47,27 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { LoadingButton } from '@/components/buttons'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
 const formSchema: any = z.object({
+  name: z.string().min(1, 'ກະລຸນາປ້ອນຊື່ບັນຊີ.'),
   balance: z
     .string()
-    .nonempty('ປ້ອນຈຳນວນເງິນ.')
+    .min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')
     .regex(/^[-]?\d+$/, {
       message: 'ຈຳນວນເງິນຕ້ອງເປັນຕົວເລກເທົ່ານັ້ນ.',
     })
     .refine((value) => Number(value) >= 0, {
       message: 'ປ້ອນຈຳນວນເງິນບໍ່ຖືກຕ້ອງ.',
     }),
-  currency: z.string(),
+  currency: z.string().min(1, 'ກະລຸນາເລືອກສະກຸນເງິນ.'),
   remark: z.string(),
 })
 
@@ -138,7 +141,8 @@ export const columns: ColumnDef<Account>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const [isOpen, setIsOpen] = useState(false)
-      const [options, setOptions] = useState<Currency[]>([])
+      const [currencies, setCurrencies] = useState<Currency[]>([])
+      const [openCurrency, setOpenCurrency] = useState(false)
       const [isPending, startTransition] = useTransition()
 
       const accounts = useAccountStore((state) => state.accounts)
@@ -151,14 +155,17 @@ export const columns: ColumnDef<Account>[] = [
       const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+          name: current.name,
           balance: current.balance.toString(),
-          currency: current.currency.code,
-          remark: current.remark,
+          currency: current.currency.id,
+          remark: current.remark ? current.remark : '',
         },
       })
 
       useEffect(() => {
         const getCurrencyData = async () => {
+          if (currencies.length > 0) return
+
           try {
             const res = await getCurrency()
 
@@ -168,21 +175,20 @@ export const columns: ColumnDef<Account>[] = [
               (a: { code: string }, b: { code: string }) =>
                 a.code.localeCompare(b.code)
             )
-            setOptions(sortedData)
+            setCurrencies(sortedData)
           } catch (error) {
             console.error('Error fetching currency:', error)
           }
         }
 
-        if (options.length > 0) return
-
         getCurrencyData()
-      }, [options])
+      }, [currencies.length, form])
 
       const onSubmit = (values: z.infer<typeof formSchema>) => {
         startTransition(async () => {
           try {
             const accountData = {
+              name: values.name,
               balance: current.balance,
               currency_id: current.currency.id,
               remark: values.remark,
@@ -289,15 +295,52 @@ export const columns: ColumnDef<Account>[] = [
                 onSubmit={form.handleSubmit(onSubmit)}
                 className='grid gap-4 py-4'
               >
-                <div className='flex gap-4'>
+                <FormField
+                  control={form.control}
+                  name='name'
+                  render={({ field }) => (
+                    <FormItem className='flex-1'>
+                      <FormLabel className='pointer-events-none'>
+                        ຊື່ບັນຊີ
+                      </FormLabel>
+                      <FormControl>
+                        <Input disabled={isPending} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className='grid grid-cols-2 gap-4'>
                   <FormField
                     control={form.control}
                     name='balance'
-                    render={({ field }) => (
-                      <FormItem className='flex-1'>
-                        <FormLabel>ຈຳນວນເງິນ</FormLabel>
+                    render={({ field: { onChange, ...rest } }) => (
+                      <FormItem className='w-full'>
+                        <FormLabel className='pointer-events-none'>
+                          ຈຳນວນເງິນ
+                        </FormLabel>
                         <FormControl>
-                          <Input {...field} disabled />
+                          <Input
+                            disabled
+                            onChange={(event: any) => {
+                              const value = event.target.value
+                              const data = event.nativeEvent.data
+
+                              if (isNaN(Number(data))) return
+
+                              if (value.startsWith('0')) {
+                                if (data === '0') {
+                                  onChange(0)
+                                } else {
+                                  onChange(value.slice(1))
+                                }
+                              } else {
+                                onChange(value)
+                              }
+                            }}
+                            {...rest}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -308,31 +351,61 @@ export const columns: ColumnDef<Account>[] = [
                     control={form.control}
                     name='currency'
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ສະກຸນເງິນ</FormLabel>
-                        <Select
-                          disabled={isPending}
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          value={field.value}
+                      <FormItem className='flex flex-col'>
+                        <FormLabel className='pointer-events-none my-[5px]'>
+                          ສະກຸນເງິນ
+                        </FormLabel>
+                        <Popover
+                          open={openCurrency}
+                          onOpenChange={setOpenCurrency}
                         >
-                          <FormControl>
-                            <SelectTrigger className='w-32' disabled>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {options.map((option, index) => (
-                              <SelectItem
-                                key={`option-${index}`}
-                                value={option.code}
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                disabled
+                                variant='outline'
+                                role='combobox'
+                                aria-expanded={openCurrency}
+                                className='w-full justify-between'
                               >
-                                {option.code}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
+                                {field.value
+                                  ? currencies.find(
+                                      (currency: Currency) =>
+                                        currency.id === field.value
+                                    )?.name
+                                  : 'ເລືອກສະກຸນເງິນ...'}
+                                <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <FormMessage />
+                          <PopoverContent className='w-[180px] p-0'>
+                            <Command>
+                              <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                                {currencies.map((currency: Currency) => (
+                                  <CommandItem
+                                    key={currency.id}
+                                    value={currency.id}
+                                    onSelect={() => {
+                                      field.onChange(currency.id)
+                                      setOpenCurrency(false)
+                                    }}
+                                  >
+                                    {currency.name}
+                                    <CheckIcon
+                                      className={cn(
+                                        'ml-auto h-4 w-4',
+                                        field.value === currency.id
+                                          ? 'opacity-100'
+                                          : 'opacity-0'
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                       </FormItem>
                     )}
                   />
@@ -344,7 +417,11 @@ export const columns: ColumnDef<Account>[] = [
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>ໝາຍເຫດ</FormLabel>
-                      <Textarea className='col-span-3' {...field} />
+                      <Textarea
+                        disabled={isPending}
+                        className='col-span-3'
+                        {...field}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
