@@ -40,7 +40,12 @@ export default function Login({
         <Card>
           <CardHeader className='mb-4 space-y-3'>
             <CardTitle className='flex-center relative flex-col text-center text-3xl'>
-              <Image src='/logo.png' alt='logo' width={84} height={84} />
+              <Image
+                src={`${process.env.NEXT_PUBLIC_BUCKET_PATH}/logo.png`}
+                alt='logo'
+                width={84}
+                height={84}
+              />
               <span className='mt-4 text-2xl font-bold'>ວັດໂນນສະຫວ່າງ</span>
               <div className='absolute right-0 top-0'>
                 <ModeToggle />
