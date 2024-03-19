@@ -54,7 +54,7 @@ const UserAvatar = ({ user }: { user?: User }) => {
           <div className='flex-center flex-col gap-1'>
             <h1 className='text-center text-base font-medium'>
               {user ? (
-                `${user.first_name} ${user.last_name}`
+                `${user.title} ${user.first_name} ${user.last_name}`
               ) : (
                 <Skeleton className='h-4 w-56' />
               )}

@@ -3,17 +3,26 @@
 import { useEffect } from 'react'
 
 import { Currency } from '@/types/currency'
+
 import { getCurrency } from '@/actions/currency-actions'
+
 import { usePendingStore, useCurrencyStore } from '@/stores'
+import { CurrencyState } from '@/stores/useCurrencyStore'
+import { PendingState } from '@/stores/usePendingStore'
+
 import { formatDate } from '@/lib/date-format'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
 
 const AdminCurrencies = () => {
-  const currencies = useCurrencyStore((state) => state.currencies)
-  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
-  const setPending = usePendingStore((state) => state.setPending)
+  const currencies = useCurrencyStore(
+    (state: CurrencyState) => state.currencies
+  )
+  const setCurrencies = useCurrencyStore(
+    (state: CurrencyState) => state.setCurrencies
+  )
+  const setPending = usePendingStore((state: PendingState) => state.setPending)
 
   useEffect(() => {
     const fetchData = async () => {

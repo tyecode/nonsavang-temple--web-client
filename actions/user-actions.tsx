@@ -35,7 +35,7 @@ export const getUser = async (id?: string) => {
 }
 
 export const createUser = async (object: UserCreationData) => {
-  const { email, password, first_name, last_name } = object
+  const { email, password, title, first_name, last_name } = object
 
   try {
     const {
@@ -45,6 +45,7 @@ export const createUser = async (object: UserCreationData) => {
       password,
       email_confirm: true,
       user_metadata: {
+        title,
         first_name,
         last_name,
       },

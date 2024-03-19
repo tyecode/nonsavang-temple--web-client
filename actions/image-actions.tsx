@@ -11,7 +11,7 @@ export const uploadImage = async (file: File) => {
 
   const { data, error } = await supabase.storage
     .from(bucket)
-    .upload(`abbeyard-${timestamp}-${file.name}`, file, {
+    .upload(`avatar/avatar-${timestamp}-${file.name}`, file, {
       cacheControl: '3600',
       upsert: true,
     })
@@ -59,10 +59,10 @@ export const uploadExpenseImage = async (file: File) => {
   }
 }
 
-export const deleteImage = async (key: string | undefined) => {
+export const deleteImage = async (imageName: string | undefined) => {
   const bucket = 'images'
 
-  if (!key) {
+  if (!imageName) {
     return {
       data: null,
       error: null,
@@ -70,7 +70,9 @@ export const deleteImage = async (key: string | undefined) => {
     }
   }
 
-  const { data, error } = await supabase.storage.from(bucket).remove([key])
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .remove([`avatar/${imageName}`])
 
   if (error) {
     console.error('Image delete failed:', error)
@@ -88,10 +90,10 @@ export const deleteImage = async (key: string | undefined) => {
   }
 }
 
-export const deleteExpenseImage = async (key: string | undefined) => {
+export const deleteExpenseImage = async (imageName: string | undefined) => {
   const bucket = 'images'
 
-  if (!key) {
+  if (!imageName) {
     return {
       data: null,
       error: null,
@@ -101,7 +103,7 @@ export const deleteExpenseImage = async (key: string | undefined) => {
 
   const { data, error } = await supabase.storage
     .from(bucket)
-    .remove([`expense/${key}`])
+    .remove([`expense/${imageName}`])
 
   if (error) {
     console.error('Image delete failed:', error)

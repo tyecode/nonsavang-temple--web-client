@@ -19,6 +19,8 @@ import { getIncomeCategory } from '@/actions/income-category-actions'
 import { getSession } from '@/actions/auth-actions'
 
 import { useDonatorStore, useIncomeStore } from '@/stores'
+import { DonatorState } from '@/stores/useDonatorStore'
+import { IncomeState } from '@/stores/useIncomeStore'
 
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/date-format'
@@ -84,14 +86,16 @@ const IncomeCreateModal = () => {
   const [isDonate, setIsDonate] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [openDonator, setOpenDonator] = useState(false)
   const [openAccount, setOpenAccount] = useState(false)
   const [openCategory, setOpenCategory] = useState(false)
   const [openCurrency, setOpenCurrency] = useState(false)
+  const [openDonator, setOpenDonator] = useState(false)
 
-  const donators = useDonatorStore((state) => state.donators)
-  const setDonators = useDonatorStore((state) => state.setDonators)
-  const setIncomes = useIncomeStore((state) => state.setIncomes)
+  const donators = useDonatorStore((state: DonatorState) => state.donators)
+  const setDonators = useDonatorStore(
+    (state: DonatorState) => state.setDonators
+  )
+  const setIncomes = useIncomeStore((state: IncomeState) => state.setIncomes)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { User } from '@/types/user'
 
-interface UserState {
+export interface UserState {
   users: User[]
   setUsers: (state: User[]) => void
 }
@@ -12,7 +12,7 @@ export const useUserStore = create<UserState>((set) => ({
     set(() => ({
       users: state.map((user) => ({
         ...user,
-        display_name: `${user.first_name} ${user.last_name}`,
+        display_name: `${user.title} ${user.first_name} ${user.last_name}`,
       })),
     })),
 }))

@@ -20,6 +20,8 @@ import { getUser } from '@/actions/user-actions'
 import { uploadExpenseImage } from '@/actions/image-actions'
 
 import { useExpenseStore, useUserStore } from '@/stores'
+import { ExpenseState } from '@/stores/useExpenseStore'
+import { UserState } from '@/stores/useUserStore'
 
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/date-format'
@@ -94,9 +96,11 @@ const ExpenseCreateModal = () => {
   const [openCurrency, setOpenCurrency] = useState(false)
   const [openDrawer, setOpenDrawer] = useState(false)
 
-  const setExpenses = useExpenseStore((state) => state.setExpenses)
-  const users = useUserStore((state) => state.users)
-  const setUsers = useUserStore((state) => state.setUsers)
+  const setExpenses = useExpenseStore(
+    (state: ExpenseState) => state.setExpenses
+  )
+  const setUsers = useUserStore((state: UserState) => state.setUsers)
+  const users = useUserStore((state: UserState) => state.users)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -558,6 +562,7 @@ const ExpenseCreateModal = () => {
                   <FormLabel className='pointer-events-none'>ຮູບພາບ</FormLabel>
                   <FormControl>
                     <Input
+                      disabled={isPending}
                       type='file'
                       accept='image/*'
                       className='cursor-pointer'
@@ -579,7 +584,11 @@ const ExpenseCreateModal = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='pointer-events-none'>ໝາຍເຫດ</FormLabel>
-                  <Textarea className='col-span-3' {...field} />
+                  <Textarea
+                    disabled={isPending}
+                    className='col-span-3'
+                    {...field}
+                  />
                   <FormMessage />
                 </FormItem>
               )}

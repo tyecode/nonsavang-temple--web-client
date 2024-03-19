@@ -2,21 +2,27 @@
 
 import { useEffect } from 'react'
 
-import { formatDate } from '@/lib/date-format'
-
-import { useIncomeCategoryStore, usePendingStore } from '@/stores'
+import { Category } from '@/types/category'
 
 import { getIncomeCategory } from '@/actions/income-category-actions'
 
-import { Category } from '@/types/category'
+import { useIncomeCategoryStore, usePendingStore } from '@/stores'
+import { CategoryState } from '@/stores/useIncomeCategoryStore'
+import { PendingState } from '@/stores/usePendingStore'
+
+import { formatDate } from '@/lib/date-format'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
 
 const AdminIncomeCategory = () => {
-  const categories = useIncomeCategoryStore((state) => state.categories)
-  const setCategories = useIncomeCategoryStore((state) => state.setCategories)
-  const setPending = usePendingStore((state) => state.setPending)
+  const setPending = usePendingStore((state: PendingState) => state.setPending)
+  const categories = useIncomeCategoryStore(
+    (state: CategoryState) => state.categories
+  )
+  const setCategories = useIncomeCategoryStore(
+    (state: CategoryState) => state.setCategories
+  )
 
   useEffect(() => {
     const fetchData = async () => {

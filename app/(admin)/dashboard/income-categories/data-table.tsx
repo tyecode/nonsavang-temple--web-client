@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
-
 import {
   ColumnDef,
   SortingState,
@@ -14,15 +13,24 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
+import { Category } from '@/types/category'
+
+import { deleteIncomeCategory } from '@/actions/income-category-actions'
+
+import { useIncomeCategoryStore, usePendingStore } from '@/stores'
+import { CategoryState } from '@/stores/useIncomeCategoryStore'
+import { PendingState } from '@/stores/usePendingStore'
+
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { useToast } from '@/components/ui/use-toast'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Table,
   TableBody,
@@ -31,17 +39,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
+import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
-import { LoadingButton } from '@/components/buttons'
 import { CategoryCreateModal } from '@/components/modals/income-category'
-import { useToast } from '@/components/ui/use-toast'
-
-import { useIncomeCategoryStore, usePendingStore } from '@/stores'
-
-import { Category } from '@/types/category'
-import { deleteIncomeCategory } from '@/actions/income-category-actions'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -60,9 +61,13 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const categories = useIncomeCategoryStore((state) => state.categories)
-  const setCategories = useIncomeCategoryStore((state) => state.setCategories)
+  const isPending = usePendingStore((state: PendingState) => state.isPending)
+  const categories = useIncomeCategoryStore(
+    (state: CategoryState) => state.categories
+  )
+  const setCategories = useIncomeCategoryStore(
+    (state: CategoryState) => state.setCategories
+  )
 
   const { toast } = useToast()
 

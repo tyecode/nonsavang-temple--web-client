@@ -2,22 +2,25 @@
 
 import { useEffect } from 'react'
 
-import { formatDate } from '@/lib/date-format'
-
 import { Expense } from '@/types/expense'
 
 import { getExpense } from '@/actions/expense-actions'
 
-import { usePendingStore } from '@/stores'
-import { useExpenseStore } from '@/stores/useExpenseStore'
+import { usePendingStore, useExpenseStore } from '@/stores'
+import { ExpenseState } from '@/stores/useExpenseStore'
+import { PendingState } from '@/stores/usePendingStore'
 
-import { columns } from './column'
+import { formatDate } from '@/lib/date-format'
+
 import { DataTable } from './data-table'
+import { columns } from './column'
 
 const AdminCurrencies = () => {
-  const expenses = useExpenseStore((state) => state.expenses)
-  const setExpenses = useExpenseStore((state) => state.setExpenses)
-  const setPending = usePendingStore((state) => state.setPending)
+  const setPending = usePendingStore((state: PendingState) => state.setPending)
+  const expenses = useExpenseStore((state: ExpenseState) => state.expenses)
+  const setExpenses = useExpenseStore(
+    (state: ExpenseState) => state.setExpenses
+  )
 
   useEffect(() => {
     const fetchData = async () => {

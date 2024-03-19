@@ -5,6 +5,15 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { Currency } from '@/types/currency'
+
+import { createCurrency, getCurrency } from '@/actions/currency-actions'
+
+import { useCurrencyStore } from '@/stores'
+import { CurrencyState } from '@/stores/useCurrencyStore'
+
+import { formatDate } from '@/lib/date-format'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { LoadingButton } from '@/components/buttons'
@@ -25,11 +34,6 @@ import {
 } from '@/components/ui/form'
 import { useToast } from '@/components/ui/use-toast'
 
-import { createCurrency, getCurrency } from '@/actions/currency-actions'
-import { useCurrencyStore } from '@/stores'
-import { formatDate } from '@/lib/date-format'
-import { Currency } from '@/types/currency'
-
 const formSchema: any = z.object({
   code: z
     .string()
@@ -48,7 +52,9 @@ const CurrencyCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
+  const setCurrencies = useCurrencyStore(
+    (state: CurrencyState) => state.setCurrencies
+  )
 
   const { toast } = useToast()
 
@@ -124,7 +130,9 @@ const CurrencyCreateModal = () => {
               name='code'
               render={({ field: { onChange, value, ...rest } }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ລະຫັດສະກຸນເງິນ</FormLabel>
+                  <FormLabel className='pointer-events-none'>
+                    ລະຫັດສະກຸນເງິນ
+                  </FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
@@ -143,7 +151,9 @@ const CurrencyCreateModal = () => {
               name='name'
               render={({ field }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ຊື່ສະກຸນເງິນ</FormLabel>
+                  <FormLabel className='pointer-events-none'>
+                    ຊື່ສະກຸນເງິນ
+                  </FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
                   </FormControl>

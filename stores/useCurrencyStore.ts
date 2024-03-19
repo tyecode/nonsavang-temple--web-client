@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { Currency } from '@/types/currency'
 
-interface CurrencyState {
+export interface CurrencyState {
   currencies: Currency[]
   setCurrencies: (currency: Currency[]) => void
 }

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { Donator } from '@/types/donator'
 
-interface DonatorState {
+export interface DonatorState {
   donators: Donator[]
   setDonators: (state: Donator[]) => void
 }

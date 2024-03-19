@@ -2,6 +2,7 @@ export type User = {
   id: string
   email: string
   role: string
+  title: string
   first_name: string
   last_name: string
   display_name?: string
@@ -12,6 +13,7 @@ export type User = {
 
 export type UserCreationData = {
   email: string
+  title: string
   first_name: string
   last_name: string
   password: string
@@ -19,6 +21,7 @@ export type UserCreationData = {
 
 export type UserModificationData = {
   role?: string
+  title?: string
   first_name?: string
   last_name?: string
   image?: string | null

@@ -4,8 +4,22 @@ import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+
+import { User } from '@/types/user'
+
+import { createUser } from '@/actions/user-actions'
+
+import { UserState, useUserStore } from '@/stores/useUserStore'
+
+import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
+import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
+import { Input } from '@/components/ui/input'
+import { LoadingButton } from '@/components/buttons'
 import {
   Dialog,
   DialogContent,
@@ -21,17 +35,19 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { LoadingButton } from '@/components/buttons'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { useToast } from '@/components/ui/use-toast'
-
-import { createUser, getUser } from '@/actions/user-actions'
-import { User } from '@/types/user'
-import { useUserStore } from '@/stores/useUserStore'
-
-import { formatDate } from '@/lib/date-format'
+import { cn } from '@/lib/utils'
+import { USER_TITLES } from '@/constants/title-name'
 
 const formSchema: any = z.object({
+  title: z.string().min(1, {
+    message: 'ກະລຸນາປ້ອນຄຳນຳໜ້າ.',
+  }),
   first_name: z.string().min(1, {
     message: 'ກະລຸນາປ້ອນຊື່.',
   }),
@@ -53,16 +69,20 @@ const formSchema: any = z.object({
 
 const UserCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoading, startTransition] = useTransition()
+  const [isShow, setIsShow] = useState(false)
+  const [openTitle, setOpenTitle] = useState(false)
 
-  const users = useUserStore((state) => state.users)
-  const setUsers = useUserStore((state) => state.setUsers)
+  const [isPending, startTransition] = useTransition()
+
+  const users = useUserStore((state: UserState) => state.users)
+  const setUsers = useUserStore((state: UserState) => state.setUsers)
 
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      title: 'ພຣະ',
       first_name: '',
       last_name: '',
       email: '',
@@ -72,12 +92,13 @@ const UserCreateModal = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
-      const { email, password, first_name, last_name } = values
+      const { email, password, title, first_name, last_name } = values
 
       try {
         const res = await createUser({
           email,
           password,
+          title,
           first_name,
           last_name,
         })
@@ -94,6 +115,7 @@ const UserCreateModal = () => {
           ...users,
           {
             id: res.data.id,
+            title: res.data.user_metadata.title,
             first_name: res.data.user_metadata.first_name,
             last_name: res.data.user_metadata.last_name,
             email: res.data.email,
@@ -119,7 +141,7 @@ const UserCreateModal = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {isLoading ? (
+        {isPending ? (
           <LoadingButton>ເພິ່ມຂໍ້ມູນ</LoadingButton>
         ) : (
           <Button size={'sm'}>ເພິ່ມຂໍ້ມູນ</Button>
@@ -134,15 +156,77 @@ const UserCreateModal = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             className='grid gap-2 py-4'
           >
+            <FormField
+              control={form.control}
+              name='title'
+              render={({ field }) => (
+                <FormItem className='flex flex-col'>
+                  <FormLabel className='pointer-events-none my-[5px]'>
+                    ຄຳນຳໜ້າ
+                  </FormLabel>
+                  <Popover open={openTitle} onOpenChange={setOpenTitle}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          disabled={isPending}
+                          variant='outline'
+                          role='combobox'
+                          aria-expanded={openTitle}
+                          className='w-full justify-between'
+                        >
+                          {field.value
+                            ? USER_TITLES.find(
+                                (option: { id: number; title: string }) =>
+                                  option.title === field.value
+                              )?.title
+                            : 'ເລືອກຄຳນຳໜ້າ...'}
+                          <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <FormMessage />
+                    <PopoverContent className='w-[390px] p-0'>
+                      <Command>
+                        <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                          {USER_TITLES.map(
+                            (option: { id: number; title: string }) => (
+                              <CommandItem
+                                key={option.id}
+                                value={option.title}
+                                onSelect={() => {
+                                  field.onChange(option.title)
+                                  setOpenTitle(false)
+                                }}
+                              >
+                                {option.title}
+                                <CheckIcon
+                                  className={cn(
+                                    'ml-auto h-4 w-4',
+                                    field.value === option.title
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            )
+                          )}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
+
             <div className='flex gap-4'>
               <FormField
                 control={form.control}
                 name='first_name'
                 render={({ field }) => (
                   <FormItem className='flex-1'>
-                    <FormLabel>ຊື່</FormLabel>
+                    <FormLabel className='pointer-events-none'>ຊື່</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input disabled={isPending} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -154,9 +238,11 @@ const UserCreateModal = () => {
                 name='last_name'
                 render={({ field }) => (
                   <FormItem className='flex-1'>
-                    <FormLabel>ນາມສະກຸນ</FormLabel>
+                    <FormLabel className='pointer-events-none'>
+                      ນາມສະກຸນ
+                    </FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input disabled={isPending} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -169,9 +255,9 @@ const UserCreateModal = () => {
               name='email'
               render={({ field }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ອີເມວ</FormLabel>
+                  <FormLabel className='pointer-events-none'>ອີເມວ</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -182,18 +268,44 @@ const UserCreateModal = () => {
               control={form.control}
               name='password'
               render={({ field }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel>ລະຫັດຜ່ານ</FormLabel>
+                <FormItem className='group relative flex-1'>
+                  <FormLabel className='pointer-events-none'>
+                    ລະຫັດຜ່ານ
+                  </FormLabel>
                   <FormControl>
-                    <Input type='password' {...field} />
+                    <Input
+                      disabled={isPending}
+                      type={isShow ? 'text' : 'password'}
+                      className='pr-12'
+                      {...field}
+                    />
                   </FormControl>
+                  <span className='absolute right-4 top-8 cursor-pointer opacity-0 duration-200 group-hover:opacity-100'>
+                    {isShow ? (
+                      <FontAwesomeIcon
+                        icon={faEye}
+                        width={20}
+                        height={20}
+                        className='text-foreground/50'
+                        onClick={() => setIsShow(!isShow)}
+                      />
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={faEyeSlash}
+                        width={20}
+                        height={20}
+                        className='text-foreground/50'
+                        onClick={() => setIsShow(!isShow)}
+                      />
+                    )}
+                  </span>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
             <div className='mt-2 flex w-full justify-end'>
-              {!isLoading ? (
+              {!isPending ? (
                 <Button type='submit' size={'sm'} className='w-fit'>
                   ເພິ່ມຂໍ້ມູນ
                 </Button>

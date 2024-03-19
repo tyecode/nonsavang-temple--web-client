@@ -2,21 +2,25 @@
 
 import { useEffect } from 'react'
 
-import { DataTable } from './data-table'
-import { columns } from './column'
-
 import { Account } from '@/types/account'
 
 import { getAccount } from '@/actions/account-actions'
 
 import { usePendingStore, useAccountStore } from '@/stores'
+import { AccountState } from '@/stores/useAccountStore'
+import { PendingState } from '@/stores/usePendingStore'
 
 import { formatDate } from '@/lib/date-format'
 
+import { DataTable } from './data-table'
+import { columns } from './column'
+
 const AdminAccounts = () => {
-  const accounts = useAccountStore((state) => state.accounts)
-  const setAccounts = useAccountStore((state) => state.setAccounts)
-  const setPending = usePendingStore((state) => state.setPending)
+  const accounts = useAccountStore((state: AccountState) => state.accounts)
+  const setAccounts = useAccountStore(
+    (state: AccountState) => state.setAccounts
+  )
+  const setPending = usePendingStore((state: PendingState) => state.setPending)
 
   useEffect(() => {
     const fetchData = async () => {

@@ -1,7 +1,7 @@
 import { Category } from '@/types/category'
 import { create } from 'zustand'
 
-interface CategoryState {
+export interface CategoryState {
   categories: Category[]
   setCategories: (state: Category[]) => void
 }

@@ -2,19 +2,27 @@
 
 import { useEffect } from 'react'
 
-import { usePendingStore } from '@/stores'
+import { Category } from '@/types/category'
+
+import { getExpenseCategory } from '@/actions/expense-category-actions'
+
+import { usePendingStore, useExpenseCategoryStore } from '@/stores'
+import { CategoryState } from '@/stores/useExpenseCategoryStore'
+import { PendingState } from '@/stores/usePendingStore'
+
 import { formatDate } from '@/lib/date-format'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
-import { useExpenseCategoryStore } from '@/stores/useExpenseCategoryStore'
-import { getExpenseCategory } from '@/actions/expense-category-actions'
-import { Category } from '@/types/category'
 
 const AdminExpenseCategory = () => {
-  const categories = useExpenseCategoryStore((state) => state.categories)
-  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
-  const setPending = usePendingStore((state) => state.setPending)
+  const categories = useExpenseCategoryStore(
+    (state: CategoryState) => state.categories
+  )
+  const setCategories = useExpenseCategoryStore(
+    (state: CategoryState) => state.setCategories
+  )
+  const setPending = usePendingStore((state: PendingState) => state.setPending)
 
   useEffect(() => {
     const fetchData = async () => {

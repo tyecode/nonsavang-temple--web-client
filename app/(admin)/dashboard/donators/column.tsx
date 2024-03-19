@@ -2,14 +2,30 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { ColumnDef } from '@tanstack/react-table'
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ColumnDef } from '@tanstack/react-table'
+import {
+  CaretSortIcon,
+  CheckIcon,
+  DotsHorizontalIcon,
+} from '@radix-ui/react-icons'
+import { Spinner } from '@nextui-org/react'
+
+import { Donator } from '@/types/donator'
+
+import { deleteDonator, updateDonator } from '@/actions/donator-actions'
+
+import { useDonatorStore } from '@/stores'
+import { DonatorState } from '@/stores/useDonatorStore'
+
+import { cn } from '@/lib/utils'
+import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -34,23 +50,14 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Spinner } from '@nextui-org/react'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { useToast } from '@/components/ui/use-toast'
 import { LoadingButton } from '@/components/buttons'
 
-import { formatDate } from '@/lib/date-format'
-
-import { Donator } from '@/types/donator'
-
-import { deleteDonator, updateDonator } from '@/actions/donator-actions'
-
-import { useDonatorStore } from '@/stores'
+import { DONATOR_TITLES } from '@/constants/title-name'
 
 const formSchema: any = z.object({
   title: z.string().min(1, {
@@ -124,11 +131,15 @@ export const columns: ColumnDef<Donator>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const [isOpen, setIsOpen] = useState(false)
       const [isPending, startTransition] = useTransition()
+      const [isOpen, setIsOpen] = useState(false)
+      const [openTitle, setOpenTitle] = useState(false)
 
-      const donators = useDonatorStore((state) => state.donators)
-      const setDonators = useDonatorStore((state) => state.setDonators)
+      const donators = useDonatorStore((state: DonatorState) => state.donators)
+      const setDonators = useDonatorStore(
+        (state: DonatorState) => state.setDonators
+      )
+
       const { toast } = useToast()
 
       const current = row.original
@@ -264,44 +275,77 @@ export const columns: ColumnDef<Donator>[] = [
                 onSubmit={form.handleSubmit(onSubmit)}
                 className='grid gap-2 py-4'
               >
-                <div className='grid grid-cols-3 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='title'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ຄຳນຳໜ້າ</FormLabel>
-                        <Select
-                          disabled={isPending}
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          value={field.value}
-                        >
+                <FormField
+                  control={form.control}
+                  name='title'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-col'>
+                      <FormLabel className='pointer-events-none my-[5px]'>
+                        ຄຳນຳໜ້າ
+                      </FormLabel>
+                      <Popover open={openTitle} onOpenChange={setOpenTitle}>
+                        <PopoverTrigger asChild>
                           <FormControl>
-                            <SelectTrigger className='flex-1'>
-                              <SelectValue />
-                            </SelectTrigger>
+                            <Button
+                              disabled={isPending}
+                              variant='outline'
+                              role='combobox'
+                              aria-expanded={openTitle}
+                              className='w-full justify-between'
+                            >
+                              {field.value
+                                ? DONATOR_TITLES.find(
+                                    (option: { id: number; title: string }) =>
+                                      option.title === field.value
+                                  )?.title
+                                : 'ເລືອກຄຳນຳໜ້າ...'}
+                              <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                            </Button>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value={'ແມ່ຕູ້'}>ແມ່ຕູ້</SelectItem>
-                            <SelectItem value={'ພໍ່ຕູ້'}>ພໍ່ຕູ້</SelectItem>
-                            <SelectItem value={'ແມ່ອອກ'}>ແມ່ອອກ</SelectItem>
-                            <SelectItem value={'ພໍ່ອອກ'}>ພໍ່ອອກ</SelectItem>
-                            <SelectItem value={'ນາງ'}>ນາງ</SelectItem>
-                            <SelectItem value={'ທ້າວ'}>ທ້າວ</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        </PopoverTrigger>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                        <PopoverContent className='w-[400px] p-0'>
+                          <Command>
+                            <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                              {DONATOR_TITLES.map(
+                                (option: { id: number; title: string }) => (
+                                  <CommandItem
+                                    key={option.id}
+                                    value={option.title}
+                                    onSelect={() => {
+                                      field.onChange(option.title)
+                                      setOpenTitle(false)
+                                    }}
+                                  >
+                                    {option.title}
+                                    <CheckIcon
+                                      className={cn(
+                                        'ml-auto h-4 w-4',
+                                        field.value === option.title
+                                          ? 'opacity-100'
+                                          : 'opacity-0'
+                                      )}
+                                    />
+                                  </CommandItem>
+                                )
+                              )}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </FormItem>
+                  )}
+                />
 
+                <div className='grid grid-cols-2 gap-4'>
                   <FormField
                     control={form.control}
                     name='first_name'
                     render={({ field }) => (
                       <FormItem className='flex-1'>
-                        <FormLabel>ຊື່</FormLabel>
+                        <FormLabel className='pointer-events-none'>
+                          ຊື່
+                        </FormLabel>
                         <FormControl>
                           <Input disabled={isPending} {...field} />
                         </FormControl>
@@ -315,7 +359,9 @@ export const columns: ColumnDef<Donator>[] = [
                     name='last_name'
                     render={({ field }) => (
                       <FormItem className='flex-1'>
-                        <FormLabel>ນາມສະກຸນ</FormLabel>
+                        <FormLabel className='pointer-events-none'>
+                          ນາມສະກຸນ
+                        </FormLabel>
                         <FormControl>
                           <Input disabled={isPending} {...field} />
                         </FormControl>
@@ -330,7 +376,9 @@ export const columns: ColumnDef<Donator>[] = [
                   name='village'
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ບ້ານ</FormLabel>
+                      <FormLabel className='pointer-events-none'>
+                        ບ້ານ
+                      </FormLabel>
                       <FormControl>
                         <Input disabled={isPending} {...field} />
                       </FormControl>
@@ -344,7 +392,9 @@ export const columns: ColumnDef<Donator>[] = [
                   name='district'
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ເມືອງ</FormLabel>
+                      <FormLabel className='pointer-events-none'>
+                        ເມືອງ
+                      </FormLabel>
                       <FormControl>
                         <Input disabled={isPending} {...field} />
                       </FormControl>
@@ -358,7 +408,9 @@ export const columns: ColumnDef<Donator>[] = [
                   name='province'
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ແຂວງ</FormLabel>
+                      <FormLabel className='pointer-events-none'>
+                        ແຂວງ
+                      </FormLabel>
                       <FormControl>
                         <Input disabled={isPending} {...field} />
                       </FormControl>

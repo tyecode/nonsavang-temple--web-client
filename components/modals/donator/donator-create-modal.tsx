@@ -4,8 +4,23 @@ import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+
+import { Donator } from '@/types/donator'
+import { DonatorState } from '@/stores/useDonatorStore'
+
+import { createDonator, getDonator } from '@/actions/donator-actions'
+
+import { useDonatorStore } from '@/stores'
+
+import { cn } from '@/lib/utils'
+import { formatDate } from '@/lib/date-format'
+import { DONATOR_TITLES } from '@/constants/title-name'
 
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { LoadingButton } from '@/components/buttons'
+import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -21,21 +36,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { LoadingButton } from '@/components/buttons'
-import { useToast } from '@/components/ui/use-toast'
-
-import { formatDate } from '@/lib/date-format'
-import { useDonatorStore } from '@/stores'
-import { createDonator, getDonator } from '@/actions/donator-actions'
-import { Donator } from '@/types/donator'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { useToast } from '@/components/ui/use-toast'
 
 const formSchema: any = z.object({
   title: z.string().min(1, {
@@ -53,17 +59,20 @@ const formSchema: any = z.object({
 })
 
 const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
-  const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [isOpen, setIsOpen] = useState(false)
+  const [openTitle, setOpenTitle] = useState(false)
 
-  const setDonators = useDonatorStore((state) => state.setDonators)
+  const setDonators = useDonatorStore(
+    (state: DonatorState) => state.setDonators
+  )
 
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: '',
+      title: DONATOR_TITLES[0].title,
       first_name: '',
       last_name: '',
       village: '',
@@ -143,44 +152,75 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className='grid gap-2 py-4'
           >
-            <div className='grid grid-cols-3 gap-4'>
-              <FormField
-                control={form.control}
-                name='title'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ຄຳນຳໜ້າ</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
+            <FormField
+              control={form.control}
+              name='title'
+              render={({ field }) => (
+                <FormItem className='flex flex-col'>
+                  <FormLabel className='pointer-events-none my-[5px]'>
+                    ຄຳນຳໜ້າ
+                  </FormLabel>
+                  <Popover open={openTitle} onOpenChange={setOpenTitle}>
+                    <PopoverTrigger asChild>
                       <FormControl>
-                        <SelectTrigger className='flex-1'>
-                          <SelectValue />
-                        </SelectTrigger>
+                        <Button
+                          disabled={isPending}
+                          variant='outline'
+                          role='combobox'
+                          aria-expanded={openTitle}
+                          className='w-full justify-between'
+                        >
+                          {field.value
+                            ? DONATOR_TITLES.find(
+                                (option: { id: number; title: string }) =>
+                                  option.title === field.value
+                              )?.title
+                            : 'ເລືອກຄຳນຳໜ້າ...'}
+                          <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                        </Button>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value={'ແມ່ຕູ້'}>ແມ່ຕູ້</SelectItem>
-                        <SelectItem value={'ພໍ່ຕູ້'}>ພໍ່ຕູ້</SelectItem>
-                        <SelectItem value={'ແມ່ອອກ'}>ແມ່ອອກ</SelectItem>
-                        <SelectItem value={'ພໍ່ອອກ'}>ພໍ່ອອກ</SelectItem>
-                        <SelectItem value={'ນາງ'}>ນາງ</SelectItem>
-                        <SelectItem value={'ທ້າວ'}>ທ້າວ</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    </PopoverTrigger>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <PopoverContent className='w-[400px] p-0'>
+                      <Command>
+                        <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                          {DONATOR_TITLES.map(
+                            (option: { id: number; title: string }) => (
+                              <CommandItem
+                                key={option.id}
+                                value={option.title}
+                                onSelect={() => {
+                                  field.onChange(option.title)
+                                  setOpenTitle(false)
+                                }}
+                              >
+                                {option.title}
+                                <CheckIcon
+                                  className={cn(
+                                    'ml-auto h-4 w-4',
+                                    field.value === option.title
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            )
+                          )}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
 
+            <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
                 name='first_name'
                 render={({ field }) => (
                   <FormItem className='flex-1'>
-                    <FormLabel>ຊື່</FormLabel>
+                    <FormLabel className='pointer-events-none'>ຊື່</FormLabel>
                     <FormControl>
                       <Input disabled={isPending} {...field} />
                     </FormControl>
@@ -194,7 +234,9 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
                 name='last_name'
                 render={({ field }) => (
                   <FormItem className='flex-1'>
-                    <FormLabel>ນາມສະກຸນ</FormLabel>
+                    <FormLabel className='pointer-events-none'>
+                      ນາມສະກຸນ
+                    </FormLabel>
                     <FormControl>
                       <Input disabled={isPending} {...field} />
                     </FormControl>
@@ -209,7 +251,7 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
               name='village'
               render={({ field }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ບ້ານ</FormLabel>
+                  <FormLabel className='pointer-events-none'>ບ້ານ</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
                   </FormControl>
@@ -223,7 +265,7 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
               name='district'
               render={({ field }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ເມືອງ</FormLabel>
+                  <FormLabel className='pointer-events-none'>ເມືອງ</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
                   </FormControl>
@@ -237,7 +279,7 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
               name='province'
               render={({ field }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ແຂວງ</FormLabel>
+                  <FormLabel className='pointer-events-none'>ແຂວງ</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
                   </FormControl>

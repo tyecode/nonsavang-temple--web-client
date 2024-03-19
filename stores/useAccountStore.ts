@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { Account } from '@/types/account'
 
-interface AccountState {
+export interface AccountState {
   accounts: Account[]
   setAccounts: (state: Account[]) => void
 }

@@ -3,11 +3,22 @@
 
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ColumnDef } from '@tanstack/react-table'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+
+import { Category } from '@/types/category'
+
+import {
+  deleteIncomeCategory,
+  updateIncomeCategory,
+} from '@/actions/income-category-actions'
+
+import { useIncomeCategoryStore } from '@/stores'
+import { CategoryState } from '@/stores/useIncomeCategoryStore'
+
+import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -34,18 +45,8 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
 import { LoadingButton } from '@/components/buttons'
 import { useToast } from '@/components/ui/use-toast'
-
-import { formatDate } from '@/lib/date-format'
-
-import { Category } from '@/types/category'
-import { useIncomeCategoryStore } from '@/stores'
-import {
-  deleteIncomeCategory,
-  updateIncomeCategory,
-} from '@/actions/income-category-actions'
 
 const formSchema: any = z.object({
   name: z.string().min(1, {
@@ -101,9 +102,11 @@ export const columns: ColumnDef<Category>[] = [
       const [isOpen, setIsOpen] = useState(false)
       const [isPending, startTransition] = useTransition()
 
-      const categories = useIncomeCategoryStore((state) => state.categories)
+      const categories = useIncomeCategoryStore(
+        (state: CategoryState) => state.categories
+      )
       const setCategories = useIncomeCategoryStore(
-        (state) => state.setCategories
+        (state: CategoryState) => state.setCategories
       )
 
       const { toast } = useToast()
@@ -230,9 +233,11 @@ export const columns: ColumnDef<Category>[] = [
                   name='name'
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ຊື່ປະເພດລາຍຮັບ</FormLabel>
+                      <FormLabel className='pointer-events-none'>
+                        ຊື່ປະເພດລາຍຮັບ
+                      </FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input disabled={isPending} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

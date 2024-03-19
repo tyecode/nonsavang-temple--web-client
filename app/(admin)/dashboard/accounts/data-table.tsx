@@ -16,9 +16,13 @@ import {
 
 import { Account } from '@/types/account'
 
-import { usePendingStore, useAccountStore } from '@/stores'
-
 import { deleteAccount, getAccount } from '@/actions/account-actions'
+
+import { usePendingStore, useAccountStore } from '@/stores'
+import { PendingState } from '@/stores/usePendingStore'
+import { AccountState } from '@/stores/useAccountStore'
+
+import { formatDate } from '@/lib/date-format'
 
 import { AccountCreateModal } from '@/components/modals/account'
 import { Button } from '@/components/ui/button'
@@ -43,8 +47,6 @@ import { useToast } from '@/components/ui/use-toast'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { LoadingButton } from '@/components/buttons'
 
-import { formatDate } from '@/lib/date-format'
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -62,8 +64,10 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const setAccounts = useAccountStore((state) => state.setAccounts)
+  const isPending = usePendingStore((state: PendingState) => state.isPending)
+  const setAccounts = useAccountStore(
+    (state: AccountState) => state.setAccounts
+  )
 
   const { toast } = useToast()
 

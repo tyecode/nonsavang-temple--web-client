@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
-
 import {
   ColumnDef,
   SortingState,
@@ -13,6 +12,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+
+import { Donator } from '@/types/donator'
+import { User } from '@/types/user'
+
+import { deleteDonator } from '@/actions/donator-actions'
+
+import { useDonatorStore, usePendingStore } from '@/stores'
+import { DonatorState } from '@/stores/useDonatorStore'
+import { PendingState } from '@/stores/usePendingStore'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,13 +45,6 @@ import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DonatorCreateModal } from '@/components/modals/donator'
 
-import { useDonatorStore, usePendingStore } from '@/stores'
-
-import { deleteDonator } from '@/actions/donator-actions'
-
-import { User } from '@/types/user'
-import { Donator } from '@/types/donator'
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -55,17 +56,19 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [globalFilter, setGlobalFilters] = useState<string>('')
+  const [isLoading, startTransition] = useTransition()
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [rowSelection, setRowSelection] = useState({})
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
-  const donators = useDonatorStore((state) => state.donators)
-  const isPending = usePendingStore((state) => state.isPending)
-  const setDonators = useDonatorStore((state) => state.setDonators)
+  const donators = useDonatorStore((state: DonatorState) => state.donators)
+  const isPending = usePendingStore((state: PendingState) => state.isPending)
+  const setDonators = useDonatorStore(
+    (state: DonatorState) => state.setDonators
+  )
 
   const { toast } = useToast()
-  const [isLoading, startTransition] = useTransition()
 
   const table = useReactTable({
     data,

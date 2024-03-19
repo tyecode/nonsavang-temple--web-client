@@ -3,10 +3,13 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import {
+  CaretSortIcon,
+  CheckIcon,
+  DotsHorizontalIcon,
+} from '@radix-ui/react-icons'
 import { ColumnDef } from '@tanstack/react-table'
 
 import { Account } from '@/types/account'
@@ -16,6 +19,7 @@ import { deleteAccount, updateAccount } from '@/actions/account-actions'
 import { getCurrency } from '@/actions/currency-actions'
 
 import { useAccountStore } from '@/stores'
+import { AccountState } from '@/stores/useAccountStore'
 
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/date-format'
@@ -54,7 +58,6 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { LoadingButton } from '@/components/buttons'
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
 const formSchema: any = z.object({
   name: z.string().min(1, 'ກະລຸນາປ້ອນຊື່ບັນຊີ.'),
@@ -140,13 +143,15 @@ export const columns: ColumnDef<Account>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const [isOpen, setIsOpen] = useState(false)
       const [currencies, setCurrencies] = useState<Currency[]>([])
-      const [openCurrency, setOpenCurrency] = useState(false)
       const [isPending, startTransition] = useTransition()
+      const [isOpen, setIsOpen] = useState(false)
+      const [openCurrency, setOpenCurrency] = useState(false)
 
-      const accounts = useAccountStore((state) => state.accounts)
-      const setAccounts = useAccountStore((state) => state.setAccounts)
+      const accounts = useAccountStore((state: AccountState) => state.accounts)
+      const setAccounts = useAccountStore(
+        (state: AccountState) => state.setAccounts
+      )
 
       const { toast } = useToast()
 

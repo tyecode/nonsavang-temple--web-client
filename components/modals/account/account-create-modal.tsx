@@ -6,18 +6,23 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 
-import { Currency } from '@/types/currency'
 import { Account } from '@/types/account'
+import { Currency } from '@/types/currency'
 
 import { createAccount, getAccount } from '@/actions/account-actions'
 import { getCurrency } from '@/actions/currency-actions'
 import { getSession } from '@/actions/auth-actions'
 
 import { useAccountStore } from '@/stores'
+import { AccountState } from '@/stores/useAccountStore'
 
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/date-format'
 
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { LoadingButton } from '@/components/buttons'
+import { Textarea } from '@/components/ui/textarea'
 import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
   Dialog,
@@ -39,11 +44,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { LoadingButton } from '@/components/buttons'
-
 import { toast } from '@/components/ui/use-toast'
 
 const formSchema: any = z.object({
@@ -62,11 +62,14 @@ const formSchema: any = z.object({
 })
 
 const AccountCreateModal = () => {
+  const [currencies, setCurrencies] = useState<Currency[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [currencies, setCurrencies] = useState<Currency[]>([])
   const [openCurrency, setOpenCurrency] = useState(false)
-  const setAccounts = useAccountStore((state) => state.setAccounts)
+
+  const setAccounts = useAccountStore(
+    (state: AccountState) => state.setAccounts
+  )
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

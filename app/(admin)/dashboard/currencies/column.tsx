@@ -8,6 +8,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ColumnDef } from '@tanstack/react-table'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
+import { Currency } from '@/types/currency'
+
+import { deleteCurrency, updateCurrency } from '@/actions/currency-actions'
+
+import { useCurrencyStore } from '@/stores'
+import { CurrencyState } from '@/stores/useCurrencyStore'
+
+import { formatDate } from '@/lib/date-format'
+
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -35,13 +44,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { LoadingButton } from '@/components/buttons'
 import { useToast } from '@/components/ui/use-toast'
-
-import { Currency } from '@/types/currency'
-
-import { deleteCurrency, updateCurrency } from '@/actions/currency-actions'
-import { useCurrencyStore } from '@/stores'
-
-import { formatDate } from '@/lib/date-format'
 
 const formSchema: any = z.object({
   code: z
@@ -109,8 +111,12 @@ export const columns: ColumnDef<Currency>[] = [
       const [isOpen, setIsOpen] = useState(false)
       const [isPending, startTransition] = useTransition()
 
-      const currencies = useCurrencyStore((state) => state.currencies)
-      const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
+      const currencies = useCurrencyStore(
+        (state: CurrencyState) => state.currencies
+      )
+      const setCurrencies = useCurrencyStore(
+        (state: CurrencyState) => state.setCurrencies
+      )
 
       const { toast } = useToast()
 
@@ -238,7 +244,9 @@ export const columns: ColumnDef<Currency>[] = [
                   name='code'
                   render={({ field: { onChange, value, ...rest } }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ລະຫັດສະກຸນເງິນ</FormLabel>
+                      <FormLabel className='pointer-events-none'>
+                        ລະຫັດສະກຸນເງິນ
+                      </FormLabel>
                       <FormControl>
                         <Input
                           disabled={isPending}
@@ -259,7 +267,9 @@ export const columns: ColumnDef<Currency>[] = [
                   name='name'
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel>ຊື່ສະກຸນເງິນ</FormLabel>
+                      <FormLabel className='pointer-events-none'>
+                        ຊື່ສະກຸນເງິນ
+                      </FormLabel>
                       <FormControl>
                         <Input disabled={isPending} {...field} />
                       </FormControl>

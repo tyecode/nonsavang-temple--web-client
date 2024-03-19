@@ -13,6 +13,14 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
+import { Currency } from '@/types/currency'
+
+import { deleteCurrency } from '@/actions/currency-actions'
+
+import { usePendingStore, useCurrencyStore } from '@/stores'
+import { CurrencyState } from '@/stores/useCurrencyStore'
+import { PendingState } from '@/stores/usePendingStore'
+
 import { Button } from '@/components/ui/button'
 import { CurrencyCreateModal } from '@/components/modals/currency'
 import DataTableSkeleton from '@/components/data-table-skeleton'
@@ -36,10 +44,6 @@ import {
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
 
-import { Currency } from '@/types/currency'
-import { deleteCurrency } from '@/actions/currency-actions'
-import { usePendingStore, useCurrencyStore } from '@/stores'
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -57,9 +61,13 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const currencies = useCurrencyStore((state) => state.currencies)
-  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
+  const isPending = usePendingStore((state: PendingState) => state.isPending)
+  const currencies = useCurrencyStore(
+    (state: CurrencyState) => state.currencies
+  )
+  const setCurrencies = useCurrencyStore(
+    (state: CurrencyState) => state.setCurrencies
+  )
 
   const { toast } = useToast()
 

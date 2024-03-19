@@ -3,13 +3,33 @@
 
 import { ChangeEvent, useState, useTransition } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
-import { DotsHorizontalIcon, UploadIcon } from '@radix-ui/react-icons'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  CaretSortIcon,
+  CheckIcon,
+  DotsHorizontalIcon,
+  UploadIcon,
+} from '@radix-ui/react-icons'
+
+import { User } from '@/types/user'
+
+import { deleteUser, updateUser } from '@/actions/user-actions'
+import { uploadImage, deleteImage } from '@/actions/image-actions'
+
+import { UserState, useUserStore } from '@/stores/useUserStore'
+
+import { formatDate } from '@/lib/date-format'
+import CreateAvatar from '@/lib/create-avatar'
+import { cn } from '@/lib/utils'
+
+import { USER_TITLES } from '@/constants/title-name'
+import { USER_ROLES } from '@/constants/user-role'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -34,25 +54,26 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { useToast } from '@/components/ui/use-toast'
-import { useUserStore } from '@/stores/useUserStore'
-import { User } from '@/types/user'
-import { deleteUser, updateUser } from '@/actions/user-actions'
-import { uploadImage, deleteImage } from '@/actions/image-actions'
-import CreateAvatar from '@/lib/create-avatar'
 import { LoadingButton } from '@/components/buttons'
-import { formatDate } from '@/lib/date-format'
 
 const formSchema: any = z.object({
-  first_name: z.string(),
-  last_name: z.string(),
-  role: z.string(),
+  title: z.string().min(1, {
+    message: 'ກະລຸນາປ້ອນຄຳນຳໜ້າ.',
+  }),
+  first_name: z.string().min(1, {
+    message: 'ກະລຸນາປ້ອນຊື່.',
+  }),
+  last_name: z.string().min(1, {
+    message: 'ກະລຸນາປ້ອນນາມສະກຸນ.',
+  }),
+  role: z.string().min(1, {
+    message: 'ກະລຸນາເລືອກສິດຜູ້ໃຊ້.',
+  }),
   image: z
     .custom<FileList>()
     .transform((file) => file.length > 0 && file.item(0))
@@ -129,19 +150,23 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const [isOpen, setIsOpen] = useState(false)
-      const [isPending, startTransition] = useTransition()
+      const [openRole, setOpenRole] = useState(false)
+      const [openTitle, setOpenTitle] = useState(false)
       const [preview, setPreview] = useState('')
 
-      const users = useUserStore((state) => state.users)
-      const setUsers = useUserStore((state) => state.setUsers)
+      const [isPending, startTransition] = useTransition()
+
+      const users = useUserStore((state: UserState) => state.users)
+      const setUsers = useUserStore((state: UserState) => state.setUsers)
+
       const { toast } = useToast()
 
       const current = row.original
-      const options = ['ADMIN', 'HOLDER', 'USER']
 
       const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+          title: current.title,
           first_name: current.first_name,
           last_name: current.last_name,
           role: current.role,
@@ -168,6 +193,7 @@ export const columns: ColumnDef<User>[] = [
       ) => {
         try {
           const res = await updateUser(current.id, {
+            title: values.title,
             first_name: values.first_name,
             last_name: values.last_name,
             role: values.role,
@@ -311,7 +337,7 @@ export const columns: ColumnDef<User>[] = [
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className='grid gap-4 py-4'
+                className='grid gap-2 py-4'
               >
                 <div className='flex-center flex-1'>
                   <FormField
@@ -333,6 +359,7 @@ export const columns: ColumnDef<User>[] = [
                         </FormLabel>
                         <FormControl>
                           <Input
+                            disabled={isPending}
                             type='file'
                             accept='image/*'
                             className='hidden'
@@ -350,15 +377,79 @@ export const columns: ColumnDef<User>[] = [
                   />
                 </div>
 
+                <FormField
+                  control={form.control}
+                  name='title'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-col'>
+                      <FormLabel className='pointer-events-none my-[5px]'>
+                        ຄຳນຳໜ້າ
+                      </FormLabel>
+                      <Popover open={openTitle} onOpenChange={setOpenTitle}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              disabled={isPending}
+                              variant='outline'
+                              role='combobox'
+                              aria-expanded={openTitle}
+                              className='w-full justify-between'
+                            >
+                              {field.value
+                                ? USER_TITLES.find(
+                                    (option: { id: number; title: string }) =>
+                                      option.title === field.value
+                                  )?.title
+                                : 'ເລືອກຄຳນຳໜ້າ...'}
+                              <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <FormMessage />
+                        <PopoverContent className='w-[390px] p-0'>
+                          <Command>
+                            <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                              {USER_TITLES.map(
+                                (option: { id: number; title: string }) => (
+                                  <CommandItem
+                                    key={option.id}
+                                    value={option.title}
+                                    onSelect={() => {
+                                      field.onChange(option.title)
+                                      setOpenTitle(false)
+                                    }}
+                                  >
+                                    {option.title}
+                                    <CheckIcon
+                                      className={cn(
+                                        'ml-auto h-4 w-4',
+                                        field.value === option.title
+                                          ? 'opacity-100'
+                                          : 'opacity-0'
+                                      )}
+                                    />
+                                  </CommandItem>
+                                )
+                              )}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </FormItem>
+                  )}
+                />
+
                 <div className='flex flex-1 gap-4'>
                   <FormField
                     control={form.control}
                     name='first_name'
                     render={({ field }) => (
                       <FormItem className='flex-1'>
-                        <FormLabel>ຊື່</FormLabel>
+                        <FormLabel className='pointer-events-none'>
+                          ຊື່
+                        </FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input disabled={isPending} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -370,9 +461,11 @@ export const columns: ColumnDef<User>[] = [
                     name='last_name'
                     render={({ field }) => (
                       <FormItem className='flex-1'>
-                        <FormLabel>ນາມສະກຸນ</FormLabel>
+                        <FormLabel className='pointer-events-none'>
+                          ນາມສະກຸນ
+                        </FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input disabled={isPending} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -384,32 +477,65 @@ export const columns: ColumnDef<User>[] = [
                   control={form.control}
                   name='role'
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>ກໍານົດສິດ</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className='w-full'>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {options.map((option, index) => (
-                            <SelectItem key={`option-${index}`} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
+                    <FormItem className='flex flex-col'>
+                      <FormLabel className='pointer-events-none my-[5px]'>
+                        ກໍານົດສິດ
+                      </FormLabel>
+                      <Popover open={openRole} onOpenChange={setOpenRole}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              disabled={isPending}
+                              variant='outline'
+                              role='combobox'
+                              aria-expanded={openRole}
+                              className='w-full justify-between'
+                            >
+                              {field.value
+                                ? USER_ROLES.find(
+                                    (role: { id: number; title: string }) =>
+                                      role.title === field.value
+                                  )?.title
+                                : 'ເລືອກສະກຸນເງິນ...'}
+                              <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <FormMessage />
+                        <PopoverContent className='w-[180px] p-0'>
+                          <Command>
+                            <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                              {USER_ROLES.map(
+                                (role: { id: number; title: string }) => (
+                                  <CommandItem
+                                    key={role.id}
+                                    value={role.title}
+                                    onSelect={() => {
+                                      field.onChange(role.title)
+                                      setOpenRole(false)
+                                    }}
+                                  >
+                                    {role.title}
+                                    <CheckIcon
+                                      className={cn(
+                                        'ml-auto h-4 w-4',
+                                        field.value === role.title
+                                          ? 'opacity-100'
+                                          : 'opacity-0'
+                                      )}
+                                    />
+                                  </CommandItem>
+                                )
+                              )}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </FormItem>
                   )}
                 />
 
-                <div className='flex w-full justify-end'>
+                <div className='mt-2 flex w-full justify-end'>
                   {!isPending ? (
                     <Button type='submit' size={'sm'} className='w-fit'>
                       ແກ້ໄຂຂໍ້ມູນ

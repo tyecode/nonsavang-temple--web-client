@@ -2,22 +2,25 @@
 
 import { useEffect } from 'react'
 
-import { formatDate } from '@/lib/date-format'
-
 import { Donator } from '@/types/donator'
 
 import { getDonator } from '@/actions/donator-actions'
 
-import { usePendingStore } from '@/stores/usePendingStore'
-import { useDonatorStore } from '@/stores/useDonatorStore'
+import { usePendingStore, useDonatorStore } from '@/stores'
+import { DonatorState } from '@/stores/useDonatorStore'
+import { PendingState } from '@/stores/usePendingStore'
 
-import { columns } from './column'
+import { formatDate } from '@/lib/date-format'
+
 import { DataTable } from './data-table'
+import { columns } from './column'
 
 const DonatorsPage = () => {
-  const setPending = usePendingStore((state) => state.setPending)
-  const donators = useDonatorStore((state) => state.donators)
-  const setDonators = useDonatorStore((state) => state.setDonators)
+  const setPending = usePendingStore((state: PendingState) => state.setPending)
+  const setDonators = useDonatorStore(
+    (state: DonatorState) => state.setDonators
+  )
+  const donators = useDonatorStore((state: DonatorState) => state.donators)
 
   useEffect(() => {
     const fetchData = async () => {

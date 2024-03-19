@@ -23,6 +23,7 @@ import { deleteExpense } from '@/actions/expense-actions'
 import { deleteExpenseImage } from '@/actions/image-actions'
 
 import { useExpenseStore } from '@/stores'
+import { ExpenseState } from '@/stores/useExpenseStore'
 
 export const columns: ColumnDef<Expense>[] = [
   {
@@ -161,8 +162,10 @@ export const columns: ColumnDef<Expense>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const expenses = useExpenseStore((state) => state.expenses)
-      const setExpenses = useExpenseStore((state) => state.setExpenses)
+      const expenses = useExpenseStore((state: ExpenseState) => state.expenses)
+      const setExpenses = useExpenseStore(
+        (state: ExpenseState) => state.setExpenses
+      )
 
       const { toast } = useToast()
 
@@ -180,7 +183,9 @@ export const columns: ColumnDef<Expense>[] = [
             return
           }
 
-          const expense = expenses.find((expense) => expense.id === current.id)
+          const expense = expenses.find(
+            (expense: Expense) => expense.id === current.id
+          )
 
           if (expense?.image) {
             const imageName = expense.image.split('/').pop()
@@ -190,7 +195,9 @@ export const columns: ColumnDef<Expense>[] = [
             }
           }
 
-          const newExpenses = expenses.filter((expense) => expense.id !== id)
+          const newExpenses = expenses.filter(
+            (expense: Expense) => expense.id !== id
+          )
 
           setExpenses(newExpenses)
           toast({

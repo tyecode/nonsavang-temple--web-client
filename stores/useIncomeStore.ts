@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { Income } from '@/types/income'
 
-interface IncomeState {
+export interface IncomeState {
   incomes: Income[]
   setIncomes: (state: Income[]) => void
 }

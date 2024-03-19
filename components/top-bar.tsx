@@ -8,14 +8,14 @@ import { User } from '@/types/user'
 import { getSession } from '@/actions/auth-actions'
 import { getUser } from '@/actions/user-actions'
 
-import { ModeToggle } from '@/components/mode-toggle'
-
 import UserAvatar from '@/components/user-avatar'
+import { ModeToggle } from '@/components/mode-toggle'
 import { Skeleton } from '@/components/ui/skeleton'
+
+import { getTextFromPathname } from '@/lib/text-maps'
 
 const TopBar = () => {
   const pathname = usePathname()
-  const title = pathname.split('/').pop()
   const [user, setUser] = useState<User>()
 
   useEffect(() => {
@@ -36,14 +36,14 @@ const TopBar = () => {
       <div className='container flex h-20 items-center justify-between md:container'>
         {pathname !== '/' ? (
           <span className='text-2xl font-bold capitalize text-foreground/80'>
-            {title}
+            {getTextFromPathname(pathname)}
           </span>
         ) : (
           <div className='flex flex-col text-xs font-normal capitalize'>
             ຍິນດີຕ້ອນຮັບ,{' '}
             <span className='text-xl font-semibold'>
               {user ? (
-                `${user.first_name} ${user.last_name}`
+                `${user.title} ${user.first_name} ${user.last_name}`
               ) : (
                 <Skeleton className='mt-2 h-5 w-40' />
               )}

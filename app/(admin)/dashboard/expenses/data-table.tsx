@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
-
 import {
   ColumnDef,
   SortingState,
@@ -14,18 +13,25 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
+import { Expense } from '@/types/expense'
+
+import { deleteExpense } from '@/actions/expense-actions'
+import { deleteExpenseImage } from '@/actions/image-actions'
+
+import { usePendingStore, useExpenseStore } from '@/stores'
+import { ExpenseState } from '@/stores/useExpenseStore'
+import { PendingState } from '@/stores/usePendingStore'
+
 import { Button } from '@/components/ui/button'
-import DataTableSkeleton from '@/components/data-table-skeleton'
-import { DataTablePagination } from '@/components/data-table-pagination'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { useToast } from '@/components/ui/use-toast'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { LoadingButton } from '@/components/buttons'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Table,
   TableBody,
@@ -34,16 +40,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useToast } from '@/components/ui/use-toast'
-
+import { LoadingButton } from '@/components/buttons'
+import DataTableSkeleton from '@/components/data-table-skeleton'
+import { DataTablePagination } from '@/components/data-table-pagination'
 import { ExpenseCreateModal } from '@/components/modals/expense'
-
-import { Expense } from '@/types/expense'
-
-import { deleteExpense } from '@/actions/expense-actions'
-
-import { usePendingStore, useExpenseStore } from '@/stores'
-import { deleteExpenseImage } from '@/actions/image-actions'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -62,9 +62,11 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const expenses = useExpenseStore((state) => state.expenses)
-  const setExpenses = useExpenseStore((state) => state.setExpenses)
+  const isPending = usePendingStore((state: PendingState) => state.isPending)
+  const expenses = useExpenseStore((state: ExpenseState) => state.expenses)
+  const setExpenses = useExpenseStore(
+    (state: ExpenseState) => state.setExpenses
+  )
 
   const { toast } = useToast()
 

@@ -1,20 +1,84 @@
-import * as Radix from '@radix-ui/react-icons'
+import {
+  faAddressBook,
+  faCreditCard,
+  faFolderClosed,
+  faMoneyBill1,
+  faUser,
+} from '@fortawesome/free-regular-svg-icons'
+import {
+  faDollarSign,
+  faBarsStaggered,
+  faChartLine,
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export const IconsCollection = ({ icon }: { icon: string }) => {
   switch (icon) {
-    case 'home-icon':
-      return <Radix.HomeIcon width={25} height={25} />
+    case 'folder-closed-icon':
+      return (
+        <FontAwesomeIcon
+          icon={faFolderClosed}
+          width={25}
+          height={25}
+          size='lg'
+        />
+      )
 
-    case 'dashboard-icon':
-      return <Radix.DashboardIcon width={25} height={25} />
+    case 'user-icon':
+      return <FontAwesomeIcon icon={faUser} width={25} height={25} size='lg' />
 
-    case 'avatar-icon':
-      return <Radix.AvatarIcon width={25} height={25} />
+    case 'chart-line-icon':
+      return (
+        <FontAwesomeIcon icon={faChartLine} width={25} height={25} size='lg' />
+      )
 
-    case 'exit-icon':
-      return <Radix.ExitIcon width={25} height={25} />
+    case 'dollar-sign-icon':
+      return (
+        <FontAwesomeIcon icon={faDollarSign} width={25} height={25} size='lg' />
+      )
+
+    case 'address-book-icon':
+      return (
+        <FontAwesomeIcon
+          icon={faAddressBook}
+          width={25}
+          height={25}
+          size='lg'
+        />
+      )
+
+    case 'money-bill-icon':
+      return (
+        <FontAwesomeIcon icon={faMoneyBill1} width={25} height={25} size='lg' />
+      )
+
+    case 'credit-card-icon':
+      return (
+        <FontAwesomeIcon icon={faCreditCard} width={25} height={25} size='lg' />
+      )
+
+    case 'bar-staggered-right-icon':
+      return (
+        <FontAwesomeIcon
+          icon={faBarsStaggered}
+          width={25}
+          height={25}
+          size='lg'
+        />
+      )
+
+    case 'bar-staggered-left-icon':
+      return (
+        <FontAwesomeIcon
+          icon={faBarsStaggered}
+          width={25}
+          height={25}
+          size='lg'
+          rotation={180}
+        />
+      )
 
     default:
-      return <Radix.PaddingIcon width={25} height={25} />
+      return <span className='w-[25px]'></span>
   }
 }

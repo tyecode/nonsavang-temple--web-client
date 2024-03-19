@@ -4,6 +4,13 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
+import { Income } from '@/types/income'
+
+import { deleteIncome } from '@/actions/income-actions'
+
+import { useIncomeStore } from '@/stores'
+import { IncomeState } from '@/stores/useIncomeStore'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -15,12 +22,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { toast, useToast } from '@/components/ui/use-toast'
-
-import { deleteIncome } from '@/actions/income-actions'
-
-import { Income } from '@/types/income'
-
-import { useIncomeStore } from '@/stores'
 
 export const columns: ColumnDef<Income>[] = [
   {
@@ -144,8 +145,10 @@ export const columns: ColumnDef<Income>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const incomes = useIncomeStore((state) => state.incomes)
-      const setIncomes = useIncomeStore((state) => state.setIncomes)
+      const incomes = useIncomeStore((state: IncomeState) => state.incomes)
+      const setIncomes = useIncomeStore(
+        (state: IncomeState) => state.setIncomes
+      )
 
       const { toast } = useToast()
 

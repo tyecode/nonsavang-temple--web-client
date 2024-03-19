@@ -7,15 +7,22 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { IconsCollection } from '@/components/icons/radix-icons-collection'
 import { NavLink, NavLinkGroup } from '@/types/nav-link'
+import { usePathname } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
+  const pathname = usePathname()
+
   const NavLinkButton: React.FC<{ link: NavLink }> = ({ link }) => (
     <li key={link.id}>
       <Link href={link.href}>
         <Button
           variant={'ghost'}
           size={'sm'}
-          className='group flex w-full items-center justify-start gap-4 text-foreground'
+          className={cn(
+            'group flex w-full items-center justify-start gap-4 text-foreground',
+            link.href === pathname ? 'bg-accent' : ''
+          )}
         >
           <IconsCollection icon={link.icon || ''} />
           {link.title}

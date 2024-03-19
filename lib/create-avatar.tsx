@@ -47,6 +47,7 @@ const CreateAvatar = ({
         width={size}
         height={size}
         priority
+        draggable={false}
       />
     </div>
   ) : (
@@ -55,7 +56,13 @@ const CreateAvatar = ({
       {...rest}
     >
       {svg && (
-        <Image src={svg} alt={`avatar-${seed}`} width={size} height={size} />
+        <Image
+          src={svg}
+          alt={`avatar-${seed}`}
+          width={size}
+          height={size}
+          draggable={false}
+        />
       )}
     </div>
   )

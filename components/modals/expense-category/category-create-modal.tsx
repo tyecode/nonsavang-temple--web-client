@@ -2,12 +2,24 @@
 
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { Category } from '@/types/category'
+
+import {
+  createExpenseCategory,
+  getExpenseCategory,
+} from '@/actions/expense-category-actions'
+
+import { useExpenseCategoryStore } from '@/stores'
+import { CategoryState } from '@/stores/useExpenseCategoryStore'
+
+import { formatDate } from '@/lib/date-format'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { LoadingButton } from '@/components/buttons'
 import {
   Dialog,
   DialogContent,
@@ -23,20 +35,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-
-import { LoadingButton } from '@/components/buttons'
 import { useToast } from '@/components/ui/use-toast'
-
-import { formatDate } from '@/lib/date-format'
-
-import { useExpenseCategoryStore } from '@/stores'
-
-import { Category } from '@/types/category'
-
-import {
-  createExpenseCategory,
-  getExpenseCategory,
-} from '@/actions/expense-category-actions'
 
 const formSchema: any = z.object({
   name: z.string().min(1, {
@@ -46,9 +45,11 @@ const formSchema: any = z.object({
 
 const CategoryCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoading, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition()
 
-  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
+  const setCategories = useExpenseCategoryStore(
+    (state: CategoryState) => state.setCategories
+  )
 
   const { toast } = useToast()
 
@@ -102,7 +103,7 @@ const CategoryCreateModal = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {isLoading ? (
+        {isPending ? (
           <LoadingButton>ເພິ່ມຂໍ້ມູນ</LoadingButton>
         ) : (
           <Button size={'sm'}>ເພິ່ມຂໍ້ມູນ</Button>
@@ -122,9 +123,11 @@ const CategoryCreateModal = () => {
               name='name'
               render={({ field }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel>ຊື່ປະເພດລາຍຈ່າຍ</FormLabel>
+                  <FormLabel className='pointer-events-none'>
+                    ຊື່ປະເພດລາຍຈ່າຍ
+                  </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -132,7 +135,7 @@ const CategoryCreateModal = () => {
             />
 
             <div className='mt-2 flex w-full justify-end'>
-              {!isLoading ? (
+              {!isPending ? (
                 <Button type='submit' size={'sm'} className='w-fit'>
                   ເພິ່ມຂໍ້ມູນ
                 </Button>
