@@ -45,6 +45,8 @@ export default function Login({
                 alt='logo'
                 width={84}
                 height={84}
+                draggable={false}
+                priority
               />
               <span className='mt-4 text-2xl font-bold'>ວັດໂນນສະຫວ່າງ</span>
               <div className='absolute right-0 top-0'>

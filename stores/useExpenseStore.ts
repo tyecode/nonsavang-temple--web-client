@@ -14,7 +14,7 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
         ...expense,
         drawer: expense.drawer && {
           ...expense.drawer,
-          display_name: `${expense.drawer.first_name} ${expense.drawer.last_name}`,
+          display_name: `${expense.drawer.title} ${expense.drawer.first_name} ${expense.drawer.last_name}`,
         },
       })),
     })),

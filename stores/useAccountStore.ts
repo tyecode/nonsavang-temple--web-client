@@ -8,5 +8,14 @@ export interface AccountState {
 
 export const useAccountStore = create<AccountState>((set) => ({
   accounts: [],
-  setAccounts: (state) => set(() => ({ accounts: state })),
+  setAccounts: (state) =>
+    set(() => ({
+      accounts: state.map((account) => ({
+        ...account,
+        user: account.user && {
+          ...account.user,
+          display_name: `${account.user.title} ${account.user.first_name} ${account.user.last_name}`,
+        },
+      })),
+    })),
 }))

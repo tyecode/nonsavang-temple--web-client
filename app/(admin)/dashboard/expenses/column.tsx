@@ -56,7 +56,7 @@ export const columns: ColumnDef<Expense>[] = [
   },
   {
     accessorKey: 'account.name',
-    header: 'ບັນຊີ',
+    header: 'ຊື່ບັນຊີ',
     cell: ({ row }) => (
       <span
         className='cursor-pointer'
@@ -71,7 +71,7 @@ export const columns: ColumnDef<Expense>[] = [
   },
   {
     accessorKey: 'category.name',
-    header: 'ປະເພດ',
+    header: 'ປະເພດລາຍຈ່າຍ',
     cell: ({ row }) => (
       <span
         className='cursor-pointer'

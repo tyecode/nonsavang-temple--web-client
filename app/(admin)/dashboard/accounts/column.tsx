@@ -56,7 +56,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/components/ui/use-toast'
+import { toast, useToast } from '@/components/ui/use-toast'
 import { LoadingButton } from '@/components/buttons'
 
 const formSchema: any = z.object({
@@ -104,14 +104,19 @@ export const columns: ColumnDef<Account>[] = [
     header: 'ID',
   },
   {
-    accessorKey: 'user',
+    accessorKey: 'user.display_name',
     header: 'ເຈົ້າຂອງບັນຊີ',
-    cell: ({ row }) => {
-      const current = row.original
-      return current.user
-        ? `${current.user.first_name} ${current.user.last_name}`
-        : ''
-    },
+    cell: ({ row }) => (
+      <span
+        className='cursor-pointer'
+        onClick={() => {
+          navigator.clipboard.writeText(row.original.user.id)
+          toast({ description: 'ຄັດລອກໄອດີລົງໃນຄລິບບອດແລ້ວ' })
+        }}
+      >
+        {row.original.user.display_name}
+      </span>
+    ),
   },
   {
     accessorKey: 'name',
