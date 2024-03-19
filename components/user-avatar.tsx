@@ -3,12 +3,12 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Spinner } from '@nextui-org/react'
-import { DashboardIcon, ExitIcon } from '@radix-ui/react-icons'
 
 import { User } from '@/types/user'
 
 import { handleLogout } from '@/actions/auth-actions'
 
+import { IconsCollection } from '@/components/icons/icons-collection'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -72,7 +72,7 @@ const UserAvatar = ({ user }: { user?: User }) => {
                 className='w-full justify-start gap-4 text-sm font-normal'
                 disabled={isPending}
               >
-                <DashboardIcon width={20} height={20} />
+                <IconsCollection icon={'grid-icon'} />
                 ໜ້າຈັດການ
               </Button>
             </Link>
@@ -85,7 +85,7 @@ const UserAvatar = ({ user }: { user?: User }) => {
               disabled={isPending}
             >
               {!isPending ? (
-                <ExitIcon width={20} height={20} />
+                <IconsCollection icon={'logout-icon'} />
               ) : (
                 <Spinner size='sm' color='danger' labelColor='danger' />
               )}

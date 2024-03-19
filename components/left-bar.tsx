@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import { Button } from '@/components/ui/button'
-import { IconsCollection } from '@/components/icons/radix-icons-collection'
+import { IconsCollection } from '@/components/icons/icons-collection'
 import { NavLink, NavLinkGroup } from '@/types/nav-link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
