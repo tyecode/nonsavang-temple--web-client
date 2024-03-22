@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { symbol, z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Currency } from '@/types/currency'
@@ -44,7 +44,10 @@ const formSchema: any = z.object({
       message: 'ລະຫັດສະກຸນເງິນຕ້ອງມີຕົວອັກສອນ 3 ຕົວເທົ່ານັ້ນ.',
     }),
   name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນສະກຸນເງິນ.',
+    message: 'ກະລຸນາປ້ອນຊື່ສະກຸນເງິນ.',
+  }),
+  symbol: z.string().min(1, {
+    message: 'ກະລຸນາປ້ອນສັນຍາລັກສະກຸນເງິນ.',
   }),
 })
 
@@ -63,6 +66,7 @@ const CurrencyCreateModal = () => {
     defaultValues: {
       code: '',
       name: '',
+      symbol: '',
     },
   })
 
@@ -72,6 +76,7 @@ const CurrencyCreateModal = () => {
         const res = await createCurrency({
           code: values.code,
           name: values.name,
+          symbol: values.symbol,
         })
 
         if (res.error || !res.data) {
@@ -153,6 +158,22 @@ const CurrencyCreateModal = () => {
                 <FormItem className='flex-1'>
                   <FormLabel className='pointer-events-none'>
                     ຊື່ສະກຸນເງິນ
+                  </FormLabel>
+                  <FormControl>
+                    <Input disabled={isPending} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='symbol'
+              render={({ field }) => (
+                <FormItem className='flex-1'>
+                  <FormLabel className='pointer-events-none'>
+                    ສັນຍາລັກ
                   </FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />

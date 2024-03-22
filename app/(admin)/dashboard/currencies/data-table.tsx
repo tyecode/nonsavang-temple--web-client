@@ -18,8 +18,6 @@ import { Currency } from '@/types/currency'
 import { deleteCurrency } from '@/actions/currency-actions'
 
 import { usePendingStore, useCurrencyStore } from '@/stores'
-import { CurrencyState } from '@/stores/useCurrencyStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { Button } from '@/components/ui/button'
 import { CurrencyCreateModal } from '@/components/modals/currency'
@@ -61,13 +59,9 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state: PendingState) => state.isPending)
-  const currencies = useCurrencyStore(
-    (state: CurrencyState) => state.currencies
-  )
-  const setCurrencies = useCurrencyStore(
-    (state: CurrencyState) => state.setCurrencies
-  )
+  const isPending = usePendingStore((state) => state.isPending)
+  const currencies = useCurrencyStore((state) => state.currencies)
+  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
 
   const { toast } = useToast()
 
@@ -124,12 +118,12 @@ export function DataTable<TData, TValue>({
           (currency: Currency) => !items.some((item) => item.id === currency.id)
         )
 
-        setCurrencies(newCurrencies)
+        setCurrencies(newCurrencies as Currency[])
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected currencies:', error)
+        console.error('Error deleting selected currencies: ', error)
       }
     })
   }

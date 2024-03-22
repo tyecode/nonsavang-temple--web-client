@@ -17,43 +17,43 @@ import {
 export const IconsCollection = ({ icon }: { icon: string }) => {
   switch (icon) {
     case 'pie-chart-icon':
-      return <PieChart width={20} height={20} />
+      return <PieChart width={18} height={18} />
 
     case 'folder-icon':
-      return <Folder width={20} height={20} />
+      return <Folder width={18} height={18} />
 
     case 'user-icon':
-      return <User width={20} height={20} />
+      return <User width={18} height={18} />
 
     case 'align-left-icon':
-      return <AlignLeft width={20} height={20} />
+      return <AlignLeft width={18} height={18} />
 
     case 'align-right-icon':
-      return <AlignRight width={20} height={20} />
+      return <AlignRight width={18} height={18} />
 
     case 'archive-icon':
-      return <Archive width={20} height={20} />
+      return <Archive width={18} height={18} />
 
     case 'book-open-icon':
-      return <BookOpen width={20} height={20} />
+      return <BookOpen width={18} height={18} />
 
     case 'dollar-sign-icon':
-      return <DollarSign width={20} height={20} />
+      return <DollarSign width={18} height={18} />
 
     case 'trending-up-icon':
-      return <TrendingUp width={20} height={20} />
+      return <TrendingUp width={18} height={18} />
 
     case 'trending-down-icon':
-      return <TrendingDown width={20} height={20} />
+      return <TrendingDown width={18} height={18} />
 
     case 'credit-card-icon':
-      return <CreditCard width={20} height={20} />
+      return <CreditCard width={18} height={18} />
 
     case 'grid-icon':
-      return <Grid width={20} height={20} />
+      return <Grid width={18} height={18} />
 
     case 'logout-icon':
-      return <LogOut width={20} height={20} />
+      return <LogOut width={18} height={18} />
 
     default:
       return <span className='w-[25px]'></span>

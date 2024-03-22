@@ -18,7 +18,7 @@ import { User } from '@/types/user'
 import { deleteUser, updateUser } from '@/actions/user-actions'
 import { uploadImage, deleteImage } from '@/actions/image-actions'
 
-import { UserState, useUserStore } from '@/stores/useUserStore'
+import { useUserStore } from '@/stores/useUserStore'
 
 import { formatDate } from '@/lib/date-format'
 import CreateAvatar from '@/lib/create-avatar'
@@ -156,8 +156,8 @@ export const columns: ColumnDef<User>[] = [
 
       const [isPending, startTransition] = useTransition()
 
-      const users = useUserStore((state: UserState) => state.users)
-      const setUsers = useUserStore((state: UserState) => state.setUsers)
+      const users = useUserStore((state) => state.users)
+      const setUsers = useUserStore((state) => state.setUsers)
 
       const { toast } = useToast()
 
@@ -228,12 +228,12 @@ export const columns: ColumnDef<User>[] = [
             return user
           })
 
-          setUsers(newUsers)
+          setUsers(newUsers as User[])
           toast({
             description: 'ແກ້ໄຂຂໍ້ມູນຜູ້ໃຊ້ສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error updating user:', error)
+          console.error('Error updating user: ', error)
         } finally {
           setIsOpen(false)
         }
@@ -266,7 +266,7 @@ export const columns: ColumnDef<User>[] = [
             await handleUpdateUser(values, uploadData)
           })
         } catch (error) {
-          console.error('Error updating user:', error)
+          console.error('Error upload user image: ', error)
         }
       }
 
@@ -294,12 +294,12 @@ export const columns: ColumnDef<User>[] = [
 
           const newUsers = users.filter((user) => user.id !== id)
 
-          setUsers(newUsers)
+          setUsers(newUsers as User[])
           toast({
             description: 'ລຶບຂໍ້ມູນຜູ້ໃຊ້ສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error deleting user:', error)
+          console.error('Error deleting user: ', error)
         }
       }
       return (

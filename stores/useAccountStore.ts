@@ -10,12 +10,17 @@ export const useAccountStore = create<AccountState>((set) => ({
   accounts: [],
   setAccounts: (state) =>
     set(() => ({
-      accounts: state.map((account) => ({
-        ...account,
-        user: account.user && {
-          ...account.user,
-          display_name: `${account.user.title} ${account.user.first_name} ${account.user.last_name}`,
-        },
-      })),
+      accounts: state
+        .map((account) => ({
+          ...account,
+          user: account.user && {
+            ...account.user,
+            display_name: `${account.user.title} ${account.user.first_name} ${account.user.last_name}`,
+          },
+        }))
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ),
     })),
 }))

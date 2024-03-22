@@ -9,7 +9,6 @@ import { Income } from '@/types/income'
 import { deleteIncome } from '@/actions/income-actions'
 
 import { useIncomeStore } from '@/stores'
-import { IncomeState } from '@/stores/useIncomeStore'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -106,11 +105,12 @@ export const columns: ColumnDef<Income>[] = [
   {
     accessorKey: 'amount',
     header: 'ຈຳນວນເງິນ',
-    cell: ({ row }) => (
-      <span>
-        {row.original.amount} {row.original.account.currency.name}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const current = row.original
+      return current.currency && current.currency.symbol
+        ? `${current.currency.symbol}${current.amount.toLocaleString()}`
+        : ''
+    },
   },
   {
     accessorKey: 'remark',
@@ -122,13 +122,19 @@ export const columns: ColumnDef<Income>[] = [
     cell: ({ row }) => (
       <>
         {row.original.status === 'PENDING' && (
-          <Badge variant={'warning'}>ລໍຖ້າການອະນຸມັດ</Badge>
+          <Badge variant={'warning'} className='whitespace-nowrap'>
+            ລໍຖ້າການອະນຸມັດ
+          </Badge>
         )}
         {row.original.status === 'APPROVED' && (
-          <Badge variant={'success'}>ອະນຸມັດແລ້ວ</Badge>
+          <Badge variant={'success'} className='whitespace-nowrap'>
+            ອະນຸມັດແລ້ວ
+          </Badge>
         )}
         {row.original.status === 'REJECTED' && (
-          <Badge variant={'danger'}>ຖືກປະຕິເສດ</Badge>
+          <Badge variant={'danger'} className='whitespace-nowrap'>
+            ຖືກປະຕິເສດ
+          </Badge>
         )}
       </>
     ),
@@ -145,10 +151,8 @@ export const columns: ColumnDef<Income>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const incomes = useIncomeStore((state: IncomeState) => state.incomes)
-      const setIncomes = useIncomeStore(
-        (state: IncomeState) => state.setIncomes
-      )
+      const incomes = useIncomeStore((state) => state.incomes)
+      const setIncomes = useIncomeStore((state) => state.setIncomes)
 
       const { toast } = useToast()
 
@@ -170,12 +174,12 @@ export const columns: ColumnDef<Income>[] = [
             (income: Income) => income.id !== id
           )
 
-          setIncomes(newIncomes)
+          setIncomes(newIncomes as Income[])
           toast({
             description: 'ລຶບຂໍ້ມູນລາຍຮັບສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error deleting incomes:', error)
+          console.error('Error deleting incomes: ', error)
         }
       }
 

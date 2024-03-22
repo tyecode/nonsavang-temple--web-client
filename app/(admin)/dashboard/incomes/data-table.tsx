@@ -18,8 +18,6 @@ import { Income } from '@/types/income'
 import { deleteIncome } from '@/actions/income-actions'
 
 import { usePendingStore, useIncomeStore } from '@/stores'
-import { IncomeState } from '@/stores/useIncomeStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -61,9 +59,9 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state: PendingState) => state.isPending)
-  const setIncomes = useIncomeStore((state: IncomeState) => state.setIncomes)
-  const incomes = useIncomeStore((state: IncomeState) => state.incomes)
+  const isPending = usePendingStore((state) => state.isPending)
+  const setIncomes = useIncomeStore((state) => state.setIncomes)
+  const incomes = useIncomeStore((state) => state.incomes)
 
   const { toast } = useToast()
 
@@ -120,12 +118,12 @@ export function DataTable<TData, TValue>({
           (income: Income) => !items.some((item) => item.id === income.id)
         )
 
-        setIncomes(newIncomes)
+        setIncomes(newIncomes as Income[])
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected incomes:', error)
+        console.error('Error deleting selected incomes: ', error)
       }
     })
   }

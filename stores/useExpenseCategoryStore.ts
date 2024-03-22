@@ -8,5 +8,11 @@ export interface CategoryState {
 
 export const useExpenseCategoryStore = create<CategoryState>((set) => ({
   categories: [],
-  setCategories: (state) => set(() => ({ categories: state })),
+  setCategories: (state) =>
+    set(() => ({
+      categories: state.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ),
+    })),
 }))

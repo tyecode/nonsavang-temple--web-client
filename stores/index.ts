@@ -1,3 +1,4 @@
+import { useAuthStore } from './useAuthStore'
 import { useAccountStore } from './useAccountStore'
 import { useCurrencyStore } from './useCurrencyStore'
 import { useDonatorStore } from './useDonatorStore'
@@ -9,6 +10,7 @@ import { useUserStore } from './useUserStore'
 import { usePendingStore } from './usePendingStore'
 
 export {
+  useAuthStore,
   useAccountStore,
   useCurrencyStore,
   useDonatorStore,

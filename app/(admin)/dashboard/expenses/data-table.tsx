@@ -19,8 +19,6 @@ import { deleteExpense } from '@/actions/expense-actions'
 import { deleteExpenseImage } from '@/actions/image-actions'
 
 import { usePendingStore, useExpenseStore } from '@/stores'
-import { ExpenseState } from '@/stores/useExpenseStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -62,11 +60,9 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state: PendingState) => state.isPending)
-  const expenses = useExpenseStore((state: ExpenseState) => state.expenses)
-  const setExpenses = useExpenseStore(
-    (state: ExpenseState) => state.setExpenses
-  )
+  const isPending = usePendingStore((state) => state.isPending)
+  const expenses = useExpenseStore((state) => state.expenses)
+  const setExpenses = useExpenseStore((state) => state.setExpenses)
 
   const { toast } = useToast()
 
@@ -129,12 +125,12 @@ export function DataTable<TData, TValue>({
           (expense: Expense) => !items.some((item) => item.id === expense.id)
         )
 
-        setExpenses(newExpenses)
+        setExpenses(newExpenses as Expense[])
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected expenses:', error)
+        console.error('Error deleting selected expenses: ', error)
       }
     })
   }

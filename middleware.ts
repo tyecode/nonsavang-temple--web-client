@@ -12,7 +12,7 @@ const middlewares: MiddlewareFactory[] = [
   supabaseMiddleware,
   authorizeMiddleware,
   authenticateMiddleware,
-  redirectMiddleware,
+  // redirectMiddleware,
 ]
 
 export default stackMiddleware(middlewares)

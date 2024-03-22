@@ -20,7 +20,7 @@ import {
 
 import CreateAvatar from '@/lib/create-avatar'
 
-const UserAvatar = ({ user }: { user?: User }) => {
+const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -28,11 +28,8 @@ const UserAvatar = ({ user }: { user?: User }) => {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger>
         <Avatar className='aspect-square w-10 cursor-pointer'>
-          {user ? (
-            <CreateAvatar
-              src={user.image}
-              seed={`${user.first_name} ${user.last_name}`}
-            />
+          {!loading ? (
+            <CreateAvatar src={user?.image} seed={`${user?.display_name}`} />
           ) : (
             <Skeleton className='h-10 w-10' />
           )}
@@ -41,10 +38,10 @@ const UserAvatar = ({ user }: { user?: User }) => {
       <PopoverContent className='flex-center mx-6 my-2 w-80 flex-col gap-4 p-6'>
         <div className='flex-center flex-col gap-4 py-4'>
           <Avatar className='flex-center h-20 w-20 flex-col'>
-            {user ? (
+            {!loading ? (
               <CreateAvatar
-                src={user.image}
-                seed={`${user.first_name} ${user.last_name}`}
+                src={user?.image}
+                seed={`${user?.display_name}`}
                 size={80}
               />
             ) : (
@@ -53,20 +50,20 @@ const UserAvatar = ({ user }: { user?: User }) => {
           </Avatar>
           <div className='flex-center flex-col gap-1'>
             <h1 className='text-center text-base font-medium'>
-              {user ? (
-                `${user.title} ${user.first_name} ${user.last_name}`
+              {!loading ? (
+                `${user?.display_name}`
               ) : (
                 <Skeleton className='h-4 w-56' />
               )}
             </h1>
             <p className='text-sm font-normal lowercase text-foreground/60'>
-              {user ? user.email : <Skeleton className='h-4 w-48' />}
+              {!loading ? user.email : <Skeleton className='h-4 w-48' />}
             </p>
           </div>
         </div>
         <ul className='flex w-full flex-col border-t pt-4'>
           <li className={user?.role === 'ADMIN' ? 'block' : 'hidden'}>
-            <Link href='/dashboard' onClick={() => setIsOpen(false)}>
+            <Link href='/dashboard' onClick={() => setIsOpen(false)} shallow>
               <Button
                 variant={'ghost'}
                 className='w-full justify-start gap-4 text-sm font-normal'

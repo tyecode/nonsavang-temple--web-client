@@ -65,6 +65,7 @@ export function DataTable<TData, TValue>({
   const isPending = usePendingStore((state) => state.isPending)
   const users = useUserStore((state) => state.users)
   const setUsers = useUserStore((state) => state.setUsers)
+
   const { toast } = useToast()
 
   const [isLoading, startTransition] = useTransition()
@@ -126,12 +127,12 @@ export function DataTable<TData, TValue>({
           (user: User) => !items.map((item) => item.id).includes(user.id)
         )
 
-        setUsers(newUsers)
+        setUsers(newUsers as User[])
         toast({
           description: `ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.`,
         })
       } catch (error) {
-        console.error('Error deleting selected users:', error)
+        console.error('Error deleting selected users: ', error)
       }
     })
   }

@@ -10,9 +10,14 @@ export const useUserStore = create<UserState>((set) => ({
   users: [],
   setUsers: (state) =>
     set(() => ({
-      users: state.map((user) => ({
-        ...user,
-        display_name: `${user.title} ${user.first_name} ${user.last_name}`,
-      })),
+      users: state
+        .map((user) => ({
+          ...user,
+          display_name: `${user.title} ${user.first_name} ${user.last_name}`,
+        }))
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ),
     })),
 }))

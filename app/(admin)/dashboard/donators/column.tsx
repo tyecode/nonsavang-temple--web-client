@@ -18,7 +18,6 @@ import { Donator } from '@/types/donator'
 import { deleteDonator, updateDonator } from '@/actions/donator-actions'
 
 import { useDonatorStore } from '@/stores'
-import { DonatorState } from '@/stores/useDonatorStore'
 
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/date-format'
@@ -135,10 +134,8 @@ export const columns: ColumnDef<Donator>[] = [
       const [isOpen, setIsOpen] = useState(false)
       const [openTitle, setOpenTitle] = useState(false)
 
-      const donators = useDonatorStore((state: DonatorState) => state.donators)
-      const setDonators = useDonatorStore(
-        (state: DonatorState) => state.setDonators
-      )
+      const donators = useDonatorStore((state) => state.donators)
+      const setDonators = useDonatorStore((state) => state.setDonators)
 
       const { toast } = useToast()
 
@@ -195,7 +192,7 @@ export const columns: ColumnDef<Donator>[] = [
               return donator
             })
 
-            setDonators(newDonators)
+            setDonators(newDonators as Donator[])
             toast({
               description: 'ແກ້ໄຂຂໍ້ມູນຜູ້ບໍລິຈາກສຳເລັດແລ້ວ.',
             })
@@ -222,7 +219,7 @@ export const columns: ColumnDef<Donator>[] = [
 
             const newDonators = donators.filter((donator) => donator.id !== id)
 
-            setDonators(newDonators)
+            setDonators(newDonators as Donator[])
             toast({
               description: 'ລຶບຂໍ້ມູນຜູ້ບໍລິຈາກສຳເລັດແລ້ວ.',
             })

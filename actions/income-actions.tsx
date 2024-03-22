@@ -19,6 +19,7 @@ export const getIncome = async (id?: string) => {
           category: category_id (*), 
           user: user_id (*), 
           account: account_id (*, currency: currency_id (*)), 
+          currency: currency_id (*), 
           donator: donator_id (*)`
         )
         .eq('id', id)
@@ -28,6 +29,7 @@ export const getIncome = async (id?: string) => {
         category: category_id (*), 
         user: user_id (*), 
         account: account_id (*, currency: currency_id (*)), 
+        currency: currency_id (*), 
         donator: donator_id (*)`
       )
     }
@@ -58,6 +60,7 @@ export const createIncome = async (object: IncomeCreationData) => {
         category: category_id (*), 
         user: user_id (*), 
         account: account_id (*, currency: currency_id (*)), 
+        currency: currency_id (*), 
         donator: donator_id (*)`
       )
 
@@ -89,6 +92,7 @@ export const updateIncome = async (
         category: category_id (*), 
         user: user_id (*), 
         account: account_id (*, currency: currency_id (*)), 
+        currency: currency_id (*), 
         donator: donator_id (*)`
       )
 

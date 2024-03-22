@@ -23,7 +23,6 @@ import { deleteExpense } from '@/actions/expense-actions'
 import { deleteExpenseImage } from '@/actions/image-actions'
 
 import { useExpenseStore } from '@/stores'
-import { ExpenseState } from '@/stores/useExpenseStore'
 
 export const columns: ColumnDef<Expense>[] = [
   {
@@ -106,11 +105,12 @@ export const columns: ColumnDef<Expense>[] = [
   {
     accessorKey: 'amount',
     header: 'ຈຳນວນເງິນ',
-    cell: ({ row }) => (
-      <span>
-        {row.original.amount} {row.original.account.currency.name}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const current = row.original
+      return current.currency && current.currency.symbol
+        ? `${current.currency.symbol}${current.amount.toLocaleString()}`
+        : ''
+    },
   },
   {
     accessorKey: 'image',
@@ -139,13 +139,19 @@ export const columns: ColumnDef<Expense>[] = [
     cell: ({ row }) => (
       <>
         {row.original.status === 'PENDING' && (
-          <Badge variant={'warning'}>ລໍຖ້າການອະນຸມັດ</Badge>
+          <Badge variant={'warning'} className='whitespace-nowrap'>
+            ລໍຖ້າການອະນຸມັດ
+          </Badge>
         )}
         {row.original.status === 'APPROVED' && (
-          <Badge variant={'success'}>ອະນຸມັດແລ້ວ</Badge>
+          <Badge variant={'success'} className='whitespace-nowrap'>
+            ອະນຸມັດແລ້ວ
+          </Badge>
         )}
         {row.original.status === 'REJECTED' && (
-          <Badge variant={'danger'}>ຖືກປະຕິເສດ</Badge>
+          <Badge variant={'danger'} className='whitespace-nowrap'>
+            ຖືກປະຕິເສດ
+          </Badge>
         )}
       </>
     ),
@@ -162,10 +168,8 @@ export const columns: ColumnDef<Expense>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const expenses = useExpenseStore((state: ExpenseState) => state.expenses)
-      const setExpenses = useExpenseStore(
-        (state: ExpenseState) => state.setExpenses
-      )
+      const expenses = useExpenseStore((state) => state.expenses)
+      const setExpenses = useExpenseStore((state) => state.setExpenses)
 
       const { toast } = useToast()
 
@@ -199,12 +203,12 @@ export const columns: ColumnDef<Expense>[] = [
             (expense: Expense) => expense.id !== id
           )
 
-          setExpenses(newExpenses)
+          setExpenses(newExpenses as Expense[])
           toast({
             description: 'ລຶບຂໍ້ມູນລາຍຈ່າຍສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error deleting expense:', error)
+          console.error('Error deleting expense: ', error)
         }
       }
 

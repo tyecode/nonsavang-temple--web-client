@@ -13,7 +13,6 @@ import { Currency } from '@/types/currency'
 import { deleteCurrency, updateCurrency } from '@/actions/currency-actions'
 
 import { useCurrencyStore } from '@/stores'
-import { CurrencyState } from '@/stores/useCurrencyStore'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -111,12 +110,8 @@ export const columns: ColumnDef<Currency>[] = [
       const [isOpen, setIsOpen] = useState(false)
       const [isPending, startTransition] = useTransition()
 
-      const currencies = useCurrencyStore(
-        (state: CurrencyState) => state.currencies
-      )
-      const setCurrencies = useCurrencyStore(
-        (state: CurrencyState) => state.setCurrencies
-      )
+      const currencies = useCurrencyStore((state) => state.currencies)
+      const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
 
       const { toast } = useToast()
 
@@ -193,12 +188,12 @@ export const columns: ColumnDef<Currency>[] = [
             (currency) => currency.id !== id
           )
 
-          setCurrencies(newCurrencies)
+          setCurrencies(newCurrencies as Currency[])
           toast({
             description: 'ລຶບຂໍ້ມູນສະກຸນເງິນສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error deleting currency:', error)
+          console.error('Error deleting currency: ', error)
         }
       }
 

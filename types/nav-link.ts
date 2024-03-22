@@ -1,5 +1,6 @@
 export type NavLinkGroup = {
   id: string
+  title: string
   links: NavLink[]
 }
 

@@ -7,8 +7,6 @@ import { Category } from '@/types/category'
 import { getExpenseCategory } from '@/actions/expense-category-actions'
 
 import { usePendingStore, useExpenseCategoryStore } from '@/stores'
-import { CategoryState } from '@/stores/useExpenseCategoryStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -16,13 +14,9 @@ import { columns } from './column'
 import { DataTable } from './data-table'
 
 const AdminExpenseCategory = () => {
-  const categories = useExpenseCategoryStore(
-    (state: CategoryState) => state.categories
-  )
-  const setCategories = useExpenseCategoryStore(
-    (state: CategoryState) => state.setCategories
-  )
-  const setPending = usePendingStore((state: PendingState) => state.setPending)
+  const setPending = usePendingStore((state) => state.setPending)
+  const categories = useExpenseCategoryStore((state) => state.categories)
+  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,9 +37,9 @@ const AdminExpenseCategory = () => {
           })
         )
 
-        setCategories(newCategories)
+        setCategories(newCategories as Category[])
       } catch (error) {
-        console.error('Error fetching expense category', error)
+        console.error('Error fetching expense categories: ', error)
       } finally {
         setPending(false)
       }

@@ -27,6 +27,7 @@ export const getExpense = async (id?: string) => {
       query = query.select(
         `*, 
         category: category_id (*), 
+        currency: currency_id (*), 
         user: user_id (*), 
         account: account_id (*, currency: currency_id (*)), 
         drawer: drawer_id (*)`
@@ -57,6 +58,7 @@ export const createExpense = async (object: ExpenseCreationData) => {
       .select(
         `*, 
         category: category_id (*), 
+        currency: currency_id (*), 
         user: user_id (*), 
         account: account_id (*, currency: currency_id (*)), 
         drawer: drawer_id (*)`
@@ -85,7 +87,14 @@ export const updateExpense = async (
       .from('expense')
       .update(object)
       .eq('id', id)
-      .select()
+      .select(
+        `*, 
+        category: category_id (*), 
+        currency: currency_id (*), 
+        user: user_id (*), 
+        account: account_id (*, currency: currency_id (*)), 
+        drawer: drawer_id (*)`
+      )
 
     return {
       data,

@@ -16,7 +16,6 @@ import {
 } from '@/actions/expense-category-actions'
 
 import { useExpenseCategoryStore } from '@/stores'
-import { CategoryState } from '@/stores/useExpenseCategoryStore'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -102,11 +101,9 @@ export const columns: ColumnDef<Category>[] = [
       const [isOpen, setIsOpen] = useState(false)
       const [isPending, startTransition] = useTransition()
 
-      const categories = useExpenseCategoryStore(
-        (state: CategoryState) => state.categories
-      )
+      const categories = useExpenseCategoryStore((state) => state.categories)
       const setCategories = useExpenseCategoryStore(
-        (state: CategoryState) => state.setCategories
+        (state) => state.setCategories
       )
 
       const { toast } = useToast()
@@ -154,12 +151,12 @@ export const columns: ColumnDef<Category>[] = [
               return category
             })
 
-            setCategories(newCategories)
+            setCategories(newCategories as Category[])
             toast({
               description: 'ແກ້ໄຂຂໍ້ມູນປະເພດລາຍຈ່າຍສຳເລັດແລ້ວ.',
             })
           } catch (error) {
-            console.error('Error updating expense category:', error)
+            console.error('Error updating expense category: ', error)
           } finally {
             setIsOpen(false)
           }
@@ -187,7 +184,7 @@ export const columns: ColumnDef<Category>[] = [
             description: 'ລຶບຂໍ້ມູນປະເພດລາຍຈ່າຍສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error deleting expense category:', error)
+          console.error('Error deleting expense category: ', error)
         }
       }
 

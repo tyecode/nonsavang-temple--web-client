@@ -19,7 +19,6 @@ import { deleteAccount, updateAccount } from '@/actions/account-actions'
 import { getCurrency } from '@/actions/currency-actions'
 
 import { useAccountStore } from '@/stores'
-import { AccountState } from '@/stores/useAccountStore'
 
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/date-format'
@@ -127,8 +126,8 @@ export const columns: ColumnDef<Account>[] = [
     header: 'ຈຳນວນເງິນ',
     cell: ({ row }) => {
       const current = row.original
-      return current.currency && current.currency.name
-        ? `${current.balance} ${current.currency.name}`
+      return current.currency && current.currency.symbol
+        ? `${current.currency.symbol}${current.balance.toLocaleString()}`
         : ''
     },
   },
@@ -153,10 +152,8 @@ export const columns: ColumnDef<Account>[] = [
       const [isOpen, setIsOpen] = useState(false)
       const [openCurrency, setOpenCurrency] = useState(false)
 
-      const accounts = useAccountStore((state: AccountState) => state.accounts)
-      const setAccounts = useAccountStore(
-        (state: AccountState) => state.setAccounts
-      )
+      const accounts = useAccountStore((state) => state.accounts)
+      const setAccounts = useAccountStore((state) => state.setAccounts)
 
       const { toast } = useToast()
 
@@ -187,7 +184,7 @@ export const columns: ColumnDef<Account>[] = [
             )
             setCurrencies(sortedData)
           } catch (error) {
-            console.error('Error fetching currency:', error)
+            console.error('Error fetching currency: ', error)
           }
         }
 
@@ -238,7 +235,7 @@ export const columns: ColumnDef<Account>[] = [
               description: 'ແກ້ໄຂຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
             })
           } catch (error) {
-            console.error('Error updating account:', error)
+            console.error('Error updating account: ', error)
           } finally {
             setIsOpen(false)
           }
@@ -259,12 +256,12 @@ export const columns: ColumnDef<Account>[] = [
 
           const newAccounts = accounts.filter((account) => account.id !== id)
 
-          setAccounts(newAccounts)
+          setAccounts(newAccounts as Account[])
           toast({
             description: 'ລຶບຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
           })
         } catch (error) {
-          console.error('Error deleting account:', error)
+          console.error('Error deleting account: ', error)
         }
       }
 

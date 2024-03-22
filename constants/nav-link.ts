@@ -3,46 +3,31 @@ import { NavLinkGroup } from '@/types/nav-link'
 export const NAV_LINK_ROOT: NavLinkGroup[] = [
   {
     id: 'group-1',
+    title: 'ຫນ້າຫຼັກ',
     links: [
       {
         id: 'overview',
         title: 'ພາບລວມ',
-        href: '/overview',
+        href: '/',
+        icon: 'pie-chart-icon',
       },
-      {
-        id: 'reports',
-        title: 'ລາຍງານ',
-        href: '/reports',
-      },
-    ],
-  },
-  {
-    id: 'group-2',
-    links: [
-      {
-        id: 'users',
-        title: 'ຜູ້ໃຊ້',
-        href: '/users',
-      },
-      {
-        id: 'donators',
-        title: 'ຜູ້ບໍລິຈາກ',
-        href: '/donators',
-      },
-    ],
-  },
-  {
-    id: 'group-3',
-    links: [
       {
         id: 'incomes',
         title: 'ລາຍຮັບ',
         href: '/incomes',
+        icon: 'trending-up-icon',
       },
       {
         id: 'expenses',
         title: 'ລາຍຈ່າຍ',
         href: '/expenses',
+        icon: 'trending-down-icon',
+      },
+      {
+        id: 'donators',
+        title: 'ຜູ້ບໍລິຈາກ',
+        href: '/donators',
+        icon: 'archive-icon',
       },
     ],
   },
@@ -51,23 +36,37 @@ export const NAV_LINK_ROOT: NavLinkGroup[] = [
 export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
   {
     id: 'group-1',
+    title: 'ຫນ້າຫຼັກ',
     links: [
       {
         id: 'overview',
         title: 'ພາບລວມ',
-        href: '/dashboard/overview',
+        href: '/dashboard',
         icon: 'pie-chart-icon',
       },
       {
-        id: 'reports',
-        title: 'ລາຍງານ',
-        href: '/dashboard/reports',
-        icon: 'folder-icon',
+        id: 'incomes',
+        title: 'ລາຍຮັບ',
+        href: '/incomes',
+        icon: 'trending-up-icon',
+      },
+      {
+        id: 'expenses',
+        title: 'ລາຍຈ່າຍ',
+        href: '/expenses',
+        icon: 'trending-down-icon',
+      },
+      {
+        id: 'donators',
+        title: 'ຜູ້ບໍລິຈາກ',
+        href: '/donators',
+        icon: 'archive-icon',
       },
     ],
   },
   {
     id: 'group-2',
+    title: 'ຈັດການຂໍ້ມູນ',
     links: [
       {
         id: 'users',
@@ -81,11 +80,6 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
         href: '/dashboard/donators',
         icon: 'archive-icon',
       },
-    ],
-  },
-  {
-    id: 'group-3',
-    links: [
       {
         id: 'incomes',
         title: 'ຈັດການລາຍຮັບ',

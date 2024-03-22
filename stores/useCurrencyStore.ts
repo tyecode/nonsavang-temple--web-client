@@ -3,10 +3,16 @@ import { Currency } from '@/types/currency'
 
 export interface CurrencyState {
   currencies: Currency[]
-  setCurrencies: (currency: Currency[]) => void
+  setCurrencies: (currencies: Currency[]) => void
 }
 
 export const useCurrencyStore = create<CurrencyState>((set) => ({
   currencies: [],
-  setCurrencies: (currency) => set(() => ({ currencies: currency })),
+  setCurrencies: (state) =>
+    set(() => ({
+      currencies: state.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ),
+    })),
 }))

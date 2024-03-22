@@ -7,8 +7,6 @@ import { Expense } from '@/types/expense'
 import { getExpense } from '@/actions/expense-actions'
 
 import { usePendingStore, useExpenseStore } from '@/stores'
-import { ExpenseState } from '@/stores/useExpenseStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -16,11 +14,9 @@ import { DataTable } from './data-table'
 import { columns } from './column'
 
 const AdminCurrencies = () => {
-  const setPending = usePendingStore((state: PendingState) => state.setPending)
-  const expenses = useExpenseStore((state: ExpenseState) => state.expenses)
-  const setExpenses = useExpenseStore(
-    (state: ExpenseState) => state.setExpenses
-  )
+  const setPending = usePendingStore((state) => state.setPending)
+  const expenses = useExpenseStore((state) => state.expenses)
+  const setExpenses = useExpenseStore((state) => state.setExpenses)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,9 +38,9 @@ const AdminCurrencies = () => {
             : undefined,
         }))
 
-        setExpenses(newExpenses)
+        setExpenses(newExpenses as Expense[])
       } catch (error) {
-        console.error('Error fetching expenses', error)
+        console.error('Error fetching expenses: ', error)
       } finally {
         setPending(false)
       }

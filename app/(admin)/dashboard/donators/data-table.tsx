@@ -19,8 +19,6 @@ import { User } from '@/types/user'
 import { deleteDonator } from '@/actions/donator-actions'
 
 import { useDonatorStore, usePendingStore } from '@/stores'
-import { DonatorState } from '@/stores/useDonatorStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -62,11 +60,9 @@ export function DataTable<TData, TValue>({
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
-  const donators = useDonatorStore((state: DonatorState) => state.donators)
-  const isPending = usePendingStore((state: PendingState) => state.isPending)
-  const setDonators = useDonatorStore(
-    (state: DonatorState) => state.setDonators
-  )
+  const isPending = usePendingStore((state) => state.isPending)
+  const donators = useDonatorStore((state) => state.donators)
+  const setDonators = useDonatorStore((state) => state.setDonators)
 
   const { toast } = useToast()
 
@@ -124,12 +120,12 @@ export function DataTable<TData, TValue>({
             !items.map((item) => item.id).includes(donator.id)
         )
 
-        setDonators(newDonators)
+        setDonators(newDonators as Donator[])
         toast({
           description: `ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.`,
         })
       } catch (error) {
-        console.error('Error deleting selected donators:', error)
+        console.error('Error deleting selected donators: ', error)
       }
     })
   }

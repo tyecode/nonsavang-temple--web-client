@@ -9,7 +9,7 @@ import { Toaster } from '@/components/ui/toaster'
 const DashboardPageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      <aside className='h-full w-[20rem] border bg-background'>
+      <aside className='h-full w-[18rem] border bg-background'>
         <LeftBar navLinkGroups={NAV_LINK_DASHBOARD} />
       </aside>
 

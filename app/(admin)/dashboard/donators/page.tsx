@@ -7,8 +7,6 @@ import { Donator } from '@/types/donator'
 import { getDonator } from '@/actions/donator-actions'
 
 import { usePendingStore, useDonatorStore } from '@/stores'
-import { DonatorState } from '@/stores/useDonatorStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -16,11 +14,9 @@ import { DataTable } from './data-table'
 import { columns } from './column'
 
 const DonatorsPage = () => {
-  const setPending = usePendingStore((state: PendingState) => state.setPending)
-  const setDonators = useDonatorStore(
-    (state: DonatorState) => state.setDonators
-  )
-  const donators = useDonatorStore((state: DonatorState) => state.donators)
+  const setPending = usePendingStore((state) => state.setPending)
+  const setDonators = useDonatorStore((state) => state.setDonators)
+  const donators = useDonatorStore((state) => state.donators)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +37,7 @@ const DonatorsPage = () => {
             : undefined,
         }))
 
-        setDonators(newDonators)
+        setDonators(newDonators as Donator[])
       } catch (error) {
         console.error('Error fetching donators', error)
       } finally {

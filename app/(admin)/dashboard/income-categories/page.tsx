@@ -7,8 +7,6 @@ import { Category } from '@/types/category'
 import { getIncomeCategory } from '@/actions/income-category-actions'
 
 import { useIncomeCategoryStore, usePendingStore } from '@/stores'
-import { CategoryState } from '@/stores/useIncomeCategoryStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -16,13 +14,9 @@ import { columns } from './column'
 import { DataTable } from './data-table'
 
 const AdminIncomeCategory = () => {
-  const setPending = usePendingStore((state: PendingState) => state.setPending)
-  const categories = useIncomeCategoryStore(
-    (state: CategoryState) => state.categories
-  )
-  const setCategories = useIncomeCategoryStore(
-    (state: CategoryState) => state.setCategories
-  )
+  const setPending = usePendingStore((state) => state.setPending)
+  const categories = useIncomeCategoryStore((state) => state.categories)
+  const setCategories = useIncomeCategoryStore((state) => state.setCategories)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,9 +37,9 @@ const AdminIncomeCategory = () => {
           })
         )
 
-        setCategories(newCategories)
+        setCategories(newCategories as Category[])
       } catch (error) {
-        console.error('Error fetching income category', error)
+        console.error('Error fetching income categories: ', error)
       } finally {
         setPending(false)
       }

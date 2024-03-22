@@ -19,8 +19,6 @@ import { Account } from '@/types/account'
 import { deleteAccount, getAccount } from '@/actions/account-actions'
 
 import { usePendingStore, useAccountStore } from '@/stores'
-import { PendingState } from '@/stores/usePendingStore'
-import { AccountState } from '@/stores/useAccountStore'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -64,10 +62,8 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state: PendingState) => state.isPending)
-  const setAccounts = useAccountStore(
-    (state: AccountState) => state.setAccounts
-  )
+  const isPending = usePendingStore((state) => state.isPending)
+  const setAccounts = useAccountStore((state) => state.setAccounts)
 
   const { toast } = useToast()
 
@@ -132,12 +128,12 @@ export function DataTable<TData, TValue>({
             : undefined,
         }))
 
-        setAccounts(newAccounts)
+        setAccounts(newAccounts as Account[])
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected accounts:', error)
+        console.error('Error deleting selected accounts: ', error)
       }
     })
   }

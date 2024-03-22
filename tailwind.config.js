@@ -21,6 +21,7 @@ module.exports = {
       },
     },
     fontFamily: {
+      inter: ['Inter', 'sans-serif'],
       nunito: ['Nunito', 'sans-serif'],
       'noto-lao': ['Noto Sans Lao', 'sans-serif'],
     },

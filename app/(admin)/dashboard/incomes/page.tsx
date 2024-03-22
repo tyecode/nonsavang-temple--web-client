@@ -7,8 +7,6 @@ import { Income } from '@/types/income'
 import { getIncome } from '@/actions/income-actions'
 
 import { useIncomeStore, usePendingStore } from '@/stores'
-import { IncomeState } from '@/stores/useIncomeStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -16,9 +14,9 @@ import { columns } from './column'
 import { DataTable } from './data-table'
 
 const AdminCurrencies = () => {
-  const setPending = usePendingStore((state: PendingState) => state.setPending)
-  const incomes = useIncomeStore((state: IncomeState) => state.incomes)
-  const setIncomes = useIncomeStore((state: IncomeState) => state.setIncomes)
+  const setPending = usePendingStore((state) => state.setPending)
+  const incomes = useIncomeStore((state) => state.incomes)
+  const setIncomes = useIncomeStore((state) => state.setIncomes)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,9 +38,9 @@ const AdminCurrencies = () => {
             : undefined,
         }))
 
-        setIncomes(newIncomes)
+        setIncomes(newIncomes as Income[])
       } catch (error) {
-        console.error('Error fetching expenses', error)
+        console.error('Error fetching incomes: ', error)
       } finally {
         setPending(false)
       }

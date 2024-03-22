@@ -18,8 +18,6 @@ import { Category } from '@/types/category'
 import { deleteIncomeCategory } from '@/actions/income-category-actions'
 
 import { useIncomeCategoryStore, usePendingStore } from '@/stores'
-import { CategoryState } from '@/stores/useIncomeCategoryStore'
-import { PendingState } from '@/stores/usePendingStore'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -61,13 +59,9 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state: PendingState) => state.isPending)
-  const categories = useIncomeCategoryStore(
-    (state: CategoryState) => state.categories
-  )
-  const setCategories = useIncomeCategoryStore(
-    (state: CategoryState) => state.setCategories
-  )
+  const isPending = usePendingStore((state) => state.isPending)
+  const categories = useIncomeCategoryStore((state) => state.categories)
+  const setCategories = useIncomeCategoryStore((state) => state.setCategories)
 
   const { toast } = useToast()
 
@@ -124,12 +118,12 @@ export function DataTable<TData, TValue>({
           (category: Category) => !items.some((item) => item.id === category.id)
         )
 
-        setCategories(newCategories)
+        setCategories(newCategories as Category[])
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected income categories:', error)
+        console.error('Error deleting selected income categories: ', error)
       }
     })
   }

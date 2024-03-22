@@ -10,12 +10,17 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
   expenses: [],
   setExpenses: (state) =>
     set(() => ({
-      expenses: state.map((expense) => ({
-        ...expense,
-        drawer: expense.drawer && {
-          ...expense.drawer,
-          display_name: `${expense.drawer.title} ${expense.drawer.first_name} ${expense.drawer.last_name}`,
-        },
-      })),
+      expenses: state
+        .map((expense) => ({
+          ...expense,
+          drawer: expense.drawer && {
+            ...expense.drawer,
+            display_name: `${expense.drawer.title} ${expense.drawer.first_name} ${expense.drawer.last_name}`,
+          },
+        }))
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ),
     })),
 }))

@@ -35,9 +35,9 @@ const UsersPage = () => {
           updated_at: user.updated_at ? formatDate(user.updated_at) : undefined,
         }))
 
-        setUsers(newUsers)
+        setUsers(newUsers as User[])
       } catch (error) {
-        console.error('Error fetching users:', error)
+        console.error('Error fetching users: ', error)
       } finally {
         setPending(false)
       }
