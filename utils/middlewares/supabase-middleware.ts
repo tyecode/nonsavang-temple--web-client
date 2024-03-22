@@ -59,7 +59,14 @@ export const supabaseMiddleware = (middleware: NextMiddleware) => {
       }
     )
 
-    await supabase.auth.getSession()
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession()
+
+    if (error) {
+      request.cookies.delete(process.env.NEXT_SUPABASE_ANON_KEY_COOKIE_NAME!)
+    }
 
     return middleware(request, event)
   }

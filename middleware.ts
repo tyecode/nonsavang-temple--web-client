@@ -4,7 +4,6 @@ import { stackMiddleware } from '@/utils/middlewares/stack-middleware'
 import { supabaseMiddleware } from '@/utils/middlewares/supabase-middleware'
 import { authorizeMiddleware } from '@/utils/middlewares/authorize-middleware'
 import { authenticateMiddleware } from '@/utils/middlewares/authenticate-middleware'
-import { redirectMiddleware } from './utils/middlewares/redirect-middleware'
 
 type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware
 
@@ -12,7 +11,6 @@ const middlewares: MiddlewareFactory[] = [
   supabaseMiddleware,
   authorizeMiddleware,
   authenticateMiddleware,
-  // redirectMiddleware,
 ]
 
 export default stackMiddleware(middlewares)
