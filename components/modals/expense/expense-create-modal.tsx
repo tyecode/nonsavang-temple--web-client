@@ -170,7 +170,7 @@ const ExpenseCreateModal = () => {
         currency_id: values.currency,
         drawer_id: values.drawer,
         image: uploadData
-          ? `${process.env.NEXT_PUBLIC_BUCKET_PATH}/${uploadData.data.path}`
+          ? `${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/${uploadData.data.path}`
           : undefined,
         remark: values.remark,
       }

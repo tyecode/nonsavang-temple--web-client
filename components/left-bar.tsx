@@ -45,7 +45,7 @@ const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
       <div className='flex-center w-full pt-4'>
         <Link href='/' shallow>
           <Image
-            src={`${process.env.NEXT_PUBLIC_BUCKET_PATH}/logo.png`}
+            src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`}
             alt={'logo'}
             width={72}
             height={72}

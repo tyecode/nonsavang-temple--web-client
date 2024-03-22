@@ -198,7 +198,7 @@ export const columns: ColumnDef<User>[] = [
             last_name: values.last_name,
             role: values.role,
             image: uploadData
-              ? `${process.env.NEXT_PUBLIC_BUCKET_PATH}/${uploadData.data.path}`
+              ? `${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/${uploadData.data.path}`
               : undefined,
           })
 
