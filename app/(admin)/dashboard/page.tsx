@@ -1,6 +1,6 @@
 import OverviewPage from '@/components/pages/overview-page'
 
-const HomePage = () => {
+const AdminDashboardPage = () => {
   return (
     <>
       <OverviewPage />
@@ -8,4 +8,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage
+export default AdminDashboardPage
