@@ -34,8 +34,10 @@ const TopBar = () => {
       } catch (error) {}
     }
 
+    if (user.display_name !== undefined) return
+
     fetchUser()
-  }, [pathname, setUser])
+  }, [pathname, setUser, user])
 
   return (
     <section className='w-full border bg-background'>

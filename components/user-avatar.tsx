@@ -1,7 +1,6 @@
 'use client'
 
-import { forwardRef, useState, useTransition } from 'react'
-import Link from 'next/link'
+import { useEffect, useState, useTransition } from 'react'
 import { Spinner } from '@nextui-org/react'
 
 import { User } from '@/types/user'
@@ -19,35 +18,17 @@ import {
 } from '@/components/ui/popover'
 
 import CreateAvatar from '@/lib/create-avatar'
-
-type LinkButtonProps = {
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>
-  href?: string
-  isPending?: boolean
-}
-
-const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
-  ({ onClick, href, isPending }, ref) => {
-    return (
-      <a href={href} onClick={onClick} ref={ref}>
-        <Button
-          variant={'ghost'}
-          className='w-full justify-start gap-4 text-sm font-normal'
-          disabled={isPending}
-        >
-          <IconsCollection icon={'grid-icon'} />
-          ໜ້າຈັດການ
-        </Button>
-      </a>
-    )
-  }
-)
-
-LinkButton.displayName = 'LinkButton'
+import { useRouter } from 'next/navigation'
 
 const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+
+  const router = useRouter()
+
+  useEffect(() => {
+    router.prefetch('/dashboard')
+  }, [])
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -88,15 +69,18 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
         </div>
         <ul className='flex w-full flex-col border-t pt-4'>
           <li className={user?.role === 'ADMIN' ? 'block' : 'hidden'}>
-            <Link
-              href='/dashboard'
-              onClick={() => setIsOpen(false)}
-              prefetch={false}
-              passHref
-              legacyBehavior
+            <Button
+              variant={'ghost'}
+              className='w-full justify-start gap-4 text-sm font-normal'
+              disabled={isPending}
+              onClick={() => {
+                setIsOpen(false)
+                router.push('/dashboard')
+              }}
             >
-              <LinkButton />
-            </Link>
+              <IconsCollection icon={'grid-icon'} />
+              ໜ້າຈັດການ
+            </Button>
           </li>
           <li>
             <Button

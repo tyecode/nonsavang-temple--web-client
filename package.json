@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "next dev -p 8000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 8000",
     "fix": "npm run fix:eslint && npm run fix:prettier",
     "fix:eslint": "eslint --fix \"**/*.{ts,tsx,js,jsx}\" --ignore-path .gitignore",
     "fix:prettier": "prettier --write \"**/*.{ts,tsx,js,jsx}\" --ignore-path .gitignore",

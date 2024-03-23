@@ -1,7 +1,6 @@
 'use client'
 
-import React, { forwardRef } from 'react'
-import Link from 'next/link'
+import React, { useEffect } from 'react'
 import Image from 'next/image'
 
 import { Button } from '@/components/ui/button'
@@ -16,70 +15,51 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-
-type LinkButtonProps = {
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>
-  href?: string
-  isPending?: boolean
-  title: string
-  icon: string | undefined
-}
+import { useRouter } from 'next/navigation'
 
 const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
   const pathname = usePathname()
+  const router = useRouter()
 
   const navActive = navLinkGroups.find((group) =>
     group.links.find((link) => link.href === pathname)
   )
 
-  const NavLinkButton: React.FC<{ link: NavLink }> = ({ link }) => (
-    <Link
-      key={link.id}
-      href={link.href}
-      prefetch={false}
-      passHref
-      legacyBehavior
-    >
-      <LinkButton title={link.title} icon={link.icon} />
-    </Link>
-  )
+  const NavLinkButton: React.FC<{ link: NavLink }> = ({ link }) => {
+    useEffect(() => {
+      router.prefetch(link.href)
+    }, [link.href, router])
 
-  const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
-    ({ onClick, href, isPending, title, icon }, ref) => {
-      return (
-        <a href={href} onClick={onClick} ref={ref}>
-          <Button
-            variant={'ghost'}
-            size={'sm'}
-            className={cn(
-              'group flex w-full items-center justify-start gap-4 text-foreground',
-              href === pathname ? 'bg-accent' : ''
-            )}
-          >
-            <IconsCollection icon={icon || ''} />
-            {title}
-          </Button>
-        </a>
-      )
-    }
-  )
-
-  LinkButton.displayName = 'LinkButton'
+    return (
+      <Button
+        key={link.id}
+        variant={'ghost'}
+        size={'sm'}
+        className={cn(
+          'group flex w-full items-center justify-start gap-4 text-foreground',
+          link.href === pathname ? 'bg-accent' : ''
+        )}
+        onClick={() => router.push(link.href)}
+      >
+        <IconsCollection icon={link.icon || ''} />
+        {link.title}
+      </Button>
+    )
+  }
 
   return (
     <nav className='h-full w-full overflow-scroll'>
       <div className='flex-center w-full pt-4'>
-        <Link href='/' prefetch={false}>
-          <Image
-            src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`}
-            alt={'logo'}
-            width={72}
-            height={72}
-            className='object-cover'
-            draggable={false}
-            priority
-          />
-        </Link>
+        <Image
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`}
+          alt={'logo'}
+          width={72}
+          height={72}
+          className='cursor-pointer object-cover'
+          onClick={() => router.push('/')}
+          draggable={false}
+          priority
+        />
       </div>
       <Accordion
         type='multiple'
