@@ -26,6 +26,7 @@ import {
 } from '@/stores'
 import { Donator, Expense, Income, User } from '@/types'
 import { useEffect, useState } from 'react'
+import IncomeChart from '../income-chart'
 
 export default function OverviewPage() {
   const [selectedAccount, setSelectedAccount] = useState({ id: '', balance: 0 })
@@ -171,6 +172,41 @@ export default function OverviewPage() {
     )
     .slice(0, 5)
 
+  const colorPalette = [
+    'red',
+    'blue',
+    'green',
+    'yellow',
+    'purple',
+    'orange',
+    'pink',
+    'cyan',
+    'fuchsia',
+  ]
+
+  const summedIncomes = filteredIncomes.reduce(
+    (acc: { name: string; amount: number; color: string }[], income) => {
+      const existingCategory = acc.find(
+        (item) => item.name === income.category.name
+      )
+
+      if (existingCategory) {
+        existingCategory.amount += income.amount
+      } else {
+        acc.push({
+          name: income.category.name,
+          amount: Number(income.amount),
+          color: colorPalette[acc.length % colorPalette.length],
+        })
+      }
+
+      return acc
+    },
+    []
+  )
+
+  console.log('latestTransactions', summedIncomes)
+
   return (
     <ScrollArea className='h-full'>
       <div className='flex-1 space-y-4 p-4 pt-6 md:p-8'>
@@ -219,12 +255,33 @@ export default function OverviewPage() {
             </div>
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7'>
               <Card className='col-span-4'>
-                <CardHeader>
-                  <CardTitle>Overview</CardTitle>
-                </CardHeader>
-                <CardContent className='pl-2'></CardContent>
+                <Tabs defaultValue='income'>
+                  <CardHeader>
+                    <CardTitle>
+                      <TabsList>
+                        <TabsTrigger value='income'>ລາຍຮັບ</TabsTrigger>
+                        <TabsTrigger value='expense'>ລາຍຈ່າຍ</TabsTrigger>
+                      </TabsList>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <TabsContent value='income' className='space-y-4'>
+                      {summedIncomes && (
+                        <IncomeChart
+                          data={summedIncomes.sort(
+                            (a, b) => b.amount - a.amount
+                          )}
+                          currency={currencySymbol}
+                        />
+                      )}
+                    </TabsContent>
+                    <TabsContent value='expense' className='space-y-4'>
+                      {/* <IncomeChart /> */}
+                    </TabsContent>
+                  </CardContent>
+                </Tabs>
               </Card>
-              <Card className='col-span-4 md:col-span-3'>
+              <Card className='col-span-4 lg:col-span-3'>
                 <CardHeader>
                   <CardTitle>ການເຄື່ອນໄຫວລ່າສຸດ</CardTitle>
                   <CardDescription>
@@ -240,7 +297,9 @@ export default function OverviewPage() {
                             {transaction.category.name}
                           </p>
                           <p className='text-sm text-muted-foreground'>
-                            {transaction.account.name}
+                            {new Date(
+                              transaction.created_at
+                            ).toLocaleDateString('en-GB')}
                           </p>
                         </div>
                         <div
