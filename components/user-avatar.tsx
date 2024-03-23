@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { forwardRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Spinner } from '@nextui-org/react'
 
@@ -19,6 +19,31 @@ import {
 } from '@/components/ui/popover'
 
 import CreateAvatar from '@/lib/create-avatar'
+
+type LinkButtonProps = {
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>
+  href?: string
+  isPending?: boolean
+}
+
+const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
+  ({ onClick, href, isPending }, ref) => {
+    return (
+      <a href={href} onClick={onClick} ref={ref}>
+        <Button
+          variant={'ghost'}
+          className='w-full justify-start gap-4 text-sm font-normal'
+          disabled={isPending}
+        >
+          <IconsCollection icon={'grid-icon'} />
+          ໜ້າຈັດການ
+        </Button>
+      </a>
+    )
+  }
+)
+
+LinkButton.displayName = 'LinkButton'
 
 const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -63,15 +88,14 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
         </div>
         <ul className='flex w-full flex-col border-t pt-4'>
           <li className={user?.role === 'ADMIN' ? 'block' : 'hidden'}>
-            <Link href='/dashboard' onClick={() => setIsOpen(false)} shallow>
-              <Button
-                variant={'ghost'}
-                className='w-full justify-start gap-4 text-sm font-normal'
-                disabled={isPending}
-              >
-                <IconsCollection icon={'grid-icon'} />
-                ໜ້າຈັດການ
-              </Button>
+            <Link
+              href='/dashboard'
+              onClick={() => setIsOpen(false)}
+              prefetch={false}
+              passHref
+              legacyBehavior
+            >
+              <LinkButton />
             </Link>
           </li>
           <li>
