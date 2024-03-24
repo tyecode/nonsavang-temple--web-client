@@ -2,6 +2,7 @@
 
 import { useEffect, useTransition } from 'react'
 import { usePathname } from 'next/navigation'
+import { useCookies } from 'next-client-cookies'
 
 import { getSession } from '@/actions/auth-actions'
 import { getUser } from '@/actions/user-actions'
@@ -14,16 +15,21 @@ import { getTextFromPathname } from '@/lib/text-maps'
 import { useAuthStore } from '@/stores'
 
 const TopBar = () => {
-  const pathname = usePathname()
-  const user = useAuthStore((state) => state.auth)
-  const setUser = useAuthStore((state) => state.setAuth)
   const [isPending, startTransition] = useTransition()
+
+  const setUser = useAuthStore((state) => state.setAuth)
+  const user = useAuthStore((state) => state.auth)
+
+  const pathname = usePathname()
+  const cookies = useCookies()
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         startTransition(async () => {
-          const session = await getSession()
+          const cookieName = process.env.NEXT_PUBLIC_SUPABASE_AUTH_COOKIE_NAME!
+          const cookieData = cookies.get(cookieName) ?? ''
+          const session = JSON.parse(cookieData)
 
           if (!session?.user?.id) return
 
@@ -31,7 +37,9 @@ const TopBar = () => {
 
           setUser(data[0])
         })
-      } catch (error) {}
+      } catch (error) {
+        console.error('Error fetching user:', error)
+      }
     }
 
     if (user.display_name !== undefined) return

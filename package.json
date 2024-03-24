@@ -53,6 +53,7 @@
     "json-schema": "^0.4.0",
     "lucide-react": "^0.321.0",
     "next": "latest",
+    "next-client-cookies": "^1.1.0",
     "next-themes": "^0.2.1",
     "postcss": "8.4.33",
     "react": "18.2.0",

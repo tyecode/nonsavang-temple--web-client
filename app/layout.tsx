@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@/components/providers/theme-provider'
+import { CookiesProvider } from 'next-client-cookies/server'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
 import './globals.css'
@@ -33,7 +34,7 @@ export default function RootLayout({
           defaultTheme='light'
           disableTransitionOnChange
         >
-          {children}
+          <CookiesProvider>{children}</CookiesProvider>
         </ThemeProvider>
       </body>
     </html>
