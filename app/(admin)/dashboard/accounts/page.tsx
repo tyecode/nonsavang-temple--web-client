@@ -1,49 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
-
-import { Account } from '@/types/account'
-
-import { getAccount } from '@/actions/account-actions'
-
-import { usePendingStore, useAccountStore } from '@/stores'
-
-import { formatDate } from '@/lib/date-format'
+import { useAccountStore } from '@/stores'
 
 import { DataTable } from './data-table'
 import { columns } from './column'
 
 const AdminAccounts = () => {
   const accounts = useAccountStore((state) => state.accounts)
-  const setAccounts = useAccountStore((state) => state.setAccounts)
-  const setPending = usePendingStore((state) => state.setPending)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setPending(true)
-
-      try {
-        const res = await getAccount()
-
-        if (res.error || !res.data) return
-
-        const newAccounts: Account[] = res.data.map((account: Account) => ({
-          ...account,
-          created_at: formatDate(account.created_at),
-          updated_at: account.updated_at
-            ? formatDate(account.updated_at)
-            : undefined,
-        }))
-
-        setAccounts(newAccounts as Account[])
-      } catch (error) {
-        console.error('Error fetching accounts: ', error)
-      } finally {
-        setPending(false)
-      }
-    }
-    fetchData()
-  }, [setAccounts, setPending])
 
   return (
     <section className='container'>

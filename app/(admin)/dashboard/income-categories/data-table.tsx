@@ -17,7 +17,7 @@ import { Category } from '@/types/category'
 
 import { deleteIncomeCategory } from '@/actions/income-category-actions'
 
-import { useIncomeCategoryStore, usePendingStore } from '@/stores'
+import { useIncomeCategoryStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -41,6 +41,7 @@ import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import { CategoryCreateModal } from '@/components/modals/income-category'
+import { useFetchIncomeCategory } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -59,10 +60,10 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const categories = useIncomeCategoryStore((state) => state.categories)
   const setCategories = useIncomeCategoryStore((state) => state.setCategories)
+  const categories = useIncomeCategoryStore((state) => state.categories)
 
+  const { data: fetchData, loading: isPending } = useFetchIncomeCategory()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -84,6 +85,12 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
+
+  useEffect(() => {
+    if (categories.length > 0) return
+
+    setCategories(fetchData)
+  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

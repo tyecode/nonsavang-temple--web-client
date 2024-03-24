@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { use, useEffect, useState, useTransition } from 'react'
 import {
   ColumnDef,
   SortingState,
@@ -41,6 +41,7 @@ import { LoadingButton } from '@/components/buttons'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { CategoryCreateModal } from '@/components/modals/expense-category'
+import { useFetchExpenseCategory } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -59,10 +60,10 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const categories = useExpenseCategoryStore((state) => state.categories)
   const setCategories = useExpenseCategoryStore((state) => state.setCategories)
+  const categories = useExpenseCategoryStore((state) => state.categories)
 
+  const { data: fetchData, loading: isPending } = useFetchExpenseCategory()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -84,6 +85,12 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
+
+  useEffect(() => {
+    if (categories.length > 0) return
+
+    setCategories(fetchData)
+  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

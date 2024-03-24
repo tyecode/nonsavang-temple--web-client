@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { use, useEffect, useState, useTransition } from 'react'
 import {
   ColumnDef,
   SortingState,
@@ -41,6 +41,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
+import { useFetchCurrency } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -59,10 +60,10 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const currencies = useCurrencyStore((state) => state.currencies)
   const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
+  const currencies = useCurrencyStore((state) => state.currencies)
 
+  const { data: fetchData, loading: isPending } = useFetchCurrency()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -84,6 +85,12 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
+
+  useEffect(() => {
+    if (currencies.length > 0) return
+
+    setCurrencies(fetchData as Currency[])
+  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

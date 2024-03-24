@@ -42,6 +42,7 @@ import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import { ExpenseCreateModal } from '@/components/modals/expense'
+import { useFetchExpense } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -60,10 +61,10 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const expenses = useExpenseStore((state) => state.expenses)
   const setExpenses = useExpenseStore((state) => state.setExpenses)
+  const expenses = useExpenseStore((state) => state.expenses)
 
+  const { data: fetchData, loading: isPending } = useFetchExpense()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -85,6 +86,12 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
+
+  useEffect(() => {
+    if (expenses.length > 0) return
+
+    setExpenses(fetchData)
+  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

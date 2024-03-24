@@ -44,6 +44,7 @@ import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { UserCreateModal } from '@/components/modals/user'
 import { deleteImage } from '@/actions/image-actions'
+import { useFetchUser } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -58,17 +59,16 @@ export function DataTable<TData, TValue>({
   const [globalFilter, setGlobalFilters] = useState<string>('')
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
+  const [isLoading, startTransition] = useTransition()
 
   const [rowSelection, setRowSelection] = useState({})
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const users = useUserStore((state) => state.users)
   const setUsers = useUserStore((state) => state.setUsers)
+  const users = useUserStore((state) => state.users)
 
+  const { data: fetchData, loading: isPending } = useFetchUser()
   const { toast } = useToast()
-
-  const [isLoading, startTransition] = useTransition()
 
   const table = useReactTable({
     data,
@@ -89,6 +89,12 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
+
+  useEffect(() => {
+    if (users.length > 0) return
+
+    setUsers(fetchData)
+  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

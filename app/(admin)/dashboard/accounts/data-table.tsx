@@ -18,7 +18,7 @@ import { Account } from '@/types/account'
 
 import { deleteAccount, getAccount } from '@/actions/account-actions'
 
-import { usePendingStore, useAccountStore } from '@/stores'
+import { useAccountStore } from '@/stores'
 
 import { formatDate } from '@/lib/date-format'
 
@@ -44,6 +44,7 @@ import {
 import { useToast } from '@/components/ui/use-toast'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { LoadingButton } from '@/components/buttons'
+import { useFetchAccount } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -62,9 +63,10 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const isPending = usePendingStore((state) => state.isPending)
   const setAccounts = useAccountStore((state) => state.setAccounts)
+  const accounts = useAccountStore((state) => state.accounts)
 
+  const { data: fetchData, loading: isPending } = useFetchAccount()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -86,6 +88,12 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
+
+  useEffect(() => {
+    if (accounts.length > 0) return
+
+    setAccounts(fetchData as Account[])
+  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

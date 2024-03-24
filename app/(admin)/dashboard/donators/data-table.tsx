@@ -18,7 +18,7 @@ import { User } from '@/types/user'
 
 import { deleteDonator } from '@/actions/donator-actions'
 
-import { useDonatorStore, usePendingStore } from '@/stores'
+import { useDonatorStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -42,6 +42,7 @@ import {
 import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DonatorCreateModal } from '@/components/modals/donator'
+import { useFetchDonator } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -60,10 +61,10 @@ export function DataTable<TData, TValue>({
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
-  const isPending = usePendingStore((state) => state.isPending)
-  const donators = useDonatorStore((state) => state.donators)
   const setDonators = useDonatorStore((state) => state.setDonators)
+  const donators = useDonatorStore((state) => state.donators)
 
+  const { data: fetchData, loading: isPending } = useFetchDonator()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -85,6 +86,12 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
+
+  useEffect(() => {
+    if (donators.length > 0) return
+
+    setDonators(fetchData as Donator[])
+  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table
