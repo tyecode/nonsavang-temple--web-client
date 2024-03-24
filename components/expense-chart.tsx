@@ -13,7 +13,7 @@ type ExpenseChartProps = {
 
 export default function ExpenseChart({ data, currency }: ExpenseChartProps) {
   const valueFormatter = (number: number) =>
-    `+${currency}${Intl.NumberFormat('us').format(number).toString()}`
+    `-${currency}${Intl.NumberFormat('us').format(number).toString()}`
 
   return (
     <>

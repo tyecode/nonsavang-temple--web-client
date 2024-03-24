@@ -28,7 +28,12 @@ export const TotalStatusCard: React.FC<TotalStatusCardProps> = ({
         </span>
       </CardHeader>
       <CardContent>
-        <div className={cn('text-inter text-2xl font-bold', className)}>
+        <div
+          className={cn(
+            'text-inter whitespace-nowrap text-xl font-bold',
+            className
+          )}
+        >
           {amount}
         </div>
         {description && (

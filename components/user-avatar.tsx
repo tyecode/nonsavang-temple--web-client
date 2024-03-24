@@ -75,7 +75,7 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
               disabled={isPending}
               onClick={() => {
                 setIsOpen(false)
-                router.push('/dashboard')
+                router.push('/dashboard/users')
               }}
             >
               <IconsCollection icon={'grid-icon'} />

@@ -28,7 +28,11 @@ import { Donator, Expense, Income, User } from '@/types'
 import { useEffect, useState } from 'react'
 import IncomeChart from '../income-chart'
 import { useFetchDonator, useFetchExpense, useFetchIncome } from '@/hooks'
-import { COLOR_PALETTE } from '@/constants/color-palette'
+import {
+  INCOME_COLOR_PALETTE,
+  EXPENSE_COLOR_PALETTE,
+} from '@/constants/color-palette'
+import ExpenseChart from '../expense-chart'
 
 export default function OverviewPage() {
   const [selectedAccount, setSelectedAccount] = useState({ id: '', balance: 0 })
@@ -145,7 +149,7 @@ export default function OverviewPage() {
     .sort((a, b) => b.amount - a.amount)
     .map((income, index) => ({
       ...income,
-      color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+      color: INCOME_COLOR_PALETTE[index % INCOME_COLOR_PALETTE.length],
     }))
 
   const summedExpenses = filteredExpenses
@@ -168,7 +172,7 @@ export default function OverviewPage() {
     .sort((a, b) => b.amount - a.amount)
     .map((expense, index) => ({
       ...expense,
-      color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+      color: EXPENSE_COLOR_PALETTE[index % EXPENSE_COLOR_PALETTE.length],
     }))
 
   return (
@@ -184,9 +188,9 @@ export default function OverviewPage() {
         </div>
         <Tabs defaultValue='overview' className='space-y-4'>
           <TabsList>
-            <TabsTrigger value='overview'>Overview</TabsTrigger>
+            <TabsTrigger value='overview'>ພາບລວມ</TabsTrigger>
             <TabsTrigger value='analytics' disabled>
-              Analytics
+              ການວິເຄາະ
             </TabsTrigger>
           </TabsList>
           <TabsContent value='overview' className='space-y-4'>
@@ -239,7 +243,7 @@ export default function OverviewPage() {
                     </TabsContent>
                     <TabsContent value='expense' className='space-y-4'>
                       {summedExpenses && (
-                        <IncomeChart
+                        <ExpenseChart
                           data={summedExpenses}
                           currency={currencySymbol}
                         />
@@ -250,9 +254,9 @@ export default function OverviewPage() {
               </Card>
               <Card className='col-span-4 lg:col-span-3'>
                 <CardHeader>
-                  <CardTitle>ການເຄື່ອນໄຫວລ່າສຸດ</CardTitle>
+                  <CardTitle className='text-xl'>ການເຄື່ອນໄຫວລ່າສຸດ</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    {`ມີການເຄື່ອນໄຫວທັງໝົດ ${combinedTransactions.length} ລາຍການ`}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

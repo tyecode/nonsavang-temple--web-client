@@ -51,6 +51,6 @@ export const getSession = async () => {
 
     return data.session
   } catch (error) {
-    throw new Error('Could not retrieve Auth user')
+    console.log('Error getting session:', error)
   }
 }
