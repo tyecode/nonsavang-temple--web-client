@@ -6,12 +6,12 @@ type DataItem = {
   color: string
 }
 
-type IncomeChartProps = {
+type ExpenseChartProps = {
   data: DataItem[]
   currency: string
 }
 
-export default function IncomeChart({ data, currency }: IncomeChartProps) {
+export default function ExpenseChart({ data, currency }: ExpenseChartProps) {
   const valueFormatter = (number: number) =>
     `+${currency}${Intl.NumberFormat('us').format(number).toString()}`
 

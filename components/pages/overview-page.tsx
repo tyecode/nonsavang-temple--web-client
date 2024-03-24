@@ -27,6 +27,8 @@ import {
 import { Donator, Expense, Income, User } from '@/types'
 import { useEffect, useState } from 'react'
 import IncomeChart from '../income-chart'
+import { useFetchDonator, useFetchExpense, useFetchIncome } from '@/hooks'
+import { COLOR_PALETTE } from '@/constants/color-palette'
 
 export default function OverviewPage() {
   const [selectedAccount, setSelectedAccount] = useState({ id: '', balance: 0 })
@@ -46,73 +48,24 @@ export default function OverviewPage() {
   const users = useUserStore((state) => state.users)
   const setUsers = useUserStore((state) => state.setUsers)
 
+  const { data: fetchIncome } = useFetchIncome()
+  const { data: fetchExpense } = useFetchExpense()
+  const { data: fetchDonator } = useFetchDonator()
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [incomeRes, expenseRes, donatorRes, userRes] = await Promise.all([
-          getIncome(),
-          getExpense(),
-          getDonator(),
-          getUser(),
-        ])
+    if (incomes.length > 0) return
+    setIncomes(fetchIncome)
+  }, [fetchIncome])
 
-        if (!incomeRes.error && incomeRes.data) {
-          const newIncomes: Income[] = incomeRes.data.map((income: Income) => ({
-            ...income,
-            created_at: formatDate(income.created_at),
-            approved_at: income.approved_at
-              ? formatDate(income.approved_at)
-              : undefined,
-            rejected_at: income.rejected_at
-              ? formatDate(income.rejected_at)
-              : undefined,
-          }))
-          setIncomes(newIncomes as Income[])
-        }
+  useEffect(() => {
+    if (expenses.length > 0) return
+    setExpenses(fetchExpense)
+  }, [fetchExpense])
 
-        if (!expenseRes.error && expenseRes.data) {
-          const newExpenses: Expense[] = expenseRes.data.map(
-            (expense: Expense) => ({
-              ...expense,
-              created_at: formatDate(expense.created_at),
-              approved_at: expense.approved_at
-                ? formatDate(expense.approved_at)
-                : undefined,
-              rejected_at: expense.rejected_at
-                ? formatDate(expense.rejected_at)
-                : undefined,
-            })
-          )
-          setExpenses(newExpenses as Expense[])
-        }
-
-        if (!donatorRes.error && donatorRes.data) {
-          const newDonators = donatorRes.data.map((donator: Donator) => ({
-            ...donator,
-            created_at: formatDate(donator.created_at),
-            updated_at: donator.updated_at
-              ? formatDate(donator.updated_at)
-              : undefined,
-          }))
-          setDonators(newDonators as Donator[])
-        }
-
-        if (!userRes.error && userRes.data) {
-          const newUsers = userRes.data.map((user: User) => ({
-            ...user,
-            created_at: formatDate(user.created_at),
-            updated_at: user.updated_at
-              ? formatDate(user.updated_at)
-              : undefined,
-          }))
-          setUsers(newUsers as User[])
-        }
-      } catch (error) {
-        console.error('Error fetching data: ', error)
-      }
-    }
-    fetchData()
-  }, [setIncomes, setExpenses, setDonators, setUsers])
+  useEffect(() => {
+    if (donators.length > 0) return
+    setDonators(fetchDonator)
+  }, [fetchDonator])
 
   useEffect(() => {
     if (selectedAccount.id) {
@@ -172,20 +125,8 @@ export default function OverviewPage() {
     )
     .slice(0, 5)
 
-  const colorPalette = [
-    'red',
-    'blue',
-    'green',
-    'yellow',
-    'purple',
-    'orange',
-    'pink',
-    'cyan',
-    'fuchsia',
-  ]
-
-  const summedIncomes = filteredIncomes.reduce(
-    (acc: { name: string; amount: number; color: string }[], income) => {
+  const summedIncomes = filteredIncomes
+    .reduce((acc: { name: string; amount: number }[], income) => {
       const existingCategory = acc.find(
         (item) => item.name === income.category.name
       )
@@ -196,16 +137,39 @@ export default function OverviewPage() {
         acc.push({
           name: income.category.name,
           amount: Number(income.amount),
-          color: colorPalette[acc.length % colorPalette.length],
         })
       }
 
       return acc
-    },
-    []
-  )
+    }, [])
+    .sort((a, b) => b.amount - a.amount)
+    .map((income, index) => ({
+      ...income,
+      color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+    }))
 
-  console.log('latestTransactions', summedIncomes)
+  const summedExpenses = filteredExpenses
+    .reduce((acc: { name: string; amount: number }[], expense) => {
+      const existingCategory = acc.find(
+        (item) => item.name === expense.category.name
+      )
+
+      if (existingCategory) {
+        existingCategory.amount += expense.amount
+      } else {
+        acc.push({
+          name: expense.category.name,
+          amount: Number(expense.amount),
+        })
+      }
+
+      return acc
+    }, [])
+    .sort((a, b) => b.amount - a.amount)
+    .map((expense, index) => ({
+      ...expense,
+      color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+    }))
 
   return (
     <ScrollArea className='h-full'>
@@ -268,15 +232,18 @@ export default function OverviewPage() {
                     <TabsContent value='income' className='space-y-4'>
                       {summedIncomes && (
                         <IncomeChart
-                          data={summedIncomes.sort(
-                            (a, b) => b.amount - a.amount
-                          )}
+                          data={summedIncomes}
                           currency={currencySymbol}
                         />
                       )}
                     </TabsContent>
                     <TabsContent value='expense' className='space-y-4'>
-                      {/* <IncomeChart /> */}
+                      {summedExpenses && (
+                        <IncomeChart
+                          data={summedExpenses}
+                          currency={currencySymbol}
+                        />
+                      )}
                     </TabsContent>
                   </CardContent>
                 </Tabs>
@@ -293,7 +260,7 @@ export default function OverviewPage() {
                     <div key={transaction.id} className='my-3'>
                       <div className='flex items-center'>
                         <div className='space-y-1'>
-                          <p className='text-sm font-medium leading-none'>
+                          <p className='text-md font-medium leading-none'>
                             {transaction.category.name}
                           </p>
                           <p className='text-sm text-muted-foreground'>
