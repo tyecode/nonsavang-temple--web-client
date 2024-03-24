@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "next dev -p 8000",
     "build": "next build",
-    "start": "next start -p 8000",
+    "start": "next start -p 8080",
     "fix": "npm run fix:eslint && npm run fix:prettier",
     "fix:eslint": "eslint --fix \"**/*.{ts,tsx,js,jsx}\" --ignore-path .gitignore",
     "fix:prettier": "prettier --write \"**/*.{ts,tsx,js,jsx}\" --ignore-path .gitignore",
@@ -69,6 +69,7 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@types/lodash": "^4.17.0",
     "@types/node": "^20.11.5",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
