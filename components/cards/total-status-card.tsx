@@ -3,6 +3,7 @@ import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { IconsCollection } from '../icons/icons-collection'
 import { cn } from '@/lib/utils'
+import { Skeleton } from '../ui/skeleton'
 
 interface TotalStatusCardProps {
   title: string
@@ -10,6 +11,7 @@ interface TotalStatusCardProps {
   amount: string
   description?: string
   className?: string
+  isPending?: boolean
 }
 
 export const TotalStatusCard: React.FC<TotalStatusCardProps> = ({
@@ -18,6 +20,7 @@ export const TotalStatusCard: React.FC<TotalStatusCardProps> = ({
   amount,
   description,
   className,
+  isPending = false,
 }) => {
   return (
     <Card>
@@ -34,7 +37,7 @@ export const TotalStatusCard: React.FC<TotalStatusCardProps> = ({
             className
           )}
         >
-          {amount}
+          {isPending ? <Skeleton className='mt-1 h-5 w-4/6' /> : amount}
         </div>
         {description && (
           <p className='text-xs text-muted-foreground'>{description}</p>
