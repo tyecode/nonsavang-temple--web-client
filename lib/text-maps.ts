@@ -9,6 +9,9 @@ const textMaps = {
   '/dashboard/expense-categories': 'ຈັດການປະເພດລາຍຈ່າຍ',
   '/dashboard/accounts': 'ຈັດການບັນຊີ',
   '/dashboard/currencies': 'ຈັດການສະກຸນເງິນ',
+  '/dashboard/pending': 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',
+  '/dashboard/approved': 'ລາຍການທີ່ອະນຸມັດແລ້ວ',
+  '/dashboard/rejected': 'ລາຍການທີ່ຖືກປະຕິເສດ',
 }
 
 export const getTextFromPathname = (pathname: string) => {

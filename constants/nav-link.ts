@@ -118,4 +118,28 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       },
     ],
   },
+  {
+    id: 'group-3',
+    title: 'ຈັດການການອະນຸມັດ',
+    links: [
+      {
+        id: 'pending',
+        title: 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',
+        href: '/dashboard/pending',
+        icon: 'user-icon',
+      },
+      {
+        id: 'approved',
+        title: 'ລາຍການທີ່ອະນຸມັດແລ້ວ',
+        href: '/dashboard/approved',
+        icon: 'archive-icon',
+      },
+      {
+        id: 'rejected',
+        title: 'ລາຍການທີ່ຖືກປະຕິເສດ',
+        href: '/dashboard/rejected',
+        icon: 'trending-up-icon',
+      },
+    ],
+  },
 ]
