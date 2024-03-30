@@ -63,7 +63,7 @@ const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
       </div>
       <Accordion
         type='multiple'
-        defaultValue={[navActive?.id || '']}
+        defaultValue={[...navLinkGroups.map((group) => group.id)]}
         className='w-full px-6 py-4 font-noto-lao'
       >
         {navLinkGroups.map((group: NavLinkGroup) => (

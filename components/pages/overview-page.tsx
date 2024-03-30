@@ -30,6 +30,7 @@ import {
 import ExpenseChart from '../expense-chart'
 import LatestTransactionSkeleton from '../latest-transaction-skeleton'
 import PieChartSkeleton from '../pie-chart-skeleton'
+import { useTransactionStore } from '@/stores/useTransactionStore'
 
 export default function OverviewPage() {
   const [selectedAccount, setSelectedAccount] = useState({ id: '', balance: 0 })
