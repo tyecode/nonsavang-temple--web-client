@@ -16,13 +16,19 @@ export const supabaseMiddleware = (middleware: NextMiddleware) => {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         auth: {
-          autoRefreshToken: true,
+          autoRefreshToken: false,
         },
         cookies: {
           get(name: string) {
             return request.cookies.get(name)?.value
           },
           set(name: string, value: string, options: CookieOptions) {
+            // If the cookie is updated, update the cookies for the request and response
+            request.cookies.set({
+              name,
+              value,
+              ...options,
+            })
             response = NextResponse.next({
               request: {
                 headers: request.headers,
@@ -35,6 +41,12 @@ export const supabaseMiddleware = (middleware: NextMiddleware) => {
             })
           },
           remove(name: string, options: CookieOptions) {
+            // If the cookie is removed, update the cookies for the request and response
+            request.cookies.set({
+              name,
+              value: '',
+              ...options,
+            })
             response = NextResponse.next({
               request: {
                 headers: request.headers,
