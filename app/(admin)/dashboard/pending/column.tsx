@@ -23,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { formatDate } from '@/lib/date-format'
 
 export const columns: ColumnDef<Transaction>[] = [
   {
@@ -101,20 +102,22 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: 'participant.display_name',
     header: 'ຜູ້ບໍລິຈາກ/ຜູ້ເບີກຈ່າຍ',
     cell: ({ row }) => {
-      if (!row.original.participant?.display_name) return <>--</>
+      const current = row.original
 
-      return (
+      return current.participant?.display_name ? (
         <span
           className='cursor-pointer'
           onClick={() => {
-            if (row.original.participant) {
-              navigator.clipboard.writeText(row.original.participant.id)
+            if (current.participant) {
+              navigator.clipboard.writeText(current.participant.id)
               toast({ description: 'ຄັດລອກໄອດີລົງໃນຄລິບບອດແລ້ວ' })
             }
           }}
         >
-          {row.original.participant.display_name}
+          {current.participant.display_name}
         </span>
+      ) : (
+        <>--</>
       )
     },
   },
@@ -126,9 +129,13 @@ export const columns: ColumnDef<Transaction>[] = [
 
       return current.transaction_type === 'income' &&
         current.currency.symbol ? (
-        <span className='font-medium'>{`${current.currency.symbol}${current.amount.toLocaleString()}`}</span>
+        <span className='whitespace-nowrap font-medium'>
+          {`${current.currency.symbol}${current.amount.toLocaleString()}`}
+        </span>
       ) : (
-        <span className='font-medium'>{`-${current.currency.symbol}${current.amount.toLocaleString()}`}</span>
+        <span className='whitespace-nowrap font-medium'>
+          {`-${current.currency.symbol}${current.amount.toLocaleString()}`}
+        </span>
       )
     },
   },
@@ -148,6 +155,11 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: 'created_at',
     header: 'ສ້າງວັນທີ່',
+    cell: ({ row }) => {
+      const current = row.original
+
+      return formatDate(current.created_at)
+    },
   },
   {
     id: 'actions',
@@ -156,6 +168,9 @@ export const columns: ColumnDef<Transaction>[] = [
       const current = row.original
 
       const transactions = useTransactionStore((state) => state.transactions)
+      const approvedTransactions = useApprovedTransactionStore(
+        (state) => state.transactions
+      )
       const setTransactions = useTransactionStore(
         (state) => state.setTransactions
       )
@@ -171,11 +186,16 @@ export const columns: ColumnDef<Transaction>[] = [
         status: string
       ) => {
         try {
-          if (transaction_type === 'income') {
-            const res = await updateIncome(id, {
+          const handleTransaction = async (
+            transaction_type: string,
+            updateFunction: Function
+          ) => {
+            const dateField =
+              status === 'APPROVED' ? 'approved_at' : 'rejected_at'
+
+            const res = await updateFunction(id, {
               status,
-              ...(status === 'APPROVED' && { approved_at: new Date() }),
-              ...(status === 'REJECTED' && { rejected_at: new Date() }),
+              [dateField]: new Date(),
             })
 
             if (res.error || !res.data) {
@@ -190,76 +210,37 @@ export const columns: ColumnDef<Transaction>[] = [
               (transaction) => transaction.id !== id
             )
 
-            const newApprovedTransactions = transactions.map(
+            const newApprovedTransactions = res.data?.map(
               (transaction: Transaction) => {
-                const updatedTransaction = res.data?.find(
-                  (item: Transaction) => item.id === transaction.id
-                )
-
-                if (updatedTransaction) {
-                  return {
-                    ...updatedTransaction,
-                    ...(status === 'APPROVED' && { approved_at: new Date() }),
-                    ...(status === 'REJECTED' && { rejected_at: new Date() }),
-                    transaction_type,
-                    status,
-                  }
+                return {
+                  ...transaction,
+                  [dateField]: new Date(),
+                  status,
+                  transaction_type,
                 }
-
-                return transaction
               }
             )
 
+            const updatedApprovedTransactions = [
+              ...(approvedTransactions || []),
+              ...newApprovedTransactions,
+            ]
+
             setTransactions(newTransactions as Transaction[])
-            setApprovedTransactions(newApprovedTransactions as Transaction[])
+            setApprovedTransactions(
+              updatedApprovedTransactions as Transaction[]
+            )
             toast({
               description: `${status === 'APPROVED' ? 'ຍອມຮັບ' : 'ປະຕິເສດ'}ລາຍການສຳເລັດແລ້ວ.`,
             })
           }
 
+          if (transaction_type === 'income') {
+            await handleTransaction('income', updateIncome)
+          }
+
           if (transaction_type === 'expense') {
-            const res = await updateExpense(id, {
-              status,
-              ...(status === 'APPROVED' && { approved_at: new Date() }),
-              ...(status === 'REJECTED' && { rejected_at: new Date() }),
-            })
-
-            if (res.error || !res.data) {
-              toast({
-                variant: 'destructive',
-                description: `ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດ${status === 'APPROVED' ? 'ຍອມຮັບ' : 'ປະຕິເສດ'}ໄດ້.`,
-              })
-              return
-            }
-
-            const newTransactions = transactions.map(
-              (transaction: Transaction) => {
-                const updatedTransaction = res.data?.find(
-                  (item: Transaction) => item.id === transaction.id
-                )
-
-                if (updatedTransaction) {
-                  return {
-                    ...updatedTransaction,
-                    ...(status === 'APPROVED' && { approved_at: new Date() }),
-                    ...(status === 'REJECTED' && { rejected_at: new Date() }),
-                    transaction_type,
-                    status,
-                  }
-                }
-
-                return transaction
-              }
-            )
-
-            setTransactions(
-              newTransactions.filter(
-                (transaction) => transaction.status.toLowerCase() === 'pending'
-              )
-            )
-            toast({
-              description: `${status === 'APPROVED' ? 'ຍອມຮັບ' : 'ປະຕິເສດ'}ລາຍການສຳເລັດແລ້ວ.`,
-            })
+            await handleTransaction('expense', updateExpense)
           }
         } catch (error) {
           console.error('Error updating transaction: ', error)
@@ -294,7 +275,7 @@ export const columns: ColumnDef<Transaction>[] = [
               }
               className='text-success transition-none focus:text-success'
             >
-              ຍອມຮັບ
+              ອະນຸມັດ
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>

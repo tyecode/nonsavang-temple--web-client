@@ -65,6 +65,9 @@ export function DataTable<TData, TValue>({
   const isPending = usePendingStore((state) => state.isPending)
   const transactions = useTransactionStore((state) => state.transactions)
   const setTransactions = useTransactionStore((state) => state.setTransactions)
+  const approvedTransactions = useApprovedTransactionStore(
+    (state) => state.transactions
+  )
   const setApprovedTransactions = useApprovedTransactionStore(
     (state) => state.setTransactions
   )
@@ -104,7 +107,7 @@ export function DataTable<TData, TValue>({
     table.toggleAllPageRowsSelected(false)
   }, [table, pagination])
 
-  const handleDeleteSelected = async (items: Income[], status: string) => {
+  const handleUpdateSelected = async (items: Income[], status: string) => {
     setStatusProcess(status)
     startTransition(async () => {
       try {
@@ -115,91 +118,78 @@ export function DataTable<TData, TValue>({
           (item: any) => item.transaction_type === 'expense'
         )
 
-        if (filterIncome.length > 0) {
-          await Promise.all(
-            items.map((item) =>
-              updateIncome(item.id, {
-                status,
-                ...(status === 'APPROVED' && { approved_at: new Date() }),
-                ...(status === 'REJECTED' && { rejected_at: new Date() }),
-              })
-            )
-          )
-
-          const ids = items.map((item) => item.id)
-          const newTransactions = transactions.filter(
-            (transaction) => !ids.includes(transaction.id)
-          )
-
-          const newApprovedTransactions = transactions.map(
-            (transaction: Transaction) => {
-              const updatedTransaction = items.find(
-                (item: any) => item.id === transaction.id
-              )
-
-              if (updatedTransaction) {
-                return {
-                  ...updatedTransaction,
-                  ...(status === 'APPROVED' && { approved_at: new Date() }),
-                  ...(status === 'REJECTED' && { rejected_at: new Date() }),
-                  status,
-                  transaction_type: 'income',
-                }
-              }
-
-              return transaction
-            }
-          )
-
-          setTransactions(newTransactions as Transaction[])
-          setApprovedTransactions(newApprovedTransactions as Transaction[])
+        const updateStatusAndDate = (
+          id: string,
+          status: string,
+          updateFunction: Function
+        ) => {
+          const dateField =
+            status === 'APPROVED' ? 'approved_at' : 'rejected_at'
+          return updateFunction(id, {
+            status,
+            [dateField]: new Date(),
+          })
         }
 
-        if (filterExpense.length > 0) {
-          await Promise.all(
-            items.map((item) =>
-              updateExpense(item.id, {
-                status,
-                ...(status === 'APPROVED' && { approved_at: new Date() }),
-                ...(status === 'REJECTED' && { rejected_at: new Date() }),
-              })
-            )
-          )
-
-          const ids = items.map((item) => item.id)
-          const newTransactions = transactions.filter(
-            (transaction) => !ids.includes(transaction.id)
-          )
-
-          const newApprovedTransactions = transactions.map(
-            (transaction: Transaction) => {
-              const updatedTransaction = items.find(
-                (item: any) => item.id === transaction.id
+        const processTransactions = async (
+          filterArray: any[],
+          updateFunction: Function,
+          transactionType: string
+        ) => {
+          if (filterArray.length > 0) {
+            await Promise.all(
+              filterArray.map((item) =>
+                updateStatusAndDate(item.id, status, updateFunction)
               )
+            )
 
-              if (updatedTransaction) {
+            const newApprovedTransactions = filterArray.map(
+              (transaction: Transaction) => {
+                const dateField =
+                  status === 'APPROVED' ? 'approved_at' : 'rejected_at'
+
                 return {
-                  ...updatedTransaction,
-                  ...(status === 'APPROVED' && { approved_at: new Date() }),
-                  ...(status === 'REJECTED' && { rejected_at: new Date() }),
+                  ...transaction,
                   status,
-                  transaction_type: 'expense',
+                  [dateField]: new Date(),
+                  transaction_type: transactionType,
                 }
               }
+            )
 
-              return transaction
-            }
-          )
-
-          setTransactions(newTransactions as Transaction[])
-          setApprovedTransactions(newApprovedTransactions as Transaction[])
+            return newApprovedTransactions
+          }
         }
 
+        const incomeProcess = await processTransactions(
+          filterIncome,
+          updateIncome,
+          'income'
+        )
+        const expenseProcess = await processTransactions(
+          filterExpense,
+          updateExpense,
+          'expense'
+        )
+
+        const ids = items.map((item) => item.id)
+        const newTransactions = transactions.filter(
+          (transaction) => !ids.includes(transaction.id)
+        )
+
+        const updatedApprovedTransactions = [
+          ...approvedTransactions,
+          ...(incomeProcess || []),
+          ...(expenseProcess || []),
+        ]
+
+        setTransactions(newTransactions as Transaction[])
+        setApprovedTransactions(updatedApprovedTransactions as Transaction[])
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected incomes: ', error)
+        console.error('Error deleting selected transactions: ', error)
         toast({
           variant: 'destructive',
           description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນທີ່ເລືອກໄດ້.',
@@ -226,7 +216,7 @@ export function DataTable<TData, TValue>({
                     variant='default'
                     size={'sm'}
                     onClick={() =>
-                      handleDeleteSelected(
+                      handleUpdateSelected(
                         selectedItems as Income[],
                         'APPROVED'
                       )
@@ -239,7 +229,7 @@ export function DataTable<TData, TValue>({
                     size={'sm'}
                     className='bg-danger hover:bg-danger-400'
                     onClick={() =>
-                      handleDeleteSelected(
+                      handleUpdateSelected(
                         selectedItems as Income[],
                         'REJECTED'
                       )

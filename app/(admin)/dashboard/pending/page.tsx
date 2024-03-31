@@ -9,10 +9,14 @@ import { getTransactions } from '@/actions/transaction-action'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
+import { useApprovedTransactionStore } from '@/stores/useApprovedTransactionStore'
 
 const AdminPending = () => {
   const transactions = useTransactionStore((state) => state.transactions)
   const setTransactions = useTransactionStore((state) => state.setTransactions)
+  const setApprovedTransactions = useApprovedTransactionStore(
+    (state) => state.setTransactions
+  )
 
   const setPending = usePendingStore((state) => state.setPending)
 
@@ -28,6 +32,11 @@ const AdminPending = () => {
         setTransactions(
           res.data.filter(
             (transaction) => transaction.status.toLowerCase() === 'pending'
+          )
+        )
+        setApprovedTransactions(
+          res.data.filter(
+            (transaction) => transaction.status.toLowerCase() === 'approved'
           )
         )
       } catch (error) {

@@ -4,7 +4,6 @@ import { useEffect, useTransition } from 'react'
 import { usePathname } from 'next/navigation'
 import { useCookies } from 'next-client-cookies'
 
-import { getSession } from '@/actions/auth-actions'
 import { getUser } from '@/actions/user-actions'
 
 import UserAvatar from '@/components/user-avatar'

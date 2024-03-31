@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { Transaction } from '@/types'
-import { formatDate } from '@/lib/date-format'
 
 export interface TransactionState {
   transactions: Transaction[]
@@ -22,13 +21,6 @@ export const useTransactionStore = create<TransactionState>((set) => ({
                 ? `${item.drawer.title} ${item.drawer.first_name} ${item.drawer.last_name}`
                 : undefined,
           },
-          created_at: formatDate(item.created_at),
-          approved_at: item.approved_at
-            ? formatDate(item.approved_at)
-            : undefined,
-          rejected_at: item.rejected_at
-            ? formatDate(item.rejected_at)
-            : undefined,
         }))
         .sort(
           (a, b) =>
