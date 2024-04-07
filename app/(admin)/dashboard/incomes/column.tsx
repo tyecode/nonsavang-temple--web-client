@@ -5,10 +5,6 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
 import { Income } from '@/types/income'
 
-import { deleteIncome } from '@/actions/income-actions'
-
-import { useIncomeStore } from '@/stores'
-
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -20,6 +16,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { toast, useToast } from '@/components/ui/use-toast'
+
+import { deleteIncome } from '@/actions/income-actions'
+
+import { useIncomeStore } from '@/stores'
+
+import { formatDate } from '@/lib/date-format'
 
 export const columns: ColumnDef<Income>[] = [
   {
@@ -86,9 +88,7 @@ export const columns: ColumnDef<Income>[] = [
     cell: ({ row }) => {
       const donator = row.original.donator
 
-      if (!donator) return <></>
-
-      return (
+      return donator ? (
         <span
           className='cursor-pointer'
           onClick={() => {
@@ -98,6 +98,8 @@ export const columns: ColumnDef<Income>[] = [
         >
           {donator.display_name}
         </span>
+      ) : (
+        '--'
       )
     },
   },
@@ -106,14 +108,26 @@ export const columns: ColumnDef<Income>[] = [
     header: 'ຈຳນວນເງິນ',
     cell: ({ row }) => {
       const current = row.original
-      return current.currency && current.currency.symbol
-        ? `${current.currency.symbol}${current.amount.toLocaleString()}`
-        : ''
+
+      return current.currency && current.currency.symbol ? (
+        <span className='whitespace-nowrap'>
+          {current.amount < 0 ? '-' : ''}
+          {current.currency.symbol}
+          {Math.abs(current.amount).toLocaleString()}
+        </span>
+      ) : (
+        '--'
+      )
     },
   },
   {
     accessorKey: 'remark',
     header: 'ໝາຍເຫດ',
+    cell: ({ row }) => {
+      const current = row.original
+
+      return current.remark ? current.remark : '--'
+    },
   },
   {
     accessorKey: 'status',
@@ -141,10 +155,20 @@ export const columns: ColumnDef<Income>[] = [
   {
     accessorKey: 'created_at',
     header: 'ສ້າງວັນທີ່',
+    cell: ({ row }) => {
+      const current = row.original
+
+      return formatDate(current.created_at)
+    },
   },
   {
     accessorKey: 'approved_at',
     header: 'ອະນຸມັດວັນທີ່',
+    cell: ({ row }) => {
+      const current = row.original
+
+      return current.approved_at ? formatDate(current.approved_at) : '--'
+    },
   },
   {
     id: 'actions',

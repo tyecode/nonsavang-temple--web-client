@@ -8,6 +8,9 @@ import { useExpenseCategoryStore } from './useExpenseCategoryStore'
 import { useExpenseStore } from './useExpenseStore'
 import { useUserStore } from './useUserStore'
 import { usePendingStore } from './usePendingStore'
+import { useTransactionStore } from './useTransactionStore'
+import { useApprovedTransactionStore } from './useApprovedTransactionStore'
+import { useRejectedTransactionStore } from './useRejectedTransactionStore'
 
 export {
   useAuthStore,
@@ -20,4 +23,7 @@ export {
   useExpenseStore,
   useUserStore,
   usePendingStore,
+  useTransactionStore,
+  useApprovedTransactionStore,
+  useRejectedTransactionStore,
 }

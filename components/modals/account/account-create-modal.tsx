@@ -8,21 +8,21 @@ import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 
 import { Account } from '@/types/account'
 import { Currency } from '@/types/currency'
+import { AccountState } from '@/stores/useAccountStore'
 
-import { createAccount, getAccount } from '@/actions/account-actions'
+import { createAccount } from '@/actions/account-actions'
 import { getCurrency } from '@/actions/currency-actions'
 import { getSession } from '@/actions/auth-actions'
 
 import { useAccountStore } from '@/stores'
-import { AccountState } from '@/stores/useAccountStore'
 
 import { cn } from '@/lib/utils'
-import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { LoadingButton } from '@/components/buttons'
 import { Textarea } from '@/components/ui/textarea'
+import { LoadingButton } from '@/components/buttons'
+import MonetaryInput from '@/components/MonetaryInput'
 import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
   Dialog,
@@ -46,20 +46,7 @@ import {
 } from '@/components/ui/popover'
 import { toast } from '@/components/ui/use-toast'
 
-const formSchema: any = z.object({
-  name: z.string().min(1, 'ກະລຸນາປ້ອນຊື່ບັນຊີ.'),
-  balance: z
-    .string()
-    .min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')
-    .regex(/^[-]?\d+$/, {
-      message: 'ຈຳນວນເງິນຕ້ອງເປັນຕົວເລກເທົ່ານັ້ນ.',
-    })
-    .refine((value) => Number(value) >= 0, {
-      message: 'ປ້ອນຈຳນວນເງິນບໍ່ຖືກຕ້ອງ.',
-    }),
-  currency: z.string().min(1, 'ກະລຸນາເລືອກສະກຸນເງິນ.'),
-  remark: z.string(),
-})
+import { accountSchema } from '@/app/(admin)/accounts/schema'
 
 const AccountCreateModal = () => {
   const [currencies, setCurrencies] = useState<Currency[]>([])
@@ -67,12 +54,13 @@ const AccountCreateModal = () => {
   const [isPending, startTransition] = useTransition()
   const [openCurrency, setOpenCurrency] = useState(false)
 
+  const accounts = useAccountStore((state) => state.accounts)
   const setAccounts = useAccountStore(
     (state: AccountState) => state.setAccounts
   )
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof accountSchema>>({
+    resolver: zodResolver(accountSchema),
     defaultValues: {
       name: '',
       balance: '0',
@@ -97,7 +85,7 @@ const AccountCreateModal = () => {
         setCurrencies(sortedData)
         form.setValue('currency', sortedData[0].id)
       } catch (error) {
-        console.error('Error fetching currency:', error)
+        console.error('Error fetching currency: ', error)
       }
     }
 
@@ -105,9 +93,9 @@ const AccountCreateModal = () => {
   }, [currencies.length, form])
 
   const createNewAccount = async (
-    values: z.infer<typeof formSchema>,
-    user: { id: string; first_name: string; last_name: string },
-    currency: { id: string; code: string; name: string }
+    values: z.infer<typeof accountSchema>,
+    currency: { id: string; code: string; name: string },
+    userId: string
   ) => {
     try {
       const accountData = {
@@ -115,7 +103,7 @@ const AccountCreateModal = () => {
         balance: Number(values.balance),
         currency_id: currency.id,
         remark: values.remark,
-        user_id: user.id,
+        user_id: userId,
       }
 
       const res = await createAccount(accountData)
@@ -128,47 +116,34 @@ const AccountCreateModal = () => {
         return
       }
 
-      const accounts = await getAccount()
+      const newAccounts: Account[] = [...accounts, ...res.data]
 
-      if (accounts.error || !accounts.data) return
-
-      const newAccounts: Account[] = accounts.data.map((account: Account) => ({
-        ...account,
-        created_at: formatDate(account.created_at),
-        updated_at: account.updated_at
-          ? formatDate(account.updated_at)
-          : undefined,
-      }))
-
-      setAccounts(newAccounts)
+      setAccounts(newAccounts as Account[])
       toast({
         description: 'ເພີ່ມຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ.',
       })
     } catch (error) {
-      console.error('Error creating donator:', error)
+      console.error('Error creating account: ', error)
     } finally {
       setIsOpen(false)
       form.reset()
     }
   }
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof accountSchema>) => {
     const session = await getSession()
 
     if (!session || currencies.length === 0) return
 
-    startTransition(
-      async () =>
-        await createNewAccount(
-          values,
-          {
-            id: session.user.id,
-            first_name: session.user.user_metadata.first_name,
-            last_name: session.user.user_metadata.last_name,
-          },
-          currencies.find((currency) => currency.id === values.currency)!
-        )
+    const userId = session.user.id
+
+    const selectedCurrency = currencies.find(
+      (currency) => currency.id === values.currency
     )
+
+    if (!selectedCurrency) return
+
+    startTransition(() => createNewAccount(values, selectedCurrency, userId))
   }
 
   return (
@@ -209,30 +184,16 @@ const AccountCreateModal = () => {
               <FormField
                 control={form.control}
                 name='balance'
-                render={({ field: { onChange, ...rest } }) => (
+                render={({ field: { value, onChange, ...rest } }) => (
                   <FormItem className='w-full'>
                     <FormLabel className='pointer-events-none'>
                       ຈຳນວນເງິນຕັ້ງຕົ້ນ
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        disabled={isPending}
-                        onChange={(event: any) => {
-                          const value = event.target.value
-                          const data = event.nativeEvent.data
-
-                          if (isNaN(Number(data))) return
-
-                          if (value.startsWith('0')) {
-                            if (data === '0') {
-                              onChange(0)
-                            } else {
-                              onChange(value.slice(1))
-                            }
-                          } else {
-                            onChange(value)
-                          }
-                        }}
+                      <MonetaryInput
+                        value={value}
+                        isPending={isPending}
+                        onChange={(e: any) => onChange(e)}
                         {...rest}
                       />
                     </FormControl>

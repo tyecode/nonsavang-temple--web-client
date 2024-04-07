@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
+
 import {
   ColumnDef,
   SortingState,
@@ -13,23 +14,23 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { Expense } from '@/types/expense'
+import { Account } from '@/types/account'
 
-import { deleteExpense } from '@/actions/expense-actions'
-import { deleteExpenseImage } from '@/actions/image-actions'
+import { deleteAccount } from '@/actions/account-actions'
 
-import { useExpenseStore } from '@/stores'
+import { useAccountStore } from '@/stores'
 
+import { AccountCreateModal } from '@/components/modals/account'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { useToast } from '@/components/ui/use-toast'
+import { DataTablePagination } from '@/components/data-table-pagination'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Table,
   TableBody,
@@ -38,11 +39,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { LoadingButton } from '@/components/buttons'
+import { useToast } from '@/components/ui/use-toast'
 import DataTableSkeleton from '@/components/data-table-skeleton'
-import { DataTablePagination } from '@/components/data-table-pagination'
-import { ExpenseCreateModal } from '@/components/modals/expense'
-import { useFetchExpense } from '@/hooks'
+import { LoadingButton } from '@/components/buttons'
+import { useFetchAccount } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -61,23 +61,24 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [isLoading, startTransition] = useTransition()
 
-  const setExpenses = useExpenseStore((state) => state.setExpenses)
-  const expenses = useExpenseStore((state) => state.expenses)
+  const setAccounts = useAccountStore((state) => state.setAccounts)
+  const accounts = useAccountStore((state) => state.accounts)
 
-  const { data: fetchData, loading: isPending } = useFetchExpense()
+  const { data: fetchData, loading: isPending } = useFetchAccount()
   const { toast } = useToast()
 
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
+    enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
       globalFilter,
@@ -88,9 +89,9 @@ export function DataTable<TData, TValue>({
   })
 
   useEffect(() => {
-    if (expenses.length > 0) return
+    if (accounts.length > 0) return
 
-    setExpenses(fetchData)
+    setAccounts(fetchData as Account[])
   }, [fetchData])
 
   useEffect(() => {
@@ -106,11 +107,11 @@ export function DataTable<TData, TValue>({
     table.toggleAllPageRowsSelected(false)
   }, [table, pagination])
 
-  const handleDeleteSelected = async (items: Expense[]) => {
+  const handleDeleteSelected = async (items: Account[]) => {
     startTransition(async () => {
       try {
         const res = await Promise.all(
-          items.map((item) => deleteExpense(item.id))
+          items.map((item) => deleteAccount(item.id))
         )
         const hasError = res.some((r) => r.error)
 
@@ -122,22 +123,17 @@ export function DataTable<TData, TValue>({
           return
         }
 
-        await Promise.all(
-          items.map(async (item) => {
-            await deleteExpenseImage(item.image && item.image.split('/').pop())
-          })
+        const itemIds = items.map((item) => item.id)
+        const newAccounts = accounts.filter(
+          (account) => !itemIds.includes(account.id)
         )
 
-        const newExpenses = expenses.filter(
-          (expense: Expense) => !items.some((item) => item.id === expense.id)
-        )
-
-        setExpenses(newExpenses as Expense[])
+        setAccounts(newAccounts as Account[])
         toast({
           description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error deleting selected expenses: ', error)
+        console.error('Error deleting selected accounts: ', error)
       }
     })
   }
@@ -159,7 +155,7 @@ export function DataTable<TData, TValue>({
                   variant='default'
                   size={'sm'}
                   onClick={() =>
-                    handleDeleteSelected(selectedItems as Expense[])
+                    handleDeleteSelected(selectedItems as Account[])
                   }
                 >
                   {`ລຶບ ${selectedItems.length} ລາຍການ`}
@@ -172,7 +168,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         <div className='flex gap-4'>
-          <ExpenseCreateModal />
+          <AccountCreateModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size={'sm'} className='ml-auto'>

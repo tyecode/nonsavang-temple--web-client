@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
-
+import { useEffect, useState } from 'react'
 import {
   ColumnDef,
   SortingState,
@@ -14,25 +13,17 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { Account } from '@/types/account'
+import { usePendingStore } from '@/stores'
 
-import { deleteAccount, getAccount } from '@/actions/account-actions'
-
-import { useAccountStore } from '@/stores'
-
-import { formatDate } from '@/lib/date-format'
-
-import { AccountCreateModal } from '@/components/modals/account'
 import { Button } from '@/components/ui/button'
-import { DataTablePagination } from '@/components/data-table-pagination'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Table,
   TableBody,
@@ -41,10 +32,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useToast } from '@/components/ui/use-toast'
 import DataTableSkeleton from '@/components/data-table-skeleton'
-import { LoadingButton } from '@/components/buttons'
-import { useFetchAccount } from '@/hooks'
+import { DataTablePagination } from '@/components/data-table-pagination'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -61,13 +50,8 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({})
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
-  const [isLoading, startTransition] = useTransition()
 
-  const setAccounts = useAccountStore((state) => state.setAccounts)
-  const accounts = useAccountStore((state) => state.accounts)
-
-  const { data: fetchData, loading: isPending } = useFetchAccount()
-  const { toast } = useToast()
+  const isPending = usePendingStore((state) => state.isPending)
 
   const table = useReactTable({
     data,
@@ -90,12 +74,6 @@ export function DataTable<TData, TValue>({
   })
 
   useEffect(() => {
-    if (accounts.length > 0) return
-
-    setAccounts(fetchData as Account[])
-  }, [fetchData])
-
-  useEffect(() => {
     const selectedItems: TData[] = table
       .getRowModel()
       .rows.filter((row) => row.getIsSelected())
@@ -108,44 +86,6 @@ export function DataTable<TData, TValue>({
     table.toggleAllPageRowsSelected(false)
   }, [table, pagination])
 
-  const handleDeleteSelected = async (items: Account[]) => {
-    startTransition(async () => {
-      try {
-        const res = await Promise.all(
-          items.map((item) => deleteAccount(item.id))
-        )
-        const hasError = res.some((r) => r.error)
-
-        if (hasError) {
-          toast({
-            variant: 'destructive',
-            description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນທີ່ເລືອກໄດ້.',
-          })
-          return
-        }
-
-        const accounts = await getAccount()
-
-        if (accounts.error || !accounts.data) return
-
-        const newAccounts = accounts.data.map((account: Account) => ({
-          ...account,
-          created_at: formatDate(account.created_at),
-          updated_at: account.updated_at
-            ? formatDate(account.updated_at)
-            : undefined,
-        }))
-
-        setAccounts(newAccounts as Account[])
-        toast({
-          description: 'ລຶບຂໍ້ມູນທີ່ເລືອກທັງຫມົດແລ້ວ.',
-        })
-      } catch (error) {
-        console.error('Error deleting selected accounts: ', error)
-      }
-    })
-  }
-
   return (
     <div>
       <div className='flex w-full justify-between py-4'>
@@ -156,27 +96,9 @@ export function DataTable<TData, TValue>({
             onChange={(event) => setGlobalFilters(event.target.value)}
             className='w-80'
           />
-          {selectedItems.length > 0 && (
-            <>
-              {!isLoading ? (
-                <Button
-                  variant='default'
-                  size={'sm'}
-                  onClick={() =>
-                    handleDeleteSelected(selectedItems as Account[])
-                  }
-                >
-                  {`ລຶບ ${selectedItems.length} ລາຍການ`}
-                </Button>
-              ) : (
-                <LoadingButton>{`ລຶບ ${selectedItems.length} ລາຍການ`}</LoadingButton>
-              )}
-            </>
-          )}
         </div>
 
         <div className='flex gap-4'>
-          <AccountCreateModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size={'sm'} className='ml-auto'>

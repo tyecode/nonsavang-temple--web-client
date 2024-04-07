@@ -2,13 +2,14 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
-import Link from 'next/link'
 
-import { Expense } from '@/types/expense'
+import { Transaction } from '@/types'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { toast, useToast } from '@/components/ui/use-toast'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,15 +17,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { toast, useToast } from '@/components/ui/use-toast'
-
-import { deleteExpense } from '@/actions/expense-actions'
-import { deleteExpenseImage } from '@/actions/image-actions'
-
-import { useExpenseStore } from '@/stores'
 import { formatDate } from '@/lib/date-format'
 
-export const columns: ColumnDef<Expense>[] = [
+export const columns: ColumnDef<Transaction>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -69,8 +64,22 @@ export const columns: ColumnDef<Expense>[] = [
     ),
   },
   {
+    accessorKey: 'transaction_type',
+    header: 'ປະເພດລາຍການ',
+    cell: ({ row }) => (
+      <Badge
+        className='flex-center w-16'
+        variant={
+          row.original.transaction_type === 'income' ? 'success' : 'danger'
+        }
+      >
+        {row.original.transaction_type === 'income' ? 'ລາຍຮັບ' : 'ລາຍຈ່າຍ'}
+      </Badge>
+    ),
+  },
+  {
     accessorKey: 'category.name',
-    header: 'ປະເພດລາຍຈ່າຍ',
+    header: 'ປະເພດລາຍຮັບ/ລາຍຈ່າຍ',
     cell: ({ row }) => (
       <span
         className='cursor-pointer'
@@ -84,23 +93,25 @@ export const columns: ColumnDef<Expense>[] = [
     ),
   },
   {
-    accessorKey: 'drawer.display_name',
-    header: 'ຜູ້ເບີກຈ່າຍ',
+    accessorKey: 'participant.display_name',
+    header: 'ຜູ້ບໍລິຈາກ/ຜູ້ເບີກຈ່າຍ',
     cell: ({ row }) => {
-      const drawer = row.original.drawer
+      const current = row.original
 
-      return drawer ? (
+      return current.participant?.display_name ? (
         <span
           className='cursor-pointer'
           onClick={() => {
-            navigator.clipboard.writeText(drawer.id)
-            toast({ description: 'ຄັດລອກໄອດີລົງໃນຄລິບບອດແລ້ວ' })
+            if (current.participant) {
+              navigator.clipboard.writeText(current.participant.id)
+              toast({ description: 'ຄັດລອກໄອດີລົງໃນຄລິບບອດແລ້ວ' })
+            }
           }}
         >
-          {drawer.display_name}
+          {current.participant.display_name}
         </span>
       ) : (
-        '--'
+        <>--</>
       )
     },
   },
@@ -110,60 +121,27 @@ export const columns: ColumnDef<Expense>[] = [
     cell: ({ row }) => {
       const current = row.original
 
-      return current.currency && current.currency.symbol ? (
+      return (
         <span className='whitespace-nowrap'>
           {current.amount < 0 ? '-' : ''}
           {current.currency.symbol}
           {Math.abs(current.amount).toLocaleString()}
         </span>
-      ) : (
-        '--'
-      )
-    },
-  },
-  {
-    accessorKey: 'image',
-    header: 'ຮູບພາບ',
-    cell: ({ row }) => {
-      const image = row.original.image
-
-      return image ? (
-        <Button size={'sm'} variant={'link'} className='m-0 p-0'>
-          <Link href={image} target='_blank'>
-            ເບິ່ງຮູບພາບ
-          </Link>
-        </Button>
-      ) : (
-        '--'
       )
     },
   },
   {
     accessorKey: 'remark',
     header: 'ໝາຍເຫດ',
-  },
-  {
-    accessorKey: 'status',
-    header: 'ສະຖານະ',
-    cell: ({ row }) => (
-      <>
-        {row.original.status === 'PENDING' && (
-          <Badge variant={'warning'} className='whitespace-nowrap'>
-            ລໍຖ້າການອະນຸມັດ
-          </Badge>
-        )}
-        {row.original.status === 'APPROVED' && (
-          <Badge variant={'success'} className='whitespace-nowrap'>
-            ອະນຸມັດແລ້ວ
-          </Badge>
-        )}
-        {row.original.status === 'REJECTED' && (
-          <Badge variant={'danger'} className='whitespace-nowrap'>
-            ຖືກປະຕິເສດ
-          </Badge>
-        )}
-      </>
-    ),
+    cell: ({ row }) => {
+      const current = row.original
+
+      return current.remark ? (
+        <span className='text-sm'>{current.remark}</span>
+      ) : (
+        <>--</>
+      )
+    },
   },
   {
     accessorKey: 'created_at',
@@ -175,61 +153,21 @@ export const columns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: 'approved_at',
-    header: 'ອະນຸມັດວັນທີ່',
+    accessorKey: 'rejected_at',
+    header: 'ປະຕິເສດວັນທີ່',
     cell: ({ row }) => {
       const current = row.original
 
-      return current.approved_at ? formatDate(current.approved_at) : '--'
+      return current.rejected_at ? formatDate(current.rejected_at) : <>--</>
     },
   },
   {
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const expenses = useExpenseStore((state) => state.expenses)
-      const setExpenses = useExpenseStore((state) => state.setExpenses)
-
-      const { toast } = useToast()
-
       const current = row.original
 
-      const handleDeleteExpense = async (id: string) => {
-        try {
-          const res = await deleteExpense(id)
-
-          if (res.error) {
-            toast({
-              variant: 'destructive',
-              description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນລາຍຈ່າຍໄດ້.',
-            })
-            return
-          }
-
-          const expense = expenses.find(
-            (expense: Expense) => expense.id === current.id
-          )
-
-          if (expense?.image) {
-            const imageName = expense.image.split('/').pop()
-
-            if (imageName) {
-              await deleteExpenseImage(imageName)
-            }
-          }
-
-          const newExpenses = expenses.filter(
-            (expense: Expense) => expense.id !== id
-          )
-
-          setExpenses(newExpenses as Expense[])
-          toast({
-            description: 'ລຶບຂໍ້ມູນລາຍຈ່າຍສຳເລັດແລ້ວ.',
-          })
-        } catch (error) {
-          console.error('Error deleting expense: ', error)
-        }
-      }
+      const { toast } = useToast()
 
       return (
         <DropdownMenu>
@@ -247,13 +185,6 @@ export const columns: ColumnDef<Expense>[] = [
               }}
             >
               ຄັດລອກໄອດີ
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => handleDeleteExpense(current.id)}
-              className='text-danger transition-none focus:text-danger'
-            >
-              ລົບຂໍ້ມູນ
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

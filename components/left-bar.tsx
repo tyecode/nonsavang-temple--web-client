@@ -2,28 +2,25 @@
 
 import React, { useEffect } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+
+import { NavLink, NavLinkGroup } from '@/types/nav-link'
 
 import { Button } from '@/components/ui/button'
-import { IconsCollection } from '@/components/icons/icons-collection'
-import { NavLink, NavLinkGroup } from '@/types/nav-link'
-import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
-
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { useRouter } from 'next/navigation'
+import { IconsCollection } from '@/components/icons/icons-collection'
+
+import { cn } from '@/lib/utils'
 
 const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
   const pathname = usePathname()
   const router = useRouter()
-
-  const navActive = navLinkGroups.find((group) =>
-    group.links.find((link) => link.href === pathname)
-  )
 
   const NavLinkButton: React.FC<{ link: NavLink }> = ({ link }) => {
     useEffect(() => {

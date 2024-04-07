@@ -34,7 +34,7 @@ const TopBar = () => {
 
           const { data } = await getUser(session.user.id)
 
-          setUser(data[0])
+          if (data) setUser(data[0])
         })
       } catch (error) {
         console.error('Error fetching user:', error)

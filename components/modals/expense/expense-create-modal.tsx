@@ -58,6 +58,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { toast } from '@/components/ui/use-toast'
+import MonetaryInput from '@/components/MonetaryInput'
 
 const formSchema: any = z.object({
   account: z.string().min(1, 'ກະລຸນາເລືອກບັນຊີ.'),
@@ -70,7 +71,8 @@ const formSchema: any = z.object({
     })
     .refine((value) => Number(value) > 0, {
       message: 'ປ້ອນຈຳນວນເງິນບໍ່ຖືກຕ້ອງ.',
-    }),
+    })
+    .or(z.number().min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')),
   currency: z.string().min(1, 'ກະລຸນາເລືອກສະກຸນເງິນ.'),
   drawer: z.string().min(1, 'ກະລຸນາເລືອກຜູ້ເບີກຈ່າຍ.'),
   image: z
@@ -96,6 +98,7 @@ const ExpenseCreateModal = () => {
   const [openCurrency, setOpenCurrency] = useState(false)
   const [openDrawer, setOpenDrawer] = useState(false)
 
+  const expenses = useExpenseStore((state) => state.expenses)
   const setExpenses = useExpenseStore(
     (state: ExpenseState) => state.setExpenses
   )
@@ -166,7 +169,7 @@ const ExpenseCreateModal = () => {
         user_id: values.user_id,
         account_id: values.account,
         category_id: values.category,
-        amount: Number(values.amount),
+        amount: Number('-' + values.amount),
         currency_id: values.currency,
         drawer_id: values.drawer,
         image: uploadData
@@ -185,22 +188,9 @@ const ExpenseCreateModal = () => {
         return
       }
 
-      const expenses = await getExpense()
+      const newExpenses: Expense[] = [...expenses, ...res.data]
 
-      if (expenses.error || !expenses.data) return
-
-      const newExpenses: Expense[] = expenses.data.map((expense: Expense) => ({
-        ...expense,
-        created_at: formatDate(expense.created_at),
-        approved_at: expense.approved_at
-          ? formatDate(expense.approved_at)
-          : undefined,
-        rejected_at: expense.rejected_at
-          ? formatDate(expense.rejected_at)
-          : undefined,
-      }))
-
-      setExpenses(newExpenses)
+      setExpenses(newExpenses as Expense[])
       toast({
         description: 'ເພີ່ມຂໍ້ມູນລາຍຈ່າຍສຳເລັດແລ້ວ.',
       })
@@ -395,30 +385,17 @@ const ExpenseCreateModal = () => {
               <FormField
                 control={form.control}
                 name='amount'
-                render={({ field: { onChange, ...rest } }) => (
+                render={({ field: { value, onChange, ...rest } }) => (
                   <FormItem className='w-full'>
                     <FormLabel className='pointer-events-none'>
                       ຈຳນວນເງິນ
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        disabled={isPending}
-                        onChange={(event: any) => {
-                          const value = event.target.value
-                          const data = event.nativeEvent.data
-
-                          if (isNaN(Number(data))) return
-
-                          if (value.startsWith('0')) {
-                            if (data === '0') {
-                              onChange(0)
-                            } else {
-                              onChange(value.slice(1))
-                            }
-                          } else {
-                            onChange(value)
-                          }
-                        }}
+                      <MonetaryInput
+                        value={value}
+                        isPending={isPending}
+                        onChange={(e: any) => onChange(e)}
+                        isNegative
                         {...rest}
                       />
                     </FormControl>

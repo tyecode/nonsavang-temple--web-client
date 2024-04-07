@@ -18,7 +18,6 @@ import { User } from '@/types/user'
 
 import { deleteUser } from '@/actions/user-actions'
 
-import { usePendingStore } from '@/stores/usePendingStore'
 import { useUserStore } from '@/stores/useUserStore'
 
 import { Button } from '@/components/ui/button'

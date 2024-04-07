@@ -127,14 +127,11 @@ export const columns: ColumnDef<Transaction>[] = [
     cell: ({ row }) => {
       const current = row.original
 
-      return current.transaction_type === 'income' &&
-        current.currency.symbol ? (
-        <span className='whitespace-nowrap font-medium'>
-          {`${current.currency.symbol}${current.amount.toLocaleString()}`}
-        </span>
-      ) : (
-        <span className='whitespace-nowrap font-medium'>
-          {`-${current.currency.symbol}${current.amount.toLocaleString()}`}
+      return (
+        <span className='whitespace-nowrap'>
+          {current.amount < 0 ? '-' : ''}
+          {current.currency.symbol}
+          {Math.abs(current.amount).toLocaleString()}
         </span>
       )
     },
@@ -192,6 +189,20 @@ export const columns: ColumnDef<Transaction>[] = [
           ) => {
             const dateField =
               status === 'APPROVED' ? 'approved_at' : 'rejected_at'
+
+            if (status === 'APPROVED') {
+              const transaction = transactions.find((item) => item.id === id)
+
+              if (transaction) {
+                const { account, amount } = transaction
+                const sum = account.balance + amount
+
+                console.log('APPROVED', transaction)
+                console.log('APPROVED', sum)
+              }
+            }
+
+            return
 
             const res = await updateFunction(id, {
               status,

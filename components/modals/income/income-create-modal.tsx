@@ -59,6 +59,7 @@ import {
 import { toast } from '@/components/ui/use-toast'
 
 import { DonatorCreateModal } from '@/components/modals/donator'
+import MonetaryInput from '@/components/MonetaryInput'
 
 const formSchema: any = z.object({
   account: z.string().min(1, 'ກະລຸນາເລືອກບັນຊີ.'),
@@ -71,7 +72,8 @@ const formSchema: any = z.object({
     })
     .refine((value) => Number(value) > 0, {
       message: 'ປ້ອນຈຳນວນເງິນບໍ່ຖືກຕ້ອງ.',
-    }),
+    })
+    .or(z.number().min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')),
   currency: z.string().min(1, 'ກະລຸນາເລືອກສະກຸນເງິນ.'),
   donator: z.string().refine((value) => value !== 'donate', {
     message: 'ກະລຸນາເລືອກຜູ້ບໍລິຈາກ.',
@@ -95,7 +97,8 @@ const IncomeCreateModal = () => {
   const setDonators = useDonatorStore(
     (state: DonatorState) => state.setDonators
   )
-  const setIncomes = useIncomeStore((state: IncomeState) => state.setIncomes)
+  const incomes = useIncomeStore((state) => state.incomes)
+  const setIncomes = useIncomeStore((state) => state.setIncomes)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -173,22 +176,9 @@ const IncomeCreateModal = () => {
         return
       }
 
-      const incomes = await getIncome()
+      const newIncomes: Income[] = [...incomes, ...res.data]
 
-      if (incomes.error || !incomes.data) return
-
-      const newIncomes: Income[] = incomes.data.map((income: Income) => ({
-        ...income,
-        created_at: formatDate(income.created_at),
-        approved_at: income.approved_at
-          ? formatDate(income.approved_at)
-          : undefined,
-        rejected_at: income.rejected_at
-          ? formatDate(income.rejected_at)
-          : undefined,
-      }))
-
-      setIncomes(newIncomes)
+      setIncomes(newIncomes as Income[])
       toast({
         description: 'ເພີ່ມຂໍ້ມູນລາຍຮັບສຳເລັດແລ້ວ.',
       })
@@ -378,30 +368,16 @@ const IncomeCreateModal = () => {
               <FormField
                 control={form.control}
                 name='amount'
-                render={({ field: { onChange, ...rest } }) => (
+                render={({ field: { value, onChange, ...rest } }) => (
                   <FormItem className='w-full'>
                     <FormLabel className='pointer-events-none'>
                       ຈຳນວນເງິນ
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        disabled={isPending}
-                        onChange={(event: any) => {
-                          const value = event.target.value
-                          const data = event.nativeEvent.data
-
-                          if (isNaN(Number(data))) return
-
-                          if (value.startsWith('0')) {
-                            if (data === '0') {
-                              onChange(0)
-                            } else {
-                              onChange(value.slice(1))
-                            }
-                          } else {
-                            onChange(value)
-                          }
-                        }}
+                      <MonetaryInput
+                        value={value}
+                        isPending={isPending}
+                        onChange={(e: any) => onChange(e)}
                         {...rest}
                       />
                     </FormControl>
