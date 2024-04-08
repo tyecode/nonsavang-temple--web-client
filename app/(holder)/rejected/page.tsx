@@ -2,18 +2,18 @@
 
 import { useEffect, useTransition } from 'react'
 
-import { usePendingStore, useApprovedTransactionStore } from '@/stores'
+import { usePendingStore, useRejectedTransactionStore } from '@/stores'
 
 import { getTransactions } from '@/actions/transaction-action'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
 
-const AdminApproved = () => {
-  const transactions = useApprovedTransactionStore(
+const AdminRejected = () => {
+  const transactions = useRejectedTransactionStore(
     (state) => state.transactions
   )
-  const setTransactions = useApprovedTransactionStore(
+  const setTransactions = useRejectedTransactionStore(
     (state) => state.setTransactions
   )
 
@@ -30,7 +30,7 @@ const AdminApproved = () => {
 
         setTransactions(
           res.data.filter(
-            (transaction) => transaction.status.toLowerCase() === 'approved'
+            (transaction) => transaction.status.toLowerCase() === 'rejected'
           )
         )
       } catch (error) {
@@ -48,10 +48,10 @@ const AdminApproved = () => {
   }, [isPending])
 
   return (
-    <section className='container'>
+    <section className='container py-6'>
       <DataTable columns={columns} data={transactions} />
     </section>
   )
 }
 
-export default AdminApproved
+export default AdminRejected

@@ -199,8 +199,8 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div>
-      <div className='flex w-full justify-between py-4'>
+    <div className='space-y-4'>
+      <div className='flex w-full justify-between'>
         <div className='flex gap-4'>
           <Input
             placeholder='ຄົ້ນຫາ...'
@@ -297,13 +297,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenu>
         </div>
       </div>
-      <ScrollArea
-        className={
-          table.getRowModel().rows?.length > 6
-            ? 'h-[64vh] rounded-md border'
-            : 'max-h-[64vh] rounded-md border'
-        }
-      >
+      <div className='rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -362,7 +356,7 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </ScrollArea>
+      </div>
       <div className='mt-6'>
         <DataTablePagination table={table} />
       </div>

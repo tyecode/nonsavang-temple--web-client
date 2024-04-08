@@ -6,14 +6,14 @@ import LeftBar from '@/components/left-bar'
 import TopBar from '@/components/top-bar'
 import { Toaster } from '@/components/ui/toaster'
 
-const DashboardPageLayout = ({ children }: { children: React.ReactNode }) => {
+const HolderPageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      <aside className='h-full w-[18rem] border bg-background'>
+      <aside className='w-[18rem] border bg-background'>
         <LeftBar navLinkGroups={NAV_LINK_DASHBOARD} />
       </aside>
 
-      <main className='flex h-full w-full flex-col'>
+      <main className='w-full overflow-auto'>
         <TopBar />
         {children}
         <Toaster />
@@ -22,4 +22,4 @@ const DashboardPageLayout = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-export default DashboardPageLayout
+export default HolderPageLayout

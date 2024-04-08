@@ -41,7 +41,7 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       {
         id: 'overview',
         title: 'ພາບລວມ',
-        href: '/dashboard',
+        href: '/',
         icon: 'pie-chart-icon',
       },
       {
@@ -125,19 +125,19 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       {
         id: 'pending',
         title: 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',
-        href: '/dashboard/pending',
+        href: '/pending',
         icon: 'user-icon',
       },
       {
         id: 'approved',
         title: 'ລາຍການທີ່ອະນຸມັດແລ້ວ',
-        href: '/dashboard/approved',
+        href: '/approved',
         icon: 'archive-icon',
       },
       {
         id: 'rejected',
         title: 'ລາຍການທີ່ຖືກປະຕິເສດ',
-        href: '/dashboard/rejected',
+        href: '/rejected',
         icon: 'trending-up-icon',
       },
     ],
@@ -182,19 +182,19 @@ export const NAV_LINK_HOLDER: NavLinkGroup[] = [
       {
         id: 'pending',
         title: 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',
-        href: '/dashboard/pending',
+        href: '/pending',
         icon: 'user-icon',
       },
       {
         id: 'approved',
         title: 'ລາຍການທີ່ອະນຸມັດແລ້ວ',
-        href: '/dashboard/approved',
+        href: '/approved',
         icon: 'archive-icon',
       },
       {
         id: 'rejected',
         title: 'ລາຍການທີ່ຖືກປະຕິເສດ',
-        href: '/dashboard/rejected',
+        href: '/rejected',
         icon: 'trending-up-icon',
       },
     ],

@@ -1,23 +1,16 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
 import { Transaction } from '@/types'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { toast, useToast } from '@/components/ui/use-toast'
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { formatDate } from '@/lib/date-format'
+
+import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { toast } from '@/components/ui/use-toast'
+
+import { DataTableRowActions } from './data-table-row-actions'
 
 export const columns: ColumnDef<Transaction>[] = [
   {
@@ -164,31 +157,6 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
-      const current = row.original
-
-      const { toast } = useToast()
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='float-right h-8 w-8 p-0'>
-              <span className='sr-only'>Open menu</span>
-              <DotsHorizontalIcon className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuItem
-              onClick={() => {
-                navigator.clipboard.writeText(current.id)
-                toast({ description: 'ຄັດລອກໄອດີລົງໃນຄລິບບອດແລ້ວ' })
-              }}
-            >
-              ຄັດລອກໄອດີ
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
+    cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ]

@@ -65,6 +65,9 @@
     -webkit-user-drag: none;
     -moz-user-select: none;
   }
+  th, td {
+    @apply !whitespace-nowrap;
+  }
 }
 
 @layer components {

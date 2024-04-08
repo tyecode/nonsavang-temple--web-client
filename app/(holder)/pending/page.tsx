@@ -2,18 +2,19 @@
 
 import { useEffect, useTransition } from 'react'
 
-import { usePendingStore, useRejectedTransactionStore } from '@/stores'
+import { useTransactionStore } from '@/stores/useTransactionStore'
+import { usePendingStore } from '@/stores'
 
 import { getTransactions } from '@/actions/transaction-action'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
+import { useApprovedTransactionStore } from '@/stores/useApprovedTransactionStore'
 
-const AdminRejected = () => {
-  const transactions = useRejectedTransactionStore(
-    (state) => state.transactions
-  )
-  const setTransactions = useRejectedTransactionStore(
+const AdminPending = () => {
+  const transactions = useTransactionStore((state) => state.transactions)
+  const setTransactions = useTransactionStore((state) => state.setTransactions)
+  const setApprovedTransactions = useApprovedTransactionStore(
     (state) => state.setTransactions
   )
 
@@ -30,11 +31,16 @@ const AdminRejected = () => {
 
         setTransactions(
           res.data.filter(
-            (transaction) => transaction.status.toLowerCase() === 'rejected'
+            (transaction) => transaction.status.toLowerCase() === 'pending'
+          )
+        )
+        setApprovedTransactions(
+          res.data.filter(
+            (transaction) => transaction.status.toLowerCase() === 'approved'
           )
         )
       } catch (error) {
-        console.error('Error fetching transactions: ', error)
+        console.error('Error fetching transactions', error)
       }
     }
 
@@ -48,10 +54,10 @@ const AdminRejected = () => {
   }, [isPending])
 
   return (
-    <section className='container'>
+    <section className='container py-6'>
       <DataTable columns={columns} data={transactions} />
     </section>
   )
 }
 
-export default AdminRejected
+export default AdminPending
