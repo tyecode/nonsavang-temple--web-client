@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-import { symbol, z } from 'zod'
+import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Currency } from '@/types/currency'
@@ -33,36 +33,23 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { useToast } from '@/components/ui/use-toast'
-
-const formSchema: any = z.object({
-  code: z
-    .string()
-    .min(1, {
-      message: 'ກະລຸນາປ້ອນລະຫັດສະກຸນເງິນ.',
-    })
-    .regex(/^[A-Z]{3}$/, {
-      message: 'ລະຫັດສະກຸນເງິນຕ້ອງມີຕົວອັກສອນ 3 ຕົວເທົ່ານັ້ນ.',
-    }),
-  name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນຊື່ສະກຸນເງິນ.',
-  }),
-  symbol: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນສັນຍາລັກສະກຸນເງິນ.',
-  }),
-})
+import { currencySchema } from '@/app/(admin)/currencies/schema'
 
 const CurrencyCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
+  const currencies = useCurrencyStore(
+    (state: CurrencyState) => state.currencies
+  )
   const setCurrencies = useCurrencyStore(
     (state: CurrencyState) => state.setCurrencies
   )
 
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof currencySchema>>({
+    resolver: zodResolver(currencySchema),
     defaultValues: {
       code: '',
       name: '',
@@ -70,7 +57,7 @@ const CurrencyCreateModal = () => {
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof currencySchema>) => {
     startTransition(async () => {
       try {
         const res = await createCurrency({
@@ -87,24 +74,14 @@ const CurrencyCreateModal = () => {
           return
         }
 
-        const currencies = await getCurrency()
+        const newCurrencies: Currency[] = [...currencies, ...res.data]
 
-        if (currencies.error || !currencies.data) return
-
-        const newCurrencies = currencies.data.map((currency: Currency) => ({
-          ...currency,
-          created_at: formatDate(currency.created_at),
-          updated_at: currency.updated_at
-            ? formatDate(currency.updated_at)
-            : undefined,
-        }))
-
-        setCurrencies(newCurrencies)
+        setCurrencies(newCurrencies as Currency[])
         toast({
           description: 'ເພີ່ມຂໍ້ມູນສະກຸນເງິນສຳເລັດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Failed to create currency', error)
+        console.error('Failed to create currency: ', error)
       } finally {
         setIsOpen(false)
         form.reset()

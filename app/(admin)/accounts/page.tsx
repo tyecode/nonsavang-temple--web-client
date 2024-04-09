@@ -9,7 +9,7 @@ const AdminAccounts = () => {
   const accounts = useAccountStore((state) => state.accounts)
 
   return (
-    <section className='container'>
+    <section className='container py-6'>
       <DataTable columns={columns} data={accounts} />
     </section>
   )

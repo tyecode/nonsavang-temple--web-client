@@ -15,15 +15,7 @@ const useFetchCurrency = () => {
 
         if (res.error || !res.data) return
 
-        const newCurrencies: Currency[] = res.data.map(
-          (currency: Currency) => ({
-            ...currency,
-            created_at: formatDate(currency.created_at),
-            updated_at: currency.updated_at
-              ? formatDate(currency.updated_at)
-              : undefined,
-          })
-        )
+        const newCurrencies: Currency[] = res.data
 
         setData(newCurrencies as Currency[])
       } catch (error: any) {

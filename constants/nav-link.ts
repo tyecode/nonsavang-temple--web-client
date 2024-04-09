@@ -113,7 +113,7 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       {
         id: 'currencies',
         title: 'ຈັດການສະກຸນເງິນ',
-        href: '/dashboard/currencies',
+        href: '/currencies',
         icon: 'dollar-sign-icon',
       },
     ],

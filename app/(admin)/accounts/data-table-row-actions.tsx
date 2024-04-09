@@ -281,11 +281,12 @@ export function DataTableRowActions<TData extends Account>({
                             aria-expanded={openCurrency}
                             className='w-full justify-between'
                           >
-                            {field.value
+                            {field.value && currencies.length > 0
                               ? currencies.find(
                                   (currency: Currency) =>
                                     currency.id === field.value
-                                )?.name
+                                )?.name +
+                                ` (${currencies.find((currency: Currency) => currency.id === field.value)?.symbol})`
                               : 'ເລືອກສະກຸນເງິນ...'}
                             <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                           </Button>
@@ -304,7 +305,7 @@ export function DataTableRowActions<TData extends Account>({
                                   setOpenCurrency(false)
                                 }}
                               >
-                                {currency.name}
+                                {`${currency.name} (${currency.symbol})`}
                                 <CheckIcon
                                   className={cn(
                                     'ml-auto h-4 w-4',
