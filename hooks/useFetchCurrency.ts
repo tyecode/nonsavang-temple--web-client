@@ -1,7 +1,6 @@
 import { useEffect, useState, useTransition } from 'react'
 import { getCurrency } from '@/actions/currency-actions'
 import { Currency } from '@/types'
-import { formatDate } from '@/lib/date-format'
 
 const useFetchCurrency = () => {
   const [data, setData] = useState<Currency[]>([])

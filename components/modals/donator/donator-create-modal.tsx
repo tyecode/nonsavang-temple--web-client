@@ -7,14 +7,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 
 import { Donator } from '@/types/donator'
-import { DonatorState } from '@/stores/useDonatorStore'
 
-import { createDonator, getDonator } from '@/actions/donator-actions'
+import { createDonator } from '@/actions/donator-actions'
 
 import { useDonatorStore } from '@/stores'
 
 import { cn } from '@/lib/utils'
-import { formatDate } from '@/lib/date-format'
 import { DONATOR_TITLES } from '@/constants/title-name'
 
 import { Button } from '@/components/ui/button'
@@ -42,35 +40,20 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { useToast } from '@/components/ui/use-toast'
-
-const formSchema: any = z.object({
-  title: z.string().min(1, {
-    message: 'ກະລຸນາເລືອກຄຳນຳໜ້າ.',
-  }),
-  first_name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນຊື່.',
-  }),
-  last_name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນນາມສະກຸນ.',
-  }),
-  village: z.string(),
-  district: z.string(),
-  province: z.string(),
-})
+import { donatorSchema } from '@/app/(admin)/donators/schema'
 
 const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
   const [isPending, startTransition] = useTransition()
   const [isOpen, setIsOpen] = useState(false)
   const [openTitle, setOpenTitle] = useState(false)
 
-  const setDonators = useDonatorStore(
-    (state: DonatorState) => state.setDonators
-  )
+  const donators = useDonatorStore((state) => state.donators)
+  const setDonators = useDonatorStore((state) => state.setDonators)
 
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof donatorSchema>>({
+    resolver: zodResolver(donatorSchema),
     defaultValues: {
       title: DONATOR_TITLES[0].title,
       first_name: '',
@@ -81,7 +64,7 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof donatorSchema>) => {
     startTransition(async () => {
       try {
         const res = await createDonator({
@@ -101,17 +84,9 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
           return
         }
 
-        const donators = await getDonator()
+        const newDonators: Donator[] = [...donators, ...res.data]
 
-        if (donators.error || !donators.data) return
-
-        const newDonators = donators.data.map((item: Donator) => ({
-          ...item,
-          created_at: formatDate(item.created_at),
-          updated_at: item.updated_at ? formatDate(item.updated_at) : undefined,
-        }))
-
-        setDonators(newDonators)
+        setDonators(newDonators as Donator[])
         toast({
           description: 'ເພີ່ມຂໍ້ມູນຜູ້ບໍລິຈາກສຳເລັດແລ້ວ.',
         })

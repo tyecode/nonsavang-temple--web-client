@@ -63,9 +63,11 @@ export function DataTableRowActions<TData extends Currency>({
   })
 
   useEffect(() => {
-    form.setValue('code', current.code)
-    form.setValue('name', current.name)
-    form.setValue('symbol', current.symbol)
+    form.reset({
+      code: current.code,
+      name: current.name,
+      symbol: current.symbol,
+    })
   }, [current, form])
 
   const onSubmit = (values: z.infer<typeof currencySchema>) => {
@@ -74,6 +76,7 @@ export function DataTableRowActions<TData extends Currency>({
         const res = await updateCurrency(current.id, {
           code: values.code,
           name: values.name,
+          symbol: values.symbol,
           updated_at: new Date(),
         })
 

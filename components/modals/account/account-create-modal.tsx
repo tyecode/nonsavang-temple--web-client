@@ -8,7 +8,6 @@ import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 
 import { Account } from '@/types/account'
 import { Currency } from '@/types/currency'
-import { AccountState } from '@/stores/useAccountStore'
 
 import { createAccount } from '@/actions/account-actions'
 import { getCurrency } from '@/actions/currency-actions'
@@ -55,9 +54,7 @@ const AccountCreateModal = () => {
   const [openCurrency, setOpenCurrency] = useState(false)
 
   const accounts = useAccountStore((state) => state.accounts)
-  const setAccounts = useAccountStore(
-    (state: AccountState) => state.setAccounts
-  )
+  const setAccounts = useAccountStore((state) => state.setAccounts)
 
   const form = useForm<z.infer<typeof accountSchema>>({
     resolver: zodResolver(accountSchema),

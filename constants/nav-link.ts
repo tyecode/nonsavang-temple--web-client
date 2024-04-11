@@ -77,7 +77,7 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       {
         id: 'donators',
         title: 'ຈັດການຜູ້ບໍລິຈາກ',
-        href: '/dashboard/donators',
+        href: '/donators',
         icon: 'archive-icon',
       },
       {

@@ -9,7 +9,7 @@ const DonatorsPage = () => {
   const donators = useDonatorStore((state) => state.donators)
 
   return (
-    <section className='container'>
+    <section className='container py-6'>
       <DataTable columns={columns} data={donators} />
     </section>
   )

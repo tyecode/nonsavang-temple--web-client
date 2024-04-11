@@ -1,7 +1,6 @@
 import { useEffect, useState, useTransition } from 'react'
-import { Donator } from '@/types'
-import { formatDate } from '@/lib/date-format'
 import { getDonator } from '@/actions/donator-actions'
+import { Donator } from '@/types'
 
 const useFetchDonator = () => {
   const [data, setData] = useState<Donator[]>([])
@@ -15,13 +14,7 @@ const useFetchDonator = () => {
 
         if (res.error || !res.data) return
 
-        const newDonators = res.data.map((donator: Donator) => ({
-          ...donator,
-          created_at: formatDate(donator.created_at),
-          updated_at: donator.updated_at
-            ? formatDate(donator.updated_at)
-            : undefined,
-        }))
+        const newDonators = res.data
 
         setData(newDonators as Donator[])
       } catch (error: any) {

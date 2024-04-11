@@ -80,10 +80,12 @@ export function DataTableRowActions<TData extends Account>({
   })
 
   useEffect(() => {
-    form.setValue('name', current.name)
-    form.setValue('balance', current.balance.toString())
-    form.setValue('currency', current.currency.id)
-    form.setValue('remark', current.remark ? current.remark : '')
+    form.reset({
+      name: current.name,
+      balance: current.balance.toString(),
+      currency: current.currency.id,
+      remark: current.remark ? current.remark : '',
+    })
   }, [current, form])
 
   useEffect(() => {

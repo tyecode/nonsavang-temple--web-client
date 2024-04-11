@@ -7,12 +7,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Currency } from '@/types/currency'
 
-import { createCurrency, getCurrency } from '@/actions/currency-actions'
+import { createCurrency } from '@/actions/currency-actions'
 
 import { useCurrencyStore } from '@/stores'
-import { CurrencyState } from '@/stores/useCurrencyStore'
-
-import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,12 +36,8 @@ const CurrencyCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const currencies = useCurrencyStore(
-    (state: CurrencyState) => state.currencies
-  )
-  const setCurrencies = useCurrencyStore(
-    (state: CurrencyState) => state.setCurrencies
-  )
+  const currencies = useCurrencyStore((state) => state.currencies)
+  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
 
   const { toast } = useToast()
 
