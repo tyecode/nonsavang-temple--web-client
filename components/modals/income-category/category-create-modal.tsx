@@ -7,15 +7,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Category } from '@/types/category'
 
-import {
-  createIncomeCategory,
-  getIncomeCategory,
-} from '@/actions/income-category-actions'
+import { createIncomeCategory } from '@/actions/income-category-actions'
 
 import { useIncomeCategoryStore } from '@/stores'
-import { CategoryState } from '@/stores/useIncomeCategoryStore'
-
-import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,30 +31,25 @@ import {
 } from '@/components/ui/form'
 import { useToast } from '@/components/ui/use-toast'
 
-const formSchema: any = z.object({
-  name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນປະເພດລາຍຮັບ.',
-  }),
-})
+import { incomeCategorySchema } from '@/app/(admin)/income-categories/schema'
 
 const CategoryCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const setCategories = useIncomeCategoryStore(
-    (state: CategoryState) => state.setCategories
-  )
+  const categories = useIncomeCategoryStore((state) => state.categories)
+  const setCategories = useIncomeCategoryStore((state) => state.setCategories)
 
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof incomeCategorySchema>>({
+    resolver: zodResolver(incomeCategorySchema),
     defaultValues: {
       name: '',
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof incomeCategorySchema>) => {
     startTransition(async () => {
       try {
         const res = await createIncomeCategory({
@@ -75,24 +64,14 @@ const CategoryCreateModal = () => {
           return
         }
 
-        const categories = await getIncomeCategory()
+        const newCategories: Category[] = [...categories, ...res.data]
 
-        if (categories.error || !categories.data) return
-
-        const newCategories = categories.data.map((category: Category) => ({
-          ...category,
-          created_at: formatDate(category.created_at),
-          updated_at: category.updated_at
-            ? formatDate(category.updated_at)
-            : undefined,
-        }))
-
-        setCategories(newCategories)
+        setCategories(newCategories as Category[])
         toast({
           description: 'ເພີ່ມຂໍ້ມູນປະເພດລາຍຮັບສຳເລັດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Failed to create income category', error)
+        console.error('Failed to create income category: ', error)
       } finally {
         setIsOpen(false)
         form.reset()

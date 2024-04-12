@@ -95,7 +95,7 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       {
         id: 'income-categories',
         title: 'ຈັດການປະເພດລາຍຮັບ',
-        href: '/dashboard/income-categories',
+        href: '/income-categories',
         icon: 'align-right-icon',
       },
       {

@@ -5,7 +5,7 @@ const textMaps = {
   '/donators': 'ຈັດການຜູ້ບໍລິຈາກ',
   '/dashboard/incomes': 'ຈັດການລາຍຮັບ',
   '/dashboard/expenses': 'ຈັດການລາຍຈ່າຍ',
-  '/dashboard/income-categories': 'ຈັດການປະເພດລາຍຮັບ',
+  '/income-categories': 'ຈັດການປະເພດລາຍຮັບ',
   '/expense-categories': 'ຈັດການປະເພດລາຍຈ່າຍ',
   '/accounts': 'ຈັດການບັນຊີ',
   '/currencies': 'ຈັດການສະກຸນເງິນ',

@@ -4,9 +4,9 @@ import { ColumnDef } from '@tanstack/react-table'
 
 import { Category } from '@/types/category'
 
-import { formatDate } from '@/lib/date-format'
-
 import { Checkbox } from '@/components/ui/checkbox'
+
+import { formatDate } from '@/lib/date-format'
 
 import { DataTableRowActions } from './data-table-row-actions'
 
@@ -41,7 +41,7 @@ export const columns: ColumnDef<Category>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'ຊື່ປະເພດລາຍຈ່າຍ',
+    header: 'ຊື່ປະເພດລາຍຮັບ',
   },
   {
     accessorKey: 'created_at',
