@@ -88,15 +88,15 @@ export function DataTableRowActions<TData extends Currency>({
           return
         }
 
-        const newCurrencies = currencies.map((currency: Currency) => {
-          const updatedCurrency: Currency = res.data?.find(
-            (item) => item.id === currency.id
-          )
-
-          if (updatedCurrency) return updatedCurrency
-
-          return currency
-        })
+        const newCurrencies = currencies.reduce(
+          (acc: Currency[], currency: Currency) => {
+            const updatedCurrency: Currency = res.data?.find(
+              (item) => item.id === currency.id
+            )
+            return [...acc, updatedCurrency || currency]
+          },
+          []
+        )
 
         setCurrencies(newCurrencies as Currency[])
         toast({

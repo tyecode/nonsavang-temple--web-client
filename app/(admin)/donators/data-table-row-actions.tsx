@@ -110,15 +110,15 @@ export function DataTableRowActions<TData extends Donator>({
           return
         }
 
-        const newDonators = donators.map((donator: Donator) => {
-          const updatedDonator: Donator = res.data?.find(
-            (item: Donator) => item.id === donator.id
-          )
-
-          if (updatedDonator) return updatedDonator
-
-          return donator
-        })
+        const newDonators = donators.reduce(
+          (acc: Donator[], donator: Donator) => {
+            const updatedDonator: Donator = res.data?.find(
+              (item: Donator) => item.id === donator.id
+            )
+            return [...acc, updatedDonator || donator]
+          },
+          []
+        )
 
         setDonators(newDonators as Donator[])
         toast({

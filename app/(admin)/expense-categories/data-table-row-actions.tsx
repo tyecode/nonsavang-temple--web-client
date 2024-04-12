@@ -88,15 +88,15 @@ export function DataTableRowActions<TData extends Category>({
           return
         }
 
-        const newCategories = categories.map((category: Category) => {
-          const updatedCategory: Category = res.data?.find(
-            (item) => item.id === category.id
-          )
-
-          if (updatedCategory) return updatedCategory
-
-          return category
-        })
+        const newCategories = categories.reduce(
+          (acc: Category[], category: Category) => {
+            const updatedCategory: Category = res.data?.find(
+              (item) => item.id === category.id
+            )
+            return [...acc, updatedCategory || category]
+          },
+          []
+        )
 
         setCategories(newCategories as Category[])
         toast({

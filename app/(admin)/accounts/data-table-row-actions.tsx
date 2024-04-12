@@ -131,15 +131,15 @@ export function DataTableRowActions<TData extends Account>({
           return
         }
 
-        const newAccounts = accounts.map((account: Account) => {
-          const updatedAccount: any = res.data?.find(
-            (item) => item.id === account.id
-          )
-
-          if (updatedAccount) return updatedAccount
-
-          return account
-        })
+        const newAccounts = accounts.reduce(
+          (acc: Account[], account: Account) => {
+            const updatedAccount: Account = res.data?.find(
+              (item) => item.id === account.id
+            )
+            return [...acc, updatedAccount || account]
+          },
+          []
+        )
 
         setAccounts(newAccounts as Account[])
         toast({
