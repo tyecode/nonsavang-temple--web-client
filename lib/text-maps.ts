@@ -4,7 +4,7 @@ const textMaps = {
   '/dashboard/users': 'ຈັດການຜູ້ໃຊ້',
   '/donators': 'ຈັດການຜູ້ບໍລິຈາກ',
   '/dashboard/incomes': 'ຈັດການລາຍຮັບ',
-  '/dashboard/expenses': 'ຈັດການລາຍຈ່າຍ',
+  '/expenses': 'ຈັດການລາຍຈ່າຍ',
   '/income-categories': 'ຈັດການປະເພດລາຍຮັບ',
   '/expense-categories': 'ຈັດການປະເພດລາຍຈ່າຍ',
   '/accounts': 'ຈັດການບັນຊີ',

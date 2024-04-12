@@ -12,7 +12,7 @@ import { Currency } from '@/types/currency'
 import { Expense } from '@/types/expense'
 import { User } from '@/types/user'
 
-import { createExpense, getExpense } from '@/actions/expense-actions'
+import { createExpense } from '@/actions/expense-actions'
 import { getAccount } from '@/actions/account-actions'
 import { getExpenseCategory } from '@/actions/expense-category-actions'
 import { getSession } from '@/actions/auth-actions'
@@ -20,11 +20,8 @@ import { getUser } from '@/actions/user-actions'
 import { uploadExpenseImage } from '@/actions/image-actions'
 
 import { useExpenseStore, useUserStore } from '@/stores'
-import { ExpenseState } from '@/stores/useExpenseStore'
-import { UserState } from '@/stores/useUserStore'
 
 import { cn } from '@/lib/utils'
-import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -58,62 +55,36 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { toast } from '@/components/ui/use-toast'
-import MonetaryInput from '@/components/MonetaryInput'
-
-const formSchema: any = z.object({
-  account: z.string().min(1, 'ກະລຸນາເລືອກບັນຊີ.'),
-  category: z.string().min(1, 'ກະລຸນາເລືອກປະເພດລາຍຈ່າຍ.'),
-  amount: z
-    .string()
-    .min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')
-    .regex(/^[-]?\d+$/, {
-      message: 'ຈຳນວນເງິນຕ້ອງເປັນຕົວເລກເທົ່ານັ້ນ.',
-    })
-    .refine((value) => Number(value) > 0, {
-      message: 'ປ້ອນຈຳນວນເງິນບໍ່ຖືກຕ້ອງ.',
-    })
-    .or(z.number().min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')),
-  currency: z.string().min(1, 'ກະລຸນາເລືອກສະກຸນເງິນ.'),
-  drawer: z.string().min(1, 'ກະລຸນາເລືອກຜູ້ເບີກຈ່າຍ.'),
-  image: z
-    .custom<FileList>()
-    .transform((file) => file.length > 0 && file.item(0))
-    .refine((file) => !file || (!!file && file.type?.startsWith('image')), {
-      message: 'ອັບໂຫຼດໄດ້ສະເພາະຮູບພາບເທົ່ານັ້ນ.',
-    })
-    .refine((file) => !file || (!!file && file.size <= 10 * 1024 * 1024), {
-      message: 'ຮູບພາບຕ້ອງມີຂະໜາດບໍ່ເກີນ 10MB.',
-    }),
-  remark: z.string(),
-})
+import MonetaryInput from '@/components/monetary-input'
+import { expenseSchema } from '@/app/(admin)/expenses/schema'
 
 const ExpenseCreateModal = () => {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [currencies, setCurrencies] = useState<Currency[]>([])
   const [isOpen, setIsOpen] = useState(false)
-  const [isPending, startTransition] = useTransition()
   const [openAccount, setOpenAccount] = useState(false)
   const [openCategory, setOpenCategory] = useState(false)
   const [openCurrency, setOpenCurrency] = useState(false)
   const [openDrawer, setOpenDrawer] = useState(false)
 
-  const expenses = useExpenseStore((state) => state.expenses)
-  const setExpenses = useExpenseStore(
-    (state: ExpenseState) => state.setExpenses
-  )
-  const setUsers = useUserStore((state: UserState) => state.setUsers)
-  const users = useUserStore((state: UserState) => state.users)
+  const [isPending, startTransition] = useTransition()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const expenses = useExpenseStore((state) => state.expenses)
+  const setExpenses = useExpenseStore((state) => state.setExpenses)
+
+  const users = useUserStore((state) => state.users)
+  const setUsers = useUserStore((state) => state.setUsers)
+
+  const form = useForm<z.infer<typeof expenseSchema>>({
+    resolver: zodResolver(expenseSchema),
     defaultValues: {
       account: '',
       category: '',
       amount: '0',
       currency: '',
       drawer: '',
-      image: '',
+      image: null,
       remark: '',
     },
   })
@@ -161,19 +132,19 @@ const ExpenseCreateModal = () => {
   }, [users.length, setUsers])
 
   const createNewExpense = async (
-    values: z.infer<typeof formSchema>,
-    uploadData?: { data: any; error?: null; message?: string }
+    values: z.infer<typeof expenseSchema>,
+    userId: string
   ) => {
     try {
       const expenseData = {
-        user_id: values.user_id,
+        user_id: userId,
         account_id: values.account,
         category_id: values.category,
         amount: Number('-' + values.amount),
         currency_id: values.currency,
         drawer_id: values.drawer,
-        image: uploadData
-          ? `${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/${uploadData.data.path}`
+        image: values.image
+          ? `${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/${values.image}`
           : undefined,
         remark: values.remark,
       }
@@ -202,26 +173,23 @@ const ExpenseCreateModal = () => {
     }
   }
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof expenseSchema>) => {
     const session = await getSession()
 
     if (!session) return
 
     startTransition(async () => {
-      if (!values.image) {
-        await createNewExpense({ ...values, user_id: session.user.id })
-        return
-      }
+      const uploadData = values.image
+        ? await uploadExpenseImage(values.image)
+        : null
 
-      const uploadData = await uploadExpenseImage(values.image)
-
-      if (uploadData.error || !uploadData.data) {
-        throw new Error('Image upload failed')
-      }
+      const expenseData = uploadData
+        ? { ...values, image: uploadData.data?.path }
+        : values
 
       await createNewExpense(
-        { ...values, user_id: session.user.id },
-        uploadData
+        expenseData as z.infer<typeof expenseSchema>,
+        session.user.id
       )
     })
   }

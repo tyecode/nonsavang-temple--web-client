@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { LoadingButton } from '@/components/buttons'
-import MonetaryInput from '@/components/MonetaryInput'
+import MonetaryInput from '@/components/monetary-input'
 import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
   Dialog,

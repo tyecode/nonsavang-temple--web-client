@@ -59,7 +59,7 @@ import {
 import { toast } from '@/components/ui/use-toast'
 
 import { DonatorCreateModal } from '@/components/modals/donator'
-import MonetaryInput from '@/components/MonetaryInput'
+import MonetaryInput from '@/components/monetary-input'
 
 const formSchema: any = z.object({
   account: z.string().min(1, 'ກະລຸນາເລືອກບັນຊີ.'),

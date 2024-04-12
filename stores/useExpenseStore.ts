@@ -17,6 +17,7 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
             ...expense.drawer,
             display_name: `${expense.drawer.title} ${expense.drawer.first_name} ${expense.drawer.last_name}`,
           },
+          status_dates: expense.approved_at || expense.rejected_at,
         }))
         .sort(
           (a, b) =>
