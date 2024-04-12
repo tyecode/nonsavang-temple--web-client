@@ -101,7 +101,7 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       {
         id: 'expense-categories',
         title: 'ຈັດການປະເພດລາຍຈ່າຍ',
-        href: '/dashboard/expense-categories',
+        href: '/expense-categories',
         icon: 'align-left-icon',
       },
       {

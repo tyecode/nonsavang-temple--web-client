@@ -6,7 +6,7 @@ const textMaps = {
   '/dashboard/incomes': 'ຈັດການລາຍຮັບ',
   '/dashboard/expenses': 'ຈັດການລາຍຈ່າຍ',
   '/dashboard/income-categories': 'ຈັດການປະເພດລາຍຮັບ',
-  '/dashboard/expense-categories': 'ຈັດການປະເພດລາຍຈ່າຍ',
+  '/expense-categories': 'ຈັດການປະເພດລາຍຈ່າຍ',
   '/accounts': 'ຈັດການບັນຊີ',
   '/currencies': 'ຈັດການສະກຸນເງິນ',
   '/pending': 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',

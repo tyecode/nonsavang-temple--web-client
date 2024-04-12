@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import {
   ColumnDef,
   SortingState,
@@ -17,7 +17,7 @@ import { Currency } from '@/types/currency'
 
 import { deleteCurrency } from '@/actions/currency-actions'
 
-import { usePendingStore, useCurrencyStore } from '@/stores'
+import { useCurrencyStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
 import { CurrencyCreateModal } from '@/components/modals/currency'
@@ -31,7 +31,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { LoadingButton } from '@/components/buttons'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Table,
   TableBody,

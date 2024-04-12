@@ -1,17 +1,20 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Row } from '@tanstack/react-table'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
-import { Currency } from '@/types/currency'
+import { Category } from '@/types/category'
 
-import { deleteCurrency, updateCurrency } from '@/actions/currency-actions'
+import {
+  deleteExpenseCategory,
+  updateExpenseCategory,
+} from '@/actions/expense-category-actions'
 
-import { useCurrencyStore } from '@/stores'
+import { useExpenseCategoryStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -39,97 +42,94 @@ import {
 import { Input } from '@/components/ui/input'
 import { LoadingButton } from '@/components/buttons'
 import { useToast } from '@/components/ui/use-toast'
-import { currencySchema } from './schema'
+
+import { expenseCategorySchema } from './schema'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
 }
 
-export function DataTableRowActions<TData extends Currency>({
+export function DataTableRowActions<TData extends Category>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const current: Currency = row.original
+  const current: Category = row.original
 
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const currencies = useCurrencyStore((state) => state.currencies)
-  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
+  const categories = useExpenseCategoryStore((state) => state.categories)
+  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
 
   const { toast } = useToast()
 
-  const form: any = useForm<z.infer<typeof currencySchema>>({
-    resolver: zodResolver(currencySchema),
+  const form = useForm<z.infer<typeof expenseCategorySchema>>({
+    resolver: zodResolver(expenseCategorySchema),
   })
 
   useEffect(() => {
     form.reset({
-      code: current.code,
       name: current.name,
-      symbol: current.symbol,
     })
   }, [current, form])
 
-  const onSubmit = (values: z.infer<typeof currencySchema>) => {
+  const onSubmit = (values: z.infer<typeof expenseCategorySchema>) => {
     startTransition(async () => {
       try {
-        const res = await updateCurrency(current.id, {
-          code: values.code,
+        const res = await updateExpenseCategory(current.id, {
           name: values.name,
-          symbol: values.symbol,
           updated_at: new Date(),
         })
 
         if (res.error || !res.data) {
           toast({
             variant: 'destructive',
-            description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດແກ້ໄຂຂໍ້ມູນສະກຸນເງິນໄດ້.',
+            description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດແກ້ໄຂຂໍ້ມູນປະເພດລາຍຈ່າຍໄດ້.',
           })
           return
         }
 
-        const newCurrencies = currencies.map((currency: Currency) => {
-          const updatedCurrency: Currency = res.data?.find(
-            (item) => item.id === currency.id
+        const newCategories = categories.map((category: Category) => {
+          const updatedCategory: Category = res.data?.find(
+            (item) => item.id === category.id
           )
 
-          if (updatedCurrency) return updatedCurrency
+          if (updatedCategory) return updatedCategory
 
-          return currency
+          return category
         })
 
-        setCurrencies(newCurrencies as Currency[])
+        setCategories(newCategories as Category[])
         toast({
-          description: 'ແກ້ໄຂຂໍ້ມູນສະກຸນເງິນສຳເລັດແລ້ວ.',
+          description: 'ແກ້ໄຂຂໍ້ມູນປະເພດລາຍຈ່າຍສຳເລັດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Error updating currency:', error)
+        console.error('Error updating expense category: ', error)
       } finally {
         setIsOpen(false)
       }
     })
   }
 
-  const handleDeleteCurrency = async (id: string) => {
+  const handleDeleteCategory = async (id: string) => {
     try {
-      const res = await deleteCurrency(id)
+      const res = await deleteExpenseCategory(id)
 
-      if (res.error) {
+      if (res.error || !res.data) {
         toast({
           variant: 'destructive',
-          description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນສະກຸນເງິນໄດ້.',
+          description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນປະເພດລາຍຈ່າຍໄດ້.',
         })
         return
       }
 
-      const newCurrencies = currencies.filter((currency) => currency.id !== id)
+      const newCategories = categories.filter((category) => category.id !== id)
 
-      setCurrencies(newCurrencies as Currency[])
+      setCategories(newCategories)
       toast({
-        description: 'ລຶບຂໍ້ມູນສະກຸນເງິນສຳເລັດແລ້ວ.',
+        description: 'ລຶບຂໍ້ມູນປະເພດລາຍຈ່າຍສຳເລັດແລ້ວ.',
       })
     } catch (error) {
-      console.error('Error deleting currency: ', error)
+      console.error('Error deleting expense category: ', error)
     }
   }
 
@@ -153,7 +153,7 @@ export function DataTableRowActions<TData extends Currency>({
             <DropdownMenuItem>ແກ້ໄຂຂໍ້ມູນ</DropdownMenuItem>
           </DialogTrigger>
           <DropdownMenuItem
-            onClick={() => handleDeleteCurrency(current.id)}
+            onClick={() => handleDeleteCategory(current.id)}
             className='text-danger transition-none focus:text-danger'
           >
             ລຶບຂໍ້ມູນ
@@ -163,7 +163,7 @@ export function DataTableRowActions<TData extends Currency>({
 
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>ແກ້ໄຂຂໍ້ມູນສະກຸນເງິນ</DialogTitle>
+          <DialogTitle>ແກ້ໄຂຂໍ້ມູນປະເພດລາຍຈ່າຍ</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -172,51 +172,14 @@ export function DataTableRowActions<TData extends Currency>({
           >
             <FormField
               control={form.control}
-              name='code'
-              render={({ field: { onChange, value, ...rest } }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel className='pointer-events-none'>
-                    ລະຫັດສະກຸນເງິນ
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled
-                      onChange={(e) => onChange(e.target.value.toUpperCase())}
-                      value={value.toUpperCase()}
-                      {...rest}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name='name'
               render={({ field }) => (
                 <FormItem className='flex-1'>
                   <FormLabel className='pointer-events-none'>
-                    ຊື່ສະກຸນເງິນ
+                    ຊື່ປະເພດລາຍຈ່າຍ
                   </FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='symbol'
-              render={({ field }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel className='pointer-events-none'>
-                    ສັນຍາລັກ
-                  </FormLabel>
-                  <FormControl>
-                    <Input disabled {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

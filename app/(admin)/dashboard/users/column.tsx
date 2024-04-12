@@ -20,7 +20,7 @@ import { uploadImage, deleteImage } from '@/actions/image-actions'
 import { useUserStore } from '@/stores/useUserStore'
 
 import { formatDate } from '@/lib/date-format'
-import CreateAvatar from '@/lib/create-avatar'
+import { CreateAvatar } from '@/lib/create-avatar'
 import { cn } from '@/lib/utils'
 
 import { USER_TITLES } from '@/constants/title-name'
@@ -324,7 +324,7 @@ export const columns: ColumnDef<User>[] = [
                 onClick={() => handleDeleteUser(current.id)}
                 className='text-danger transition-none focus:text-danger'
               >
-                ລົບຂໍ້ມູນ
+                ລຶບຂໍ້ມູນ
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

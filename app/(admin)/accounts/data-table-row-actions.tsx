@@ -199,7 +199,7 @@ export function DataTableRowActions<TData extends Account>({
             onClick={() => handleDeleteAccount(current.id)}
             className='text-danger transition-none focus:text-danger'
           >
-            ລົບຂໍ້ມູນ
+            ລຶບຂໍ້ມູນ
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

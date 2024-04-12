@@ -210,7 +210,7 @@ export const columns: ColumnDef<Category>[] = [
                 onClick={() => handleDeleteCategory(current.id)}
                 className='text-danger transition-none focus:text-danger'
               >
-                ລົບຂໍ້ມູນ
+                ລຶບຂໍ້ມູນ
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

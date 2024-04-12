@@ -1,7 +1,6 @@
 import { useEffect, useState, useTransition } from 'react'
-import { Category } from '@/types'
-import { formatDate } from '@/lib/date-format'
 import { getExpenseCategory } from '@/actions/expense-category-actions'
+import { Category } from '@/types'
 
 const useFetchExpenseCategory = () => {
   const [data, setData] = useState<Category[]>([])
@@ -15,15 +14,7 @@ const useFetchExpenseCategory = () => {
 
         if (res.error || !res.data) return
 
-        const newCategories: Category[] = res.data.map(
-          (category: Category) => ({
-            ...category,
-            created_at: formatDate(category.created_at),
-            updated_at: category.updated_at
-              ? formatDate(category.updated_at)
-              : undefined,
-          })
-        )
+        const newCategories: Category[] = res.data
 
         setData(newCategories as Category[])
       } catch (error: any) {

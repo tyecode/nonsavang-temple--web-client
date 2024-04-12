@@ -1,10 +1,10 @@
 'use client'
 
-import { Row } from '@tanstack/react-table'
 import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Row } from '@tanstack/react-table'
 import {
   CaretSortIcon,
   CheckIcon,
@@ -184,7 +184,7 @@ export function DataTableRowActions<TData extends Donator>({
             onClick={() => handleDeleteDonator(current.id)}
             className='gap-4 text-danger transition-none focus:text-danger'
           >
-            <span>ລົບຂໍ້ມູນ</span>
+            <span>ລຶບຂໍ້ມູນ</span>
             {isPending && (
               <Spinner size='sm' color='danger' labelColor='danger' />
             )}

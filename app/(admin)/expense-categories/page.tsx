@@ -9,7 +9,7 @@ const AdminExpenseCategory = () => {
   const categories = useExpenseCategoryStore((state) => state.categories)
 
   return (
-    <section className='container'>
+    <section className='container py-6'>
       <DataTable columns={columns} data={categories} />
     </section>
   )

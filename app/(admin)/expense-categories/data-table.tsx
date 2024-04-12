@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import {
   ColumnDef,
   SortingState,
@@ -17,11 +17,10 @@ import { Category } from '@/types/category'
 
 import { deleteExpenseCategory } from '@/actions/expense-category-actions'
 
-import { useExpenseCategoryStore, usePendingStore } from '@/stores'
+import { useExpenseCategoryStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToast } from '@/components/ui/use-toast'
 import {
   DropdownMenu,
@@ -69,14 +68,15 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
+    enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
       globalFilter,
@@ -136,8 +136,8 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div>
-      <div className='flex w-full justify-between py-4'>
+    <div className='space-y-4'>
+      <div className='flex w-full justify-between'>
         <div className='flex gap-4'>
           <Input
             placeholder='ຄົ້ນຫາ...'
@@ -196,13 +196,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenu>
         </div>
       </div>
-      <ScrollArea
-        className={
-          table.getRowModel().rows?.length > 6
-            ? 'h-[64vh] rounded-md border'
-            : 'max-h-[64vh] rounded-md border'
-        }
-      >
+      <div className='rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -261,7 +255,7 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </ScrollArea>
+      </div>
       <div className='mt-6'>
         <DataTablePagination table={table} />
       </div>

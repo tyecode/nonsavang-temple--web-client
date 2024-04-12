@@ -228,7 +228,7 @@ export const columns: ColumnDef<Income>[] = [
               onClick={() => handleDeleteIncome(current.id)}
               className='text-danger transition-none focus:text-danger'
             >
-              ລົບຂໍ້ມູນ
+              ລຶບຂໍ້ມູນ
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -253,7 +253,7 @@ export const columns: ColumnDef<Expense>[] = [
               onClick={() => handleDeleteExpense(current.id)}
               className='text-danger transition-none focus:text-danger'
             >
-              ລົບຂໍ້ມູນ
+              ລຶບຂໍ້ມູນ
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

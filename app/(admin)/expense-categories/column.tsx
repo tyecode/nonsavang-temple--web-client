@@ -2,14 +2,14 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 
-import { Currency } from '@/types/currency'
+import { Category } from '@/types/category'
 
 import { formatDate } from '@/lib/date-format'
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableRowActions } from './data-table-row-actions'
 
-export const columns: ColumnDef<Currency>[] = [
+export const columns: ColumnDef<Category>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -39,16 +39,8 @@ export const columns: ColumnDef<Currency>[] = [
     header: 'ID',
   },
   {
-    accessorKey: 'code',
-    header: 'ລະຫັດ',
-  },
-  {
     accessorKey: 'name',
-    header: 'ຊື່ສະກຸນເງິນ',
-  },
-  {
-    accessorKey: 'symbol',
-    header: 'ສັນຍາລັກ',
+    header: 'ຊື່ປະເພດລາຍຈ່າຍ',
   },
   {
     accessorKey: 'created_at',
