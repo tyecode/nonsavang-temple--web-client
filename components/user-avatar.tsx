@@ -1,24 +1,18 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { Spinner } from '@nextui-org/react'
 
 import { User } from '@/types/user'
-
 import { handleLogout } from '@/actions/auth-actions'
 
-import { IconsCollection } from '@/components/icons/icons-collection'
-import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { IconsCollection } from '@/components/icons/icons-collection'
 
-import CreateAvatar from '@/lib/create-avatar'
-import { useRouter } from 'next/navigation'
+import { CreateAvatar } from '@/lib/create-avatar'
 
 const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -33,38 +27,38 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger>
-        <Avatar className='aspect-square w-10 cursor-pointer'>
-          {!loading ? (
-            <CreateAvatar src={user?.image} seed={`${user?.display_name}`} />
-          ) : (
-            <Skeleton className='h-10 w-10' />
-          )}
-        </Avatar>
+        {!loading ? (
+          <CreateAvatar src={user?.image} seed={`${user?.display_name}`} />
+        ) : (
+          <Skeleton className='h-10 w-10 rounded-full' />
+        )}
       </PopoverTrigger>
       <PopoverContent className='flex-center mx-6 my-2 w-80 flex-col gap-4 p-6'>
         <div className='flex-center flex-col gap-4 py-4'>
-          <Avatar className='flex-center h-20 w-20 flex-col'>
-            {!loading ? (
-              <CreateAvatar
-                src={user?.image}
-                seed={`${user?.display_name}`}
-                size={80}
-              />
-            ) : (
-              <Skeleton className='h-20 w-20' />
-            )}
-          </Avatar>
+          {!loading ? (
+            <CreateAvatar
+              src={user?.image}
+              seed={`${user?.display_name}`}
+              className='h-20 w-20'
+            />
+          ) : (
+            <Skeleton className='h-20 w-20 rounded-full' />
+          )}
           <div className='flex-center flex-col gap-1'>
-            <h1 className='text-center text-base font-medium'>
-              {!loading ? (
-                `${user?.display_name}`
-              ) : (
-                <Skeleton className='h-4 w-56' />
-              )}
-            </h1>
-            <p className='text-sm font-normal lowercase text-foreground/60'>
-              {!loading ? user.email : <Skeleton className='h-4 w-48' />}
-            </p>
+            {!loading ? (
+              <h1 className='text-center text-base font-medium'>
+                {user?.display_name}
+              </h1>
+            ) : (
+              <Skeleton className='my-1 h-4 w-56' />
+            )}
+            {!loading ? (
+              <p className='text-sm font-normal lowercase text-foreground/60'>
+                {user.email}
+              </p>
+            ) : (
+              <Skeleton className='h-4 w-48' />
+            )}
           </div>
         </div>
         <ul className='flex w-full flex-col border-t pt-4'>

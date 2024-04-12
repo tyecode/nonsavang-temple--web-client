@@ -58,7 +58,7 @@ const TopBar = () => {
             ຍິນດີຕ້ອນຮັບ,{' '}
             <span className='text-xl font-semibold'>
               {!isPending ? (
-                `${user.title} ${user.first_name} ${user.last_name}`
+                <span>{user.display_name}</span>
               ) : (
                 <Skeleton className='mt-2 h-5 w-40' />
               )}
