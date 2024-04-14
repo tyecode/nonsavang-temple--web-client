@@ -12,21 +12,17 @@ import { Currency } from '@/types/currency'
 import { Donator } from '@/types/donator'
 import { Income } from '@/types/income'
 
-import { createIncome, getIncome } from '@/actions/income-actions'
+import { createIncome } from '@/actions/income-actions'
 import { getAccount } from '@/actions/account-actions'
 import { getDonator } from '@/actions/donator-actions'
 import { getIncomeCategory } from '@/actions/income-category-actions'
 import { getSession } from '@/actions/auth-actions'
 
 import { useDonatorStore, useIncomeStore } from '@/stores'
-import { DonatorState } from '@/stores/useDonatorStore'
-import { IncomeState } from '@/stores/useIncomeStore'
 
 import { cn } from '@/lib/utils'
-import { formatDate } from '@/lib/date-format'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { LoadingButton } from '@/components/buttons'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -60,48 +56,28 @@ import { toast } from '@/components/ui/use-toast'
 
 import { DonatorCreateModal } from '@/components/modals/donator'
 import MonetaryInput from '@/components/monetary-input'
-
-const formSchema: any = z.object({
-  account: z.string().min(1, 'ກະລຸນາເລືອກບັນຊີ.'),
-  category: z.string().min(1, 'ກະລຸນາເລືອກປະເພດລາຍຮັບ.'),
-  amount: z
-    .string()
-    .min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')
-    .regex(/^[-]?\d+$/, {
-      message: 'ຈຳນວນເງິນຕ້ອງເປັນຕົວເລກເທົ່ານັ້ນ.',
-    })
-    .refine((value) => Number(value) > 0, {
-      message: 'ປ້ອນຈຳນວນເງິນບໍ່ຖືກຕ້ອງ.',
-    })
-    .or(z.number().min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')),
-  currency: z.string().min(1, 'ກະລຸນາເລືອກສະກຸນເງິນ.'),
-  donator: z.string().refine((value) => value !== 'donate', {
-    message: 'ກະລຸນາເລືອກຜູ້ບໍລິຈາກ.',
-  }),
-  remark: z.string(),
-})
+import { incomeSchema } from '@/app/(admin)/incomes/schema'
 
 const IncomeCreateModal = () => {
-  const [accounts, setAccounts] = useState<Account[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [currencies, setCurrencies] = useState<Currency[]>([])
-  const [isDonate, setIsDonate] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [isDonate, setIsDonate] = useState(false)
   const [openAccount, setOpenAccount] = useState(false)
   const [openCategory, setOpenCategory] = useState(false)
   const [openCurrency, setOpenCurrency] = useState(false)
   const [openDonator, setOpenDonator] = useState(false)
 
-  const donators = useDonatorStore((state: DonatorState) => state.donators)
-  const setDonators = useDonatorStore(
-    (state: DonatorState) => state.setDonators
-  )
+  const [accounts, setAccounts] = useState<Account[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [currencies, setCurrencies] = useState<Currency[]>([])
+
+  const donators = useDonatorStore((state) => state.donators)
+  const setDonators = useDonatorStore((state) => state.setDonators)
   const incomes = useIncomeStore((state) => state.incomes)
   const setIncomes = useIncomeStore((state) => state.setIncomes)
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof incomeSchema>>({
+    resolver: zodResolver(incomeSchema),
     defaultValues: {
       account: '',
       category: '',
@@ -154,10 +130,13 @@ const IncomeCreateModal = () => {
     fetchDonators()
   }, [donators, setDonators])
 
-  const createNewIncome = async (values: z.infer<typeof formSchema>) => {
+  const createNewIncome = async (
+    values: z.infer<typeof incomeSchema>,
+    userId: string
+  ) => {
     try {
       const incomeData = {
-        user_id: values.user_id,
+        user_id: userId,
         account_id: values.account,
         category_id: values.category,
         amount: Number(values.amount),
@@ -183,7 +162,7 @@ const IncomeCreateModal = () => {
         description: 'ເພີ່ມຂໍ້ມູນລາຍຮັບສຳເລັດແລ້ວ.',
       })
     } catch (error) {
-      console.error('Error creating income:', error)
+      console.error('Error creating income: ', error)
     } finally {
       setIsOpen(false)
       setIsDonate(false)
@@ -191,14 +170,12 @@ const IncomeCreateModal = () => {
     }
   }
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof incomeSchema>) => {
     const session = await getSession()
 
     if (!session) return
 
-    startTransition(
-      async () => await createNewIncome({ ...values, user_id: session.user.id })
-    )
+    startTransition(async () => await createNewIncome(values, session.user.id))
   }
 
   return (

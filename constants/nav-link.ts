@@ -83,7 +83,7 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       {
         id: 'incomes',
         title: 'ຈັດການລາຍຮັບ',
-        href: '/dashboard/incomes',
+        href: '/incomes',
         icon: 'trending-up-icon',
       },
       {

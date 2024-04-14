@@ -47,7 +47,7 @@ const TopBar = () => {
   }, [pathname, setUser, user])
 
   return (
-    <section className='sticky top-0 w-full border bg-background'>
+    <section className='sticky top-0 z-50 w-full border bg-background'>
       <div className='container flex h-20 items-center justify-between md:container'>
         {pathname !== '/' && pathname !== '/dashboard' ? (
           <span className='text-2xl font-bold capitalize text-foreground/80'>

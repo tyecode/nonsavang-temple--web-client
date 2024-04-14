@@ -17,6 +17,7 @@ export const useIncomeStore = create<IncomeState>((set) => ({
             ...income.donator,
             display_name: `${income.donator.title} ${income.donator.first_name} ${income.donator.last_name}`,
           },
+          status_dates: income.approved_at || income.rejected_at,
         }))
         .sort(
           (a, b) =>

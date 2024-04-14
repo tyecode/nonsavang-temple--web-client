@@ -17,6 +17,7 @@ export type Income = {
   created_at: Date | string
   approved_at?: Date | string | null
   rejected_at?: Date | string | null
+  status_dates?: Date | string | null
 }
 
 export type IncomeCreationData = {

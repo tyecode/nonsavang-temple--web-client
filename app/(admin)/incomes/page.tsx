@@ -9,7 +9,7 @@ const AdminCurrencies = () => {
   const incomes = useIncomeStore((state) => state.incomes)
 
   return (
-    <section className='container'>
+    <section className='container py-6'>
       <DataTable columns={columns} data={incomes} />
     </section>
   )

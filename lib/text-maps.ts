@@ -3,7 +3,7 @@ const textMaps = {
   '/dashboard/reports': 'ລາຍງານ',
   '/dashboard/users': 'ຈັດການຜູ້ໃຊ້',
   '/donators': 'ຈັດການຜູ້ບໍລິຈາກ',
-  '/dashboard/incomes': 'ຈັດການລາຍຮັບ',
+  '/incomes': 'ຈັດການລາຍຮັບ',
   '/expenses': 'ຈັດການລາຍຈ່າຍ',
   '/income-categories': 'ຈັດການປະເພດລາຍຮັບ',
   '/expense-categories': 'ຈັດການປະເພດລາຍຈ່າຍ',
