@@ -3,7 +3,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { getUser } from './user-actions'
 
 export const handleLogin = async (formData: FormData) => {
   const email = formData.get('email') as string
@@ -20,17 +19,7 @@ export const handleLogin = async (formData: FormData) => {
     return redirect('/login?error=Could not authenticate user')
   }
 
-  const userResponse = await getUser(data?.user?.id)
-
-  if (userResponse.error) {
-    return redirect('/login?error=Could not retrieve user data')
-  }
-
-  const role = userResponse.data[0]?.role
-
-  return redirect(
-    role === 'ADMIN' || role === 'HOLDER' ? '/dashboard/users' : '/'
-  )
+  return redirect('/')
 }
 
 export const handleLogout = async () => {
@@ -51,6 +40,6 @@ export const getSession = async () => {
 
     return data.session
   } catch (error) {
-    console.log('Error getting session:', error)
+    console.log('Error getting session: ', error)
   }
 }

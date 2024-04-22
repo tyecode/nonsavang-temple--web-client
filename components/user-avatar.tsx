@@ -9,7 +9,11 @@ import { handleLogout } from '@/actions/auth-actions'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { IconsCollection } from '@/components/icons/icons-collection'
 
 import { CreateAvatar } from '@/lib/create-avatar'
@@ -21,7 +25,7 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
   const router = useRouter()
 
   useEffect(() => {
-    router.prefetch('/dashboard')
+    router.prefetch('/login')
   }, [])
 
   return (
@@ -62,7 +66,7 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
           </div>
         </div>
         <ul className='flex w-full flex-col border-t pt-4'>
-          <li className={user?.role === 'ADMIN' ? 'block' : 'hidden'}>
+          {/* <li className={user?.role === 'ADMIN' ? 'block' : 'hidden'}>
             <Button
               variant={'ghost'}
               className='w-full justify-start gap-4 text-sm font-normal'
@@ -75,7 +79,7 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
               <IconsCollection icon={'grid-icon'} />
               ໜ້າຈັດການ
             </Button>
-          </li>
+          </li> */}
           <li>
             <Button
               variant={'ghost'}
