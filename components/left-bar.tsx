@@ -46,7 +46,7 @@ const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
 
   return (
     <nav className='h-full w-full overflow-scroll'>
-      <div className='flex-center w-full pt-4'>
+      <div className='flex-center mb-4 w-full pt-4'>
         <Image
           src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`}
           alt={'logo'}
@@ -58,13 +58,14 @@ const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
           priority
         />
       </div>
-      <Accordion
-        type='multiple'
-        defaultValue={[...navLinkGroups.map((group) => group.id)]}
-        className='w-full px-6 py-4 font-noto-lao'
-      >
-        {navLinkGroups.map((group: NavLinkGroup) => (
-          <AccordionItem key={group.id} value={group.id}>
+      {navLinkGroups.map((group: NavLinkGroup) => (
+        <Accordion
+          key={group.id}
+          type='multiple'
+          defaultValue={[group.id]}
+          className='w-full px-6 font-noto-lao'
+        >
+          <AccordionItem value={group.id}>
             <AccordionTrigger className='text-sm hover:no-underline'>
               {group.title}
             </AccordionTrigger>
@@ -76,8 +77,8 @@ const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
               </div>
             </AccordionContent>
           </AccordionItem>
-        ))}
-      </Accordion>
+        </Accordion>
+      ))}
     </nav>
   )
 }

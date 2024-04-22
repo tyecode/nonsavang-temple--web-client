@@ -45,22 +45,10 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
         icon: 'pie-chart-icon',
       },
       {
-        id: 'incomes',
-        title: 'ລາຍຮັບ',
-        href: '/incomes',
-        icon: 'trending-up-icon',
-      },
-      {
-        id: 'expenses',
-        title: 'ລາຍຈ່າຍ',
-        href: '/expenses',
-        icon: 'trending-down-icon',
-      },
-      {
-        id: 'donators',
-        title: 'ຜູ້ບໍລິຈາກ',
-        href: '/donators',
-        icon: 'archive-icon',
+        id: 'reports',
+        title: 'ລາຍງານ',
+        href: '/reports',
+        icon: 'file-text-icon',
       },
     ],
   },
@@ -71,7 +59,7 @@ export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
       {
         id: 'users',
         title: 'ຈັດການຜູ້ໃຊ້',
-        href: '/dashboard/users',
+        href: '/users',
         icon: 'user-icon',
       },
       {

@@ -5,6 +5,7 @@ import {
   BookOpen,
   CreditCard,
   DollarSign,
+  FileText,
   Folder,
   Grid,
   LogOut,
@@ -18,6 +19,9 @@ export const IconsCollection = ({ icon }: { icon: string }) => {
   switch (icon) {
     case 'pie-chart-icon':
       return <PieChart width={18} height={18} />
+
+    case 'file-text-icon':
+      return <FileText width={18} height={18} />
 
     case 'folder-icon':
       return <Folder width={18} height={18} />
