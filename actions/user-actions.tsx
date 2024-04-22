@@ -35,24 +35,32 @@ export const getUser = async (id?: string) => {
 }
 
 export const createUser = async (object: UserCreationData) => {
-  const { email, password, title, first_name, last_name } = object
-
   try {
     const {
       data: { user },
     } = await supabase.auth.admin.createUser({
-      email,
-      password,
+      ...object,
       email_confirm: true,
       user_metadata: {
-        title,
-        first_name,
-        last_name,
+        title: object.title,
+        first_name: object.first_name,
+        last_name: object.last_name,
       },
     })
 
     return {
-      data: user,
+      data: [
+        {
+          id: user?.id,
+          title: user?.user_metadata.title,
+          first_name: user?.user_metadata.first_name,
+          last_name: user?.user_metadata.last_name,
+          email: user?.email,
+          role: 'USER',
+          created_at: user?.created_at,
+          updated_at: undefined,
+        },
+      ],
       error: null,
       message: `User creation was successful.`,
     }

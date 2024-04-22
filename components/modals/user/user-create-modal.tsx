@@ -14,8 +14,6 @@ import { createUser } from '@/actions/user-actions'
 
 import { UserState, useUserStore } from '@/stores/useUserStore'
 
-import { formatDate } from '@/lib/date-format'
-
 import { Button } from '@/components/ui/button'
 import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import { Input } from '@/components/ui/input'
@@ -43,29 +41,7 @@ import {
 import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/lib/utils'
 import { USER_TITLES } from '@/constants/title-name'
-
-const formSchema: any = z.object({
-  title: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນຄຳນຳໜ້າ.',
-  }),
-  first_name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນຊື່.',
-  }),
-  last_name: z.string().min(1, {
-    message: 'ກະລຸນາປ້ອນນາມສະກຸນ.',
-  }),
-  email: z
-    .string()
-    .min(1, {
-      message: 'ກະລຸນາປ້ອນອີເມວ.',
-    })
-    .email({
-      message: 'ອີເມວບໍ່ຖືກຕ້ອງ.',
-    }),
-  password: z.string().min(8, {
-    message: 'ລະຫັດຜ່ານຕ້ອງຢ່າງໜ້ອຍ 8 ຕົວອັກສອນ.',
-  }),
-})
+import { userCreateSchema } from '@/app/(admin)/users/schema'
 
 const UserCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -79,8 +55,8 @@ const UserCreateModal = () => {
 
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof userCreateSchema>>({
+    resolver: zodResolver(userCreateSchema),
     defaultValues: {
       title: 'ພຣະ',
       first_name: '',
@@ -90,18 +66,10 @@ const UserCreateModal = () => {
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof userCreateSchema>) => {
     startTransition(async () => {
-      const { email, password, title, first_name, last_name } = values
-
       try {
-        const res = await createUser({
-          email,
-          password,
-          title,
-          first_name,
-          last_name,
-        })
+        const res = await createUser(values)
 
         if (res.error || !res.data) {
           toast({
@@ -111,26 +79,14 @@ const UserCreateModal = () => {
           return
         }
 
-        const newUsers = [
-          ...users,
-          {
-            id: res.data.id,
-            title: res.data.user_metadata.title,
-            first_name: res.data.user_metadata.first_name,
-            last_name: res.data.user_metadata.last_name,
-            email: res.data.email,
-            role: 'USER',
-            created_at: formatDate(res.data.created_at),
-            updated_at: undefined,
-          } as User,
-        ]
+        const newUsers = [...users, ...res.data]
 
-        setUsers(newUsers)
+        setUsers(newUsers as User[])
         toast({
           description: 'ເພີ່ມຂໍ້ມູນຜູ້ໃຊ້ໃໝ່ສຳເລັດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Failed to create user', error)
+        console.error('Failed to create user: ', error)
       } finally {
         setIsOpen(false)
         form.reset()

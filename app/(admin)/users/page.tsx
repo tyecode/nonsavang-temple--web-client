@@ -9,7 +9,7 @@ const UsersPage = () => {
   const users = useUserStore((state) => state.users)
 
   return (
-    <section className='container'>
+    <section className='container p-6'>
       <DataTable columns={columns} data={users} />
     </section>
   )
