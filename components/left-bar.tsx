@@ -1,51 +1,33 @@
 'use client'
 
 import React, { useEffect } from 'react'
+
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { usePathname } from 'next/navigation'
+import { useRouter } from 'next/router'
 
-import { NavLink, NavLinkGroup } from '@/types/nav-link'
+import { Nav } from '@/components/nav'
+import { Separator } from '@/components/ui/separator'
 
-import { Button } from '@/components/ui/button'
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
-import { IconsCollection } from '@/components/icons/icons-collection'
+  Archive,
+  TrendingUp,
+  TrendingDown,
+  AlignRight,
+  AlignLeft,
+  CreditCard,
+  DollarSign,
+  User,
+  Home,
+  FileBarChart,
+  FileBarChart2,
+  FileSpreadsheet,
+} from 'lucide-react'
 
-import { cn } from '@/lib/utils'
-
-const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
-  const pathname = usePathname()
+const LeftBar = () => {
   const router = useRouter()
 
-  const NavLinkButton: React.FC<{ link: NavLink }> = ({ link }) => {
-    useEffect(() => {
-      router.prefetch(link.href)
-    }, [link.href, router])
-
-    return (
-      <Button
-        key={link.id}
-        variant={'ghost'}
-        size={'sm'}
-        className={cn(
-          'group flex w-full items-center justify-start gap-4 text-foreground',
-          link.href === pathname ? 'bg-accent' : ''
-        )}
-        onClick={() => router.push(link.href)}
-      >
-        <IconsCollection icon={link.icon || ''} />
-        {link.title}
-      </Button>
-    )
-  }
-
   return (
-    <nav className='h-full w-full overflow-scroll'>
+    <div className='h-full w-full overflow-scroll'>
       <div className='flex-center mb-4 w-full pt-4'>
         <Image
           src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`}
@@ -58,28 +40,84 @@ const LeftBar = ({ navLinkGroups }: { navLinkGroups: NavLinkGroup[] }) => {
           priority
         />
       </div>
-      {navLinkGroups.map((group: NavLinkGroup) => (
-        <Accordion
-          key={group.id}
-          type='multiple'
-          defaultValue={[group.id]}
-          className='w-full px-6 font-noto-lao'
-        >
-          <AccordionItem value={group.id}>
-            <AccordionTrigger className='text-sm hover:no-underline'>
-              {group.title}
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className='flex flex-col'>
-                {group.links.map((link: NavLink) => (
-                  <NavLinkButton key={link.id} link={link} />
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      ))}
-    </nav>
+      <Nav
+        isCollapsed={false}
+        links={[
+          {
+            title: 'ຫນ້າຫຼັກ',
+            href: '/',
+            icon: Home,
+          },
+          {
+            title: 'ຈັດການລາຍຮັບ',
+            href: '/incomes',
+            icon: TrendingUp,
+          },
+          {
+            title: 'ຈັດການລາຍຈ່າຍ',
+            href: '/expenses',
+            icon: TrendingDown,
+          },
+        ]}
+      />
+      <Separator />
+      <Nav
+        isCollapsed={false}
+        links={[
+          {
+            title: 'ຈັດການຜູ້ໃຊ້',
+            href: '/users',
+            icon: User,
+          },
+          {
+            title: 'ຈັດການຜູ້ບໍລິຈາກ',
+            href: '/donators',
+            icon: Archive,
+          },
+          {
+            title: 'ຈັດການປະເພດລາຍຮັບ',
+            href: '/income-categories',
+            icon: AlignRight,
+          },
+          {
+            title: 'ຈັດການປະເພດລາຍຈ່າຍ',
+            href: '/expense-categories',
+            icon: AlignLeft,
+          },
+          {
+            title: 'ຈັດການບັນຊີ',
+            href: '/accounts',
+            icon: CreditCard,
+          },
+          {
+            title: 'ຈັດການສະກຸນເງິນ',
+            href: '/currencies',
+            icon: DollarSign,
+          },
+        ]}
+      />
+      <Separator />
+      <Nav
+        isCollapsed={false}
+        links={[
+          {
+            title: 'ລາຍງານລາຍຮັບ',
+            href: '/report-incomes',
+            icon: FileBarChart,
+          },
+          {
+            title: 'ລາຍງານລາຍຈ່າຍ',
+            href: '/report-expenses',
+            icon: FileBarChart2,
+          },
+          {
+            title: 'ລາຍງານຜູ້ບໍລິຈາກ',
+            href: '/report-donator',
+            icon: FileSpreadsheet,
+          },
+        ]}
+      />
+    </div>
   )
 }
 
