@@ -8,6 +8,7 @@ import {
   FileText,
   Folder,
   Grid,
+  Home,
   LogOut,
   PieChart,
   TrendingDown,
@@ -19,6 +20,9 @@ export const IconsCollection = ({ icon }: { icon: string }) => {
   switch (icon) {
     case 'pie-chart-icon':
       return <PieChart width={18} height={18} />
+
+    case 'home-icon':
+      return <Home width={18} height={18} />
 
     case 'file-text-icon':
       return <FileText width={18} height={18} />

@@ -34,24 +34,24 @@ export const NAV_LINK_ROOT: NavLinkGroup[] = [
 ]
 
 export const NAV_LINK_DASHBOARD: NavLinkGroup[] = [
-  {
-    id: 'group-1',
-    title: 'ຫນ້າຫຼັກ',
-    links: [
-      {
-        id: 'overview',
-        title: 'ພາບລວມ',
-        href: '/',
-        icon: 'pie-chart-icon',
-      },
-      {
-        id: 'reports',
-        title: 'ລາຍງານ',
-        href: '/reports',
-        icon: 'file-text-icon',
-      },
-    ],
-  },
+  // {
+  //   id: 'group-1',
+  //   title: 'ຫນ້າຫຼັກ',
+  //   links: [
+  //     {
+  //       id: 'overview',
+  //       title: 'ພາບລວມ',
+  //       href: '/',
+  //       icon: 'pie-chart-icon',
+  //     },
+  //     {
+  //       id: 'reports',
+  //       title: 'ລາຍງານ',
+  //       href: '/reports',
+  //       icon: 'file-text-icon',
+  //     },
+  //   ],
+  // },
   {
     id: 'group-2',
     title: 'ຈັດການຂໍ້ມູນ',
