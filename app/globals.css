@@ -53,20 +53,44 @@
   }
 }
 
+
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
+
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: hsl(var(--background));
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: hsl(var(--muted));
+      border-radius: 50px;
+    }
   }
+
   body {
-    @apply flex h-screen w-screen overflow-hidden bg-background font-noto-lao text-foreground;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Noto Sans Lao', 'sans-serif';
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--background));
   }
+
   img {
     user-select: none;
     -webkit-user-drag: none;
     -moz-user-select: none;
   }
+
   th, td {
-    @apply !whitespace-nowrap;
+    white-space: nowrap !important;
   }
 }
 

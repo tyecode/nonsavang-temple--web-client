@@ -1,10 +1,9 @@
 'use client'
 
-import LeftBar from '@/components/left-bar'
-import TopBar from '@/components/top-bar'
+import { LeftBar, TopBar } from '@/layouts'
 import { Toaster } from '@/components/ui/toaster'
 
-const HomePageLayout = ({ children }: { children: React.ReactNode }) => {
+const HolderPageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <aside className='w-[18rem] border bg-background'>
@@ -20,4 +19,4 @@ const HomePageLayout = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-export default HomePageLayout
+export default HolderPageLayout

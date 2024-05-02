@@ -12,7 +12,7 @@ import { toast } from '@/components/ui/use-toast'
 import { formatDate } from '@/lib/date-format'
 
 import { DataTableRowActions } from './data-table-row-actions'
-import { StatusBadge } from '@/components/status-badge'
+import { StatusBadge } from '@/components/badges'
 
 export const columns: ColumnDef<Expense>[] = [
   {

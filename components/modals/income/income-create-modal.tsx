@@ -61,7 +61,6 @@ import { incomeSchema } from '@/app/(admin)/incomes/schema'
 const IncomeCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [isDonate, setIsDonate] = useState(false)
   const [openAccount, setOpenAccount] = useState(false)
   const [openCategory, setOpenCategory] = useState(false)
   const [openCurrency, setOpenCurrency] = useState(false)
@@ -83,7 +82,7 @@ const IncomeCreateModal = () => {
       category: '',
       amount: '0',
       currency: '',
-      donator: '',
+      donator: null,
       remark: '',
     },
   })
@@ -165,7 +164,6 @@ const IncomeCreateModal = () => {
       console.error('Error creating income: ', error)
     } finally {
       setIsOpen(false)
-      setIsDonate(false)
       form.reset()
     }
   }
@@ -298,27 +296,6 @@ const IncomeCreateModal = () => {
                                 onSelect={() => {
                                   field.onChange(category.id)
                                   setOpenCategory(false)
-
-                                  const lists = [
-                                    'donate',
-                                    'donation',
-                                    'ການບໍລິຈາກ',
-                                    'ບໍລິຈາກ',
-                                  ]
-
-                                  if (
-                                    lists.some((str) =>
-                                      category.name
-                                        .toLocaleLowerCase()
-                                        .includes(str)
-                                    )
-                                  ) {
-                                    setIsDonate(true)
-                                    form.setValue('donator', 'donate')
-                                  } else {
-                                    setIsDonate(false)
-                                    form.setValue('donator', '')
-                                  }
                                 }}
                               >
                                 {category.name}
@@ -436,13 +413,13 @@ const IncomeCreateModal = () => {
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
-                          disabled={isPending || !isDonate}
+                          disabled={isPending}
                           variant='outline'
                           role='combobox'
                           aria-expanded={openDonator}
                           className='w-full justify-between'
                         >
-                          {field.value && field.value !== 'donate'
+                          {field.value
                             ? donators.find(
                                 (donator: Donator) => donator.id === field.value
                               )?.display_name
@@ -465,6 +442,24 @@ const IncomeCreateModal = () => {
                           <DonatorCreateModal asChild />
                         </CommandEmpty>
                         <CommandGroup className='max-h-[200px] overflow-y-scroll'>
+                          <CommandItem
+                            key='default'
+                            value='0'
+                            onSelect={() => {
+                              field.onChange(null)
+                              setOpenDonator(false)
+                            }}
+                          >
+                            {'ເລືອກຜູ້ບໍລິຈາກ...'}
+                            <CheckIcon
+                              className={cn(
+                                'ml-auto h-4 w-4',
+                                field.value === null
+                                  ? 'opacity-100'
+                                  : 'opacity-0'
+                              )}
+                            />
+                          </CommandItem>
                           {donators.map((donator: Donator) => (
                             <CommandItem
                               key={donator.id}

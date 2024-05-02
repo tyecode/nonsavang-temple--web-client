@@ -1,13 +1,12 @@
 import React from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { IconsCollection } from '../icons/icons-collection'
 import { cn } from '@/lib/utils'
-import { Skeleton } from '../ui/skeleton'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface TotalStatusCardProps {
   title: string
-  icon: string
+  icon: React.ElementType
   amount: string
   description?: string
   className?: string
@@ -16,7 +15,7 @@ interface TotalStatusCardProps {
 
 export const TotalStatusCard: React.FC<TotalStatusCardProps> = ({
   title,
-  icon,
+  icon: Icon,
   amount,
   description,
   className,
@@ -27,7 +26,7 @@ export const TotalStatusCard: React.FC<TotalStatusCardProps> = ({
       <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
         <CardTitle className='text-md font-medium'>{title}</CardTitle>
         <span className='text-foreground/60'>
-          <IconsCollection icon={icon} />
+          <Icon className='h-5 w-5' />
         </span>
       </CardHeader>
       <CardContent>

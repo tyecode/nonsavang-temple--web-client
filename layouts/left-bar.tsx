@@ -1,15 +1,11 @@
 'use client'
 
-import React, { useEffect } from 'react'
-
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 
 import { Nav } from '@/components/nav'
 import { Separator } from '@/components/ui/separator'
 
 import {
-  Archive,
   TrendingUp,
   TrendingDown,
   AlignRight,
@@ -21,27 +17,27 @@ import {
   FileBarChart,
   FileBarChart2,
   FileSpreadsheet,
+  CheckCircle,
+  XCircle,
+  Box,
+  Clock,
 } from 'lucide-react'
 
 const LeftBar = () => {
-  const router = useRouter()
-
   return (
-    <div className='h-full w-full overflow-scroll'>
+    <div className='h-screen w-full overflow-y-auto'>
       <div className='flex-center mb-4 w-full pt-4'>
         <Image
           src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`}
           alt={'logo'}
           width={72}
           height={72}
-          className='cursor-pointer object-cover'
-          onClick={() => router.push('/')}
+          className='object-cover'
           draggable={false}
           priority
         />
       </div>
       <Nav
-        isCollapsed={false}
         links={[
           {
             title: 'ຫນ້າຫຼັກ',
@@ -62,7 +58,6 @@ const LeftBar = () => {
       />
       <Separator />
       <Nav
-        isCollapsed={false}
         links={[
           {
             title: 'ຈັດການຜູ້ໃຊ້',
@@ -72,7 +67,7 @@ const LeftBar = () => {
           {
             title: 'ຈັດການຜູ້ບໍລິຈາກ',
             href: '/donators',
-            icon: Archive,
+            icon: Box,
           },
           {
             title: 'ຈັດການປະເພດລາຍຮັບ',
@@ -98,7 +93,26 @@ const LeftBar = () => {
       />
       <Separator />
       <Nav
-        isCollapsed={false}
+        links={[
+          {
+            title: 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',
+            href: '/pending',
+            icon: Clock,
+          },
+          {
+            title: 'ລາຍການທີ່ອະນຸມັດແລ້ວ',
+            href: '/approved',
+            icon: CheckCircle,
+          },
+          {
+            title: 'ລາຍການທີ່ຖືກປະຕິເສດ',
+            href: '/rejected',
+            icon: XCircle,
+          },
+        ]}
+      />
+      <Separator />
+      <Nav
         links={[
           {
             title: 'ລາຍງານລາຍຮັບ',

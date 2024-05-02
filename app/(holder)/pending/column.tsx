@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from '@/components/ui/use-toast'
 
 import { DataTableRowActions } from './data-table-row-actions'
+import { TypeBadge } from '@/components/badges'
 
 export const columns: ColumnDef<Transaction>[] = [
   {
@@ -60,14 +61,7 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: 'transaction_type',
     header: 'ປະເພດລາຍການ',
     cell: ({ row }) => (
-      <Badge
-        className='flex-center w-16'
-        variant={
-          row.original.transaction_type === 'income' ? 'success' : 'danger'
-        }
-      >
-        {row.original.transaction_type === 'income' ? 'ລາຍຮັບ' : 'ລາຍຈ່າຍ'}
-      </Badge>
+      <TypeBadge status={row.original.transaction_type.toUpperCase()} />
     ),
   },
   {

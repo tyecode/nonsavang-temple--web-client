@@ -5,7 +5,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Income } from '@/types/income'
 
 import { Checkbox } from '@/components/ui/checkbox'
-import { StatusBadge } from '@/components/status-badge'
+import { StatusBadge } from '@/components/badges'
 import { toast } from '@/components/ui/use-toast'
 
 import { formatDate } from '@/lib/date-format'
