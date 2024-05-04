@@ -22,10 +22,10 @@ export const useApprovedTransactionStore = create<TransactionState>((set) => ({
                 : undefined,
           },
         }))
-        .sort(
-          (a, b) =>
-            new Date(b.approved_at || '').getTime() -
-            new Date(a.approved_at || '').getTime()
-        ) as unknown as Transaction[],
+        .sort((a, b) => {
+          const aDate = a.approved_at ? new Date(a.approved_at).getTime() : 0
+          const bDate = b.approved_at ? new Date(b.approved_at).getTime() : 0
+          return bDate - aDate
+        }) as unknown as Transaction[],
     })),
 }))

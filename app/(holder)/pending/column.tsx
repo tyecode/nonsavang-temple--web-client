@@ -3,15 +3,12 @@
 import { ColumnDef } from '@tanstack/react-table'
 
 import { Transaction } from '@/types'
-
 import { formatDate } from '@/lib/date-format'
-
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from '@/components/ui/use-toast'
+import { TypeBadge } from '@/components/badges'
 
 import { DataTableRowActions } from './data-table-row-actions'
-import { TypeBadge } from '@/components/badges'
 
 export const columns: ColumnDef<Transaction>[] = [
   {

@@ -2,14 +2,15 @@
 
 import { useEffect, useTransition } from 'react'
 
-import { usePendingStore, useRejectedTransactionStore } from '@/stores'
-
 import { getTransactions } from '@/actions/transaction-action'
+import { usePendingStore, useRejectedTransactionStore } from '@/stores'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
 
 const AdminRejected = () => {
+  const [isPending, startTransition] = useTransition()
+
   const transactions = useRejectedTransactionStore(
     (state) => state.transactions
   )
@@ -18,8 +19,6 @@ const AdminRejected = () => {
   )
 
   const setPending = usePendingStore((state) => state.setPending)
-
-  const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
     const fetchData = async () => {

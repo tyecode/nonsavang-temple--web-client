@@ -2,19 +2,24 @@
 
 import { useEffect, useTransition } from 'react'
 
-import { useTransactionStore } from '@/stores/useTransactionStore'
-import { usePendingStore } from '@/stores'
-
 import { getTransactions } from '@/actions/transaction-action'
+import { useTransactionStore } from '@/stores/useTransactionStore'
+import {
+  usePendingStore,
+  useApprovedTransactionStore,
+  useRejectedTransactionStore,
+} from '@/stores'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
-import { useApprovedTransactionStore } from '@/stores/useApprovedTransactionStore'
 
 const AdminPending = () => {
   const transactions = useTransactionStore((state) => state.transactions)
   const setTransactions = useTransactionStore((state) => state.setTransactions)
   const setApprovedTransactions = useApprovedTransactionStore(
+    (state) => state.setTransactions
+  )
+  const setRejectedTransactions = useRejectedTransactionStore(
     (state) => state.setTransactions
   )
 
@@ -37,6 +42,11 @@ const AdminPending = () => {
         setApprovedTransactions(
           res.data.filter(
             (transaction) => transaction.status.toLowerCase() === 'approved'
+          )
+        )
+        setRejectedTransactions(
+          res.data.filter(
+            (transaction) => transaction.status.toLowerCase() === 'rejected'
           )
         )
       } catch (error) {

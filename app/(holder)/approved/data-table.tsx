@@ -17,7 +17,6 @@ import { usePendingStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -32,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
 
@@ -47,9 +47,9 @@ export function DataTable<TData, TValue>({
   const [globalFilter, setGlobalFilters] = useState<string>('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [rowSelection, setRowSelection] = useState({})
   const [selectedItems, setSelectedItems] = useState<TData[]>([])
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
 
   const isPending = usePendingStore((state) => state.isPending)
 

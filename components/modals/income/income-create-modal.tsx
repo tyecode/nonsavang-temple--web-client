@@ -234,7 +234,7 @@ const IncomeCreateModal = () => {
                                 onSelect={() => {
                                   field.onChange(account.id)
                                   setCurrencies([account.currency])
-                                  form.setValue('currency', '')
+                                  form.setValue('currency', account.currency.id)
                                   setOpenAccount(false)
                                 }}
                               >

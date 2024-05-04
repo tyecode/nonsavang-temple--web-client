@@ -6,13 +6,13 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Transaction } from '@/types'
 
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useToast } from '@/components/ui/use-toast'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>

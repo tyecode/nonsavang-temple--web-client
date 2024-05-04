@@ -4,9 +4,9 @@ import { Row } from '@tanstack/react-table'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 
 import { Transaction } from '@/types'
-
 import { useTransactionStore } from '@/stores/useTransactionStore'
 import { useApprovedTransactionStore } from '@/stores/useApprovedTransactionStore'
+import { useRejectedTransactionStore } from '@/stores'
 
 import { updateIncome } from '@/actions/income-actions'
 import { updateExpense } from '@/actions/expense-actions'
@@ -31,11 +31,19 @@ export function DataTableRowActions<TData extends Transaction>({
   const current: Transaction = row.original
 
   const transactions = useTransactionStore((state) => state.transactions)
+  const setTransactions = useTransactionStore((state) => state.setTransactions)
+
   const approvedTransactions = useApprovedTransactionStore(
     (state) => state.transactions
   )
-  const setTransactions = useTransactionStore((state) => state.setTransactions)
   const setApprovedTransactions = useApprovedTransactionStore(
+    (state) => state.setTransactions
+  )
+
+  const rejectedTransactions = useRejectedTransactionStore(
+    (state) => state.transactions
+  )
+  const setRejectedTransactions = useRejectedTransactionStore(
     (state) => state.setTransactions
   )
 
@@ -52,20 +60,6 @@ export function DataTableRowActions<TData extends Transaction>({
         updateFunction: Function
       ) => {
         const dateField = status === 'APPROVED' ? 'approved_at' : 'rejected_at'
-
-        if (status === 'APPROVED') {
-          const transaction = transactions.find((item) => item.id === id)
-
-          if (transaction) {
-            const { account, amount } = transaction
-            const sum = account.balance + amount
-
-            console.log('APPROVED', transaction)
-            console.log('APPROVED', sum)
-          }
-        }
-
-        return
 
         const res = await updateFunction(id, {
           status,
@@ -84,7 +78,7 @@ export function DataTableRowActions<TData extends Transaction>({
           (transaction) => transaction.id !== id
         )
 
-        const newApprovedTransactions = res.data?.map(
+        const newStatusTransactions = await res.data?.map(
           (transaction: Transaction) => {
             return {
               ...transaction,
@@ -95,13 +89,21 @@ export function DataTableRowActions<TData extends Transaction>({
           }
         )
 
-        const updatedApprovedTransactions = [
-          ...(approvedTransactions || []),
-          ...newApprovedTransactions,
-        ]
+        if (status === 'APPROVED') {
+          const updatedApprovedTransactions = [
+            ...newStatusTransactions,
+            ...(approvedTransactions || []),
+          ]
+          setApprovedTransactions(updatedApprovedTransactions as Transaction[])
+        } else {
+          const updatedRejectedTransactions = [
+            ...newStatusTransactions,
+            ...(rejectedTransactions || []),
+          ]
+          setRejectedTransactions(updatedRejectedTransactions as Transaction[])
+        }
 
         setTransactions(newTransactions as Transaction[])
-        setApprovedTransactions(updatedApprovedTransactions as Transaction[])
         toast({
           description: `${status === 'APPROVED' ? 'ຍອມຮັບ' : 'ປະຕິເສດ'}ລາຍການສຳເລັດແລ້ວ.`,
         })

@@ -6,12 +6,11 @@ import { Transaction } from '@/types'
 
 import { formatDate } from '@/lib/date-format'
 
-import { Badge } from '@/components/ui/badge'
+import { TypeBadge } from '@/components/badges'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from '@/components/ui/use-toast'
 
 import { DataTableRowActions } from './data-table-row-actions'
-import { TypeBadge } from '@/components/badges'
 
 export const columns: ColumnDef<Transaction>[] = [
   {
