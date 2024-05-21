@@ -94,6 +94,31 @@
   }
 }
 
+@media print {
+  html, body {
+    height: initial !important;
+    overflow: initial !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+  
+  table {
+    width: 100vw !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border-width: 1px 0 0 1px !important;
+  }
+  
+  th, td {
+    border: 1px solid hsl(var(--border)) !important;
+    border-width: 0 1px 1px 0 !important;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
 @layer components {
   .flex-center {
     @apply flex items-center justify-center;

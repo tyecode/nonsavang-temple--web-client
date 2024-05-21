@@ -1,9 +1,9 @@
-import OverviewPage from '@/pages/overview-page'
+import Overview from '@/pages/overview'
 
 const HomePage = () => {
   return (
     <div className='flex flex-grow'>
-      <OverviewPage />
+      <Overview />
     </div>
   )
 }

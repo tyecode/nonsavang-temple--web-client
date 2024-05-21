@@ -12,6 +12,9 @@ const textMaps = {
   '/pending': 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',
   '/approved': 'ລາຍການທີ່ອະນຸມັດແລ້ວ',
   '/rejected': 'ລາຍການທີ່ຖືກປະຕິເສດ',
+  '/report-account': 'ລາຍງານບັນຊີ',
+  '/report-income-expense': 'ລາຍງານລາຍຮັບ-ລາຍຈ່າຍ',
+  '/report-donator': 'ລາຍງານຜູ້ບໍລິຈາກ',
 }
 
 export const getTextFromPathname = (pathname: string) => {

@@ -115,14 +115,14 @@ const LeftBar = () => {
       <Nav
         links={[
           {
-            title: 'ລາຍງານລາຍຮັບ',
-            href: '/report-incomes',
-            icon: FileBarChart,
+            title: 'ລາຍງານບັນຊີ',
+            href: '/report-account',
+            icon: FileBarChart2,
           },
           {
-            title: 'ລາຍງານລາຍຈ່າຍ',
-            href: '/report-expenses',
-            icon: FileBarChart2,
+            title: 'ລາຍງານລາຍຮັບ-ລາຍຈ່າຍ',
+            href: '/report-income-expense',
+            icon: FileBarChart,
           },
           {
             title: 'ລາຍງານຜູ້ບໍລິຈາກ',

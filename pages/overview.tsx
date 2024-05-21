@@ -32,7 +32,7 @@ import PieChartSkeleton from '../components/pie-chart-skeleton'
 import { useTransactionStore } from '@/stores/useTransactionStore'
 import { Box, CreditCard, TrendingDown, TrendingUp } from 'lucide-react'
 
-export default function OverviewPage() {
+export default function Overview() {
   const [selectedAccount, setSelectedAccount] = useState({ id: '', balance: 0 })
   const [currencySymbol, setCurrencySymbol] = useState<string>('')
   const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([])
@@ -174,6 +174,9 @@ export default function OverviewPage() {
       ...expense,
       color: EXPENSE_COLOR_PALETTE[index % EXPENSE_COLOR_PALETTE.length],
     }))
+
+  console.log(fetchIncome)
+  console.log(summedIncomes)
 
   return (
     <div className='flex-1 space-y-4 p-4 pt-6 md:p-8'>
