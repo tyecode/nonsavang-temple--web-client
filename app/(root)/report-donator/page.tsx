@@ -34,7 +34,7 @@ const ReportDonatorPage = () => {
   }
 
   const handleAccountChange = (newState: { id: string }) => {
-    setAccountId(newState.id)
+    setAccountId(newState?.id)
   }
 
   useEffect(() => {

@@ -23,9 +23,7 @@ export function AccountSelector({
 }) {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState<string>('')
-
-  const accounts = useAccountStore((state) => state.accounts)
-  const setAccounts = useAccountStore((state) => state.setAccounts)
+  const [accounts, setAccounts] = useState<Account[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,15 +32,7 @@ export function AccountSelector({
 
         if (res.error || !res.data) return
 
-        const newAccounts: Account[] = res.data.map((account: Account) => ({
-          ...account,
-          created_at: formatDate(account.created_at),
-          updated_at: account.updated_at
-            ? formatDate(account.updated_at)
-            : undefined,
-        }))
-
-        setAccounts(newAccounts as Account[])
+        setAccounts(res.data)
       } catch (error) {
         console.error('Error fetching accounts: ', error)
       }
@@ -51,14 +41,14 @@ export function AccountSelector({
   }, [setAccounts])
 
   useEffect(() => {
-    if (accounts.length > 0) {
-      setValue(accounts[0].id)
+    if (accounts?.length > 0) {
+      setValue(accounts[0]?.id)
     }
   }, [accounts])
 
   useEffect(() => {
     if (onStateChange) {
-      const selectedAccount = accounts.find((account) => account.id === value)
+      const selectedAccount = accounts?.find((account) => account?.id === value)
       if (selectedAccount) {
         onStateChange({
           id: selectedAccount.id,
@@ -80,7 +70,7 @@ export function AccountSelector({
           className='w-[260px] justify-between'
         >
           {value
-            ? accounts.find((account) => account.id === value)?.name
+            ? accounts?.find((account) => account?.id === value)?.name
             : 'ເລືອກບັນຊີ...'}
           <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
         </Button>
@@ -88,24 +78,25 @@ export function AccountSelector({
       <PopoverContent className='w-[260px] p-0'>
         <Command>
           <CommandGroup>
-            {accounts.map((account) => (
-              <CommandItem
-                key={account.id}
-                value={account.id}
-                onSelect={(currentValue: string) => {
-                  setValue(currentValue)
-                  setOpen(false)
-                }}
-              >
-                {account.name}
-                <CheckIcon
-                  className={cn(
-                    'ml-auto h-4 w-4',
-                    value === account.id ? 'opacity-100' : 'opacity-0'
-                  )}
-                />
-              </CommandItem>
-            ))}
+            {accounts.length > 0 &&
+              accounts?.map((account) => (
+                <CommandItem
+                  key={account.id}
+                  value={account.id}
+                  onSelect={(currentValue: string) => {
+                    setValue(currentValue)
+                    setOpen(false)
+                  }}
+                >
+                  {account?.name}
+                  <CheckIcon
+                    className={cn(
+                      'ml-auto h-4 w-4',
+                      value === account?.id ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                </CommandItem>
+              ))}
           </CommandGroup>
         </Command>
       </PopoverContent>
