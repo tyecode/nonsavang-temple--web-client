@@ -3,12 +3,14 @@ import { NextMiddleware } from 'next/server'
 import { stackMiddleware } from '@/utils/middlewares/stack-middleware'
 import { supabaseMiddleware } from '@/utils/middlewares/supabase-middleware'
 import { authenticateMiddleware } from '@/utils/middlewares/authenticate-middleware'
+import { authorizationMiddleware } from '@/utils/middlewares/authorization-middleware'
 
 type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware
 
 const middlewares: MiddlewareFactory[] = [
   supabaseMiddleware,
   authenticateMiddleware,
+  authorizationMiddleware
 ]
 
 export default stackMiddleware(middlewares)

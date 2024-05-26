@@ -10,6 +10,7 @@ import { CreateAvatar } from '@/lib/create-avatar'
 import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableRowActions } from './data-table-row-actions'
+import { USER_ROLES } from '@/constants/user-role'
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -62,6 +63,13 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'role',
     header: 'ສິດຜູ້ໃຊ້',
+    cell: ({ row }) => {
+      const current = row.original
+
+      return current.role === 'SUPER_ADMIN'
+        ? 'Super Admin'
+        : USER_ROLES.find((role) => role.title === current.role)?.label
+    },
   },
   {
     accessorKey: 'created_at',

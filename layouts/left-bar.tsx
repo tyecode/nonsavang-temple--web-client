@@ -22,8 +22,34 @@ import {
   Box,
   Clock,
 } from 'lucide-react'
+import { useAuthStore } from '@/stores'
 
 const LeftBar = () => {
+  const user = useAuthStore((state) => state.auth)
+
+  const rootLinks = [
+    {
+      title: 'ຫນ້າຫຼັກ',
+      href: '/',
+      icon: Home,
+    },
+  ]
+
+  if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+    rootLinks.push(
+      {
+        title: 'ຈັດການລາຍຮັບ',
+        href: '/incomes',
+        icon: TrendingUp,
+      },
+      {
+        title: 'ຈັດການລາຍຈ່າຍ',
+        href: '/expenses',
+        icon: TrendingDown,
+      }
+    )
+  }
+
   return (
     <div className='h-screen w-full overflow-y-auto'>
       <div className='flex-center mb-4 w-full pt-4'>
@@ -37,81 +63,71 @@ const LeftBar = () => {
           priority
         />
       </div>
-      <Nav
-        links={[
-          {
-            title: 'ຫນ້າຫຼັກ',
-            href: '/',
-            icon: Home,
-          },
-          {
-            title: 'ຈັດການລາຍຮັບ',
-            href: '/incomes',
-            icon: TrendingUp,
-          },
-          {
-            title: 'ຈັດການລາຍຈ່າຍ',
-            href: '/expenses',
-            icon: TrendingDown,
-          },
-        ]}
-      />
+      <Nav links={rootLinks} />
       <Separator />
-      <Nav
-        links={[
-          {
-            title: 'ຈັດການຜູ້ໃຊ້',
-            href: '/users',
-            icon: User,
-          },
-          {
-            title: 'ຈັດການຜູ້ບໍລິຈາກ',
-            href: '/donators',
-            icon: Box,
-          },
-          {
-            title: 'ຈັດການປະເພດລາຍຮັບ',
-            href: '/income-categories',
-            icon: AlignRight,
-          },
-          {
-            title: 'ຈັດການປະເພດລາຍຈ່າຍ',
-            href: '/expense-categories',
-            icon: AlignLeft,
-          },
-          {
-            title: 'ຈັດການບັນຊີ',
-            href: '/accounts',
-            icon: CreditCard,
-          },
-          {
-            title: 'ຈັດການສະກຸນເງິນ',
-            href: '/currencies',
-            icon: DollarSign,
-          },
-        ]}
-      />
-      <Separator />
-      <Nav
-        links={[
-          {
-            title: 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',
-            href: '/pending',
-            icon: Clock,
-          },
-          {
-            title: 'ລາຍການທີ່ອະນຸມັດແລ້ວ',
-            href: '/approved',
-            icon: CheckCircle,
-          },
-          {
-            title: 'ລາຍການທີ່ຖືກປະຕິເສດ',
-            href: '/rejected',
-            icon: XCircle,
-          },
-        ]}
-      />
-      <Separator />
+      {user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' ? (
+        <>
+          <Nav
+            links={[
+              {
+                title: 'ຈັດການຜູ້ໃຊ້',
+                href: '/users',
+                icon: User,
+              },
+              {
+                title: 'ຈັດການຜູ້ບໍລິຈາກ',
+                href: '/donators',
+                icon: Box,
+              },
+              {
+                title: 'ຈັດການປະເພດລາຍຮັບ',
+                href: '/income-categories',
+                icon: AlignRight,
+              },
+              {
+                title: 'ຈັດການປະເພດລາຍຈ່າຍ',
+                href: '/expense-categories',
+                icon: AlignLeft,
+              },
+              {
+                title: 'ຈັດການບັນຊີ',
+                href: '/accounts',
+                icon: CreditCard,
+              },
+              {
+                title: 'ຈັດການສະກຸນເງິນ',
+                href: '/currencies',
+                icon: DollarSign,
+              },
+            ]}
+          />
+          <Separator />
+        </>
+      ) : null}
+      {user.role === 'HOLDER' || user.role === 'SUPER_ADMIN' ? (
+        <>
+          <Nav
+            links={[
+              {
+                title: 'ລາຍການທີ່ລໍຖ້າອະນຸມັດ',
+                href: '/pending',
+                icon: Clock,
+              },
+              {
+                title: 'ລາຍການທີ່ອະນຸມັດແລ້ວ',
+                href: '/approved',
+                icon: CheckCircle,
+              },
+              {
+                title: 'ລາຍການທີ່ຖືກປະຕິເສດ',
+                href: '/rejected',
+                icon: XCircle,
+              },
+            ]}
+          />
+          <Separator />
+        </>
+      ) : null}
       <Nav
         links={[
           {

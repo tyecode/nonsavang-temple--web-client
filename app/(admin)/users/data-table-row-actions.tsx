@@ -309,7 +309,7 @@ export function DataTableRowActions<TData extends User>({
                       </FormControl>
                     </PopoverTrigger>
                     <FormMessage />
-                    <PopoverContent className='w-[390px] p-0'>
+                    <PopoverContent className='w-[375px] p-0'>
                       <Command>
                         <CommandGroup className='max-h-[200px] overflow-y-scroll'>
                           {USER_TITLES.map(
@@ -386,28 +386,30 @@ export function DataTableRowActions<TData extends User>({
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
-                          disabled={isPending}
+                          disabled={isPending || field.value === 'SUPER_ADMIN'}
                           variant='outline'
                           role='combobox'
                           aria-expanded={openRole}
                           className='w-full justify-between'
                         >
-                          {field.value
-                            ? USER_ROLES.find(
-                                (role: { id: number; title: string }) =>
-                                  role.title === field.value
-                              )?.title
-                            : 'ເລືອກສະກຸນເງິນ...'}
+                          {field.value === 'SUPER_ADMIN'
+                            ? 'Super Admin'
+                            : field.value
+                              ? USER_ROLES.find(
+                                  (role: { id: number; title: string }) =>
+                                    role.title === field.value
+                                )?.label
+                              : 'ເລືອກສະກຸນເງິນ...'}
                           <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <FormMessage />
-                    <PopoverContent className='w-[180px] p-0'>
+                    <PopoverContent className='w-[375px] p-0'>
                       <Command>
                         <CommandGroup className='max-h-[200px] overflow-y-scroll'>
                           {USER_ROLES.map(
-                            (role: { id: number; title: string }) => (
+                            (role: { id: number; title: string, label: string }) => (
                               <CommandItem
                                 key={role.id}
                                 value={role.title}
@@ -416,7 +418,7 @@ export function DataTableRowActions<TData extends User>({
                                   setOpenRole(false)
                                 }}
                               >
-                                {role.title}
+                                {role.label}
                                 <CheckIcon
                                   className={cn(
                                     'ml-auto h-4 w-4',
