@@ -19,7 +19,11 @@ import {
 export function AccountSelector({
   onStateChange,
 }: {
-  onStateChange?: (state: { id: string; balance: number }) => void
+  onStateChange?: (state: {
+    id: string
+    balance: number
+    currency: string
+  }) => void
 }) {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState<string>('')
@@ -53,9 +57,10 @@ export function AccountSelector({
         onStateChange({
           id: selectedAccount.id,
           balance: selectedAccount.balance,
+          currency: selectedAccount.currency.symbol,
         })
       } else {
-        onStateChange({ id: '', balance: 0 })
+        onStateChange({ id: '', balance: 0, currency: '#' })
       }
     }
   }, [accounts, onStateChange, value])

@@ -31,15 +31,24 @@ import LatestTransactionSkeleton from '../components/latest-transaction-skeleton
 import PieChartSkeleton from '../components/pie-chart-skeleton'
 import { useTransactionStore } from '@/stores/useTransactionStore'
 import { Box, CreditCard, TrendingDown, TrendingUp } from 'lucide-react'
+import { BarChart, PieChart } from 'react-feather'
+import { DatePickerWithRange } from '@/components/date-picker-with-range'
 
 export default function Overview() {
-  const [selectedAccount, setSelectedAccount] = useState({ id: '', balance: 0 })
-  const [currencySymbol, setCurrencySymbol] = useState<string>('')
+  const [selectedAccount, setSelectedAccount] = useState({
+    id: '',
+    balance: 0,
+    currency: '#',
+  })
   const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([])
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([])
+  const [filteredDonators, setFilteredDonators] = useState<Income[]>([])
+  const [dateRange, setDateRange] = useState<any>(null)
+  const [totalIncomeAmount, setTotalIncomeAmount] = useState(0)
+  const [totalExpenseAmount, setTotalExpenseAmount] = useState(0)
 
-  const donators = useDonatorStore((state) => state.donators)
-  const setDonators = useDonatorStore((state) => state.setDonators)
+  // const donators = useDonatorStore((state) => state.donators)
+  // const setDonators = useDonatorStore((state) => state.setDonators)
 
   const incomes = useIncomeStore((state) => state.incomes)
   const setIncomes = useIncomeStore((state) => state.setIncomes)
@@ -65,50 +74,72 @@ export default function Overview() {
   }, [fetchExpense])
 
   useEffect(() => {
-    if (donators.length > 0) return
-    setDonators(fetchDonator as Donator[])
-  }, [fetchDonator])
+    const filterTransactions = (transactions: (Income | Expense)[]) => {
+      return transactions.filter((transaction) => {
+        const createdAt = new Date(transaction.created_at).getTime()
+        const from = dateRange?.from
+          ? new Date(dateRange.from).getTime()
+          : -Infinity
+        const to = dateRange?.to
+          ? new Date(dateRange.to).setHours(23, 59, 59, 999)
+          : Infinity
 
-  useEffect(() => {
-    if (selectedAccount.id) {
-      const incomeResult = incomes.filter(
-        (income: Income) => income.account.id === selectedAccount.id
-      )
-      setFilteredIncomes(incomeResult)
-
-      const expenseResult = expenses.filter(
-        (expense: Expense) => expense.account.id === selectedAccount.id
-      )
-      setFilteredExpenses(expenseResult)
-
-      if (expenseResult.length > 0 && expenseResult[0].currency) {
-        setCurrencySymbol(expenseResult[0].currency.symbol)
-      }
+        return (
+          transaction.account.id === selectedAccount.id &&
+          createdAt >= from &&
+          createdAt <= to &&
+          transaction.status === 'APPROVED'
+        )
+      })
     }
-  }, [incomes, expenses, selectedAccount.id])
 
-  const handleAccountChange = (newState: { id: string; balance: number }) => {
+    if (selectedAccount.id && dateRange?.from && dateRange?.to) {
+      const filteredIncomes = filterTransactions(incomes)
+      const filteredDonators = filteredIncomes.filter(
+        (item: any) => item.donator !== null
+      )
+      setFilteredIncomes(filteredIncomes as Income[])
+      setFilteredDonators(filteredDonators as Income[])
+
+      const filteredExpenses = filterTransactions(expenses)
+      setFilteredExpenses(filteredExpenses as Expense[])
+    } else {
+      setFilteredIncomes([])
+      setFilteredExpenses([])
+    }
+  }, [incomes, expenses, selectedAccount.id, dateRange])
+
+  const handleAccountChange = (newState: {
+    id: string
+    balance: number
+    currency: string
+  }) => {
     if (
       newState.id !== selectedAccount.id ||
-      newState.balance !== selectedAccount.balance
+      newState.balance !== selectedAccount.balance ||
+      newState.currency !== selectedAccount.currency
     ) {
       setSelectedAccount(newState)
     }
   }
 
-  const handleDatePickerChange = (state: any) => {
-    console.log(state)
+  const handleStateChange = (state: any) => {
+    setDateRange(state)
   }
 
-  const totalIncomeAmount = filteredIncomes.reduce(
-    (acc, income) => acc + income.amount,
-    0
-  )
+  useEffect(() => {
+    const totalIncome = filteredIncomes.reduce(
+      (acc, income) => acc + income.amount,
+      0
+    )
+    setTotalIncomeAmount(totalIncome)
 
-  const totalExpenseAmount = filteredExpenses.reduce(
-    (acc, expense) => acc + expense.amount,
-    0
-  )
+    const totalExpense = filteredExpenses.reduce(
+      (acc, expense) => acc + expense.amount,
+      0
+    )
+    setTotalExpenseAmount(totalExpense)
+  }, [filteredIncomes, filteredExpenses])
 
   const typedIncomes = filteredIncomes.map((income) => ({
     ...income,
@@ -185,7 +216,7 @@ export default function Overview() {
           <AccountSelector onStateChange={handleAccountChange} />
         </div>
         <div className='hidden items-center space-x-2 md:flex'>
-          <CalendarDateRangePicker onStateChange={handleDatePickerChange} />
+          <CalendarDateRangePicker onStateChange={handleStateChange} />
         </div>
       </div>
       <Tabs defaultValue='overview' className='space-y-4'>
@@ -202,8 +233,8 @@ export default function Overview() {
               icon={TrendingUp}
               amount={
                 totalIncomeAmount > 0
-                  ? `+${currencySymbol}${totalIncomeAmount.toLocaleString()}`
-                  : `${currencySymbol}${totalIncomeAmount}`
+                  ? `+${selectedAccount.currency}${totalIncomeAmount.toLocaleString()}`
+                  : `${selectedAccount.currency}${totalIncomeAmount}`
               }
               className={
                 totalIncomeAmount > 0 ? 'text-success' : 'text-foreground'
@@ -214,47 +245,51 @@ export default function Overview() {
               title='ລາຍຈ່າຍ'
               icon={TrendingDown}
               amount={
-                totalExpenseAmount > 0
-                  ? `-${currencySymbol}${totalExpenseAmount.toLocaleString()}`
-                  : `${currencySymbol}${totalExpenseAmount}`
+                totalExpenseAmount < 0
+                  ? `-${selectedAccount.currency}${Math.abs(totalExpenseAmount).toLocaleString()}`
+                  : `${selectedAccount.currency}${totalExpenseAmount}`
               }
               className={
-                totalExpenseAmount > 0 ? 'text-danger' : 'text-foreground'
+                totalExpenseAmount < 0 ? 'text-danger' : 'text-foreground'
               }
               isPending={expensePending}
             />
             <TotalStatusCard
               title='ຍອດເງິນໃນບັນຊີ'
               icon={CreditCard}
-              amount={`${currencySymbol}${selectedAccount.balance.toLocaleString()}`}
+              amount={`${selectedAccount.currency}${selectedAccount.balance.toLocaleString()}`}
               isPending={incomePending && expensePending}
             />
             <TotalStatusCard
               title='ຈຳນວນຜູ້ບໍລິຈາກ'
               icon={Box}
-              amount={`${donators?.length}` || '0'}
+              amount={`${filteredDonators?.length}` || '0'}
               isPending={donatorPending}
             />
           </div>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7'>
             <Card className='col-span-4'>
-              <Tabs defaultValue='income'>
+              <Tabs defaultValue='pie-chart'>
                 <CardHeader>
                   <CardTitle>
                     <TabsList>
-                      <TabsTrigger value='income'>ລາຍຮັບ</TabsTrigger>
-                      <TabsTrigger value='expense'>ລາຍຈ່າຍ</TabsTrigger>
+                      <TabsTrigger value='pie-chart'>
+                        <PieChart size={20} />
+                      </TabsTrigger>
+                      <TabsTrigger value='bar-chart'>
+                        <BarChart size={20} />
+                      </TabsTrigger>
                     </TabsList>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <TabsContent value='income' className='space-y-4'>
+                  <TabsContent value='pie-chart' className='space-y-4'>
                     {incomePending || expensePending ? (
                       <PieChartSkeleton />
                     ) : summedIncomes && summedIncomes.length > 0 ? (
                       <IncomeChart
                         data={summedIncomes}
-                        currency={currencySymbol}
+                        currency={selectedAccount.currency}
                       />
                     ) : (
                       <div className='flex-center mt-3 h-28 w-full rounded-md border border-dashed text-foreground/50'>
@@ -262,13 +297,13 @@ export default function Overview() {
                       </div>
                     )}
                   </TabsContent>
-                  <TabsContent value='expense' className='space-y-4'>
+                  <TabsContent value='bar-chart' className='space-y-4'>
                     {incomePending || expensePending ? (
                       <PieChartSkeleton />
                     ) : summedExpenses && summedExpenses.length > 0 ? (
                       <ExpenseChart
                         data={summedExpenses}
-                        currency={currencySymbol}
+                        currency={selectedAccount.currency}
                       />
                     ) : (
                       <div className='flex-center mt-3 h-28 w-full rounded-md border border-dashed text-foreground/50'>
@@ -312,8 +347,8 @@ export default function Overview() {
                           )}
                         >
                           {transaction.type === 'income'
-                            ? `+${currencySymbol}${transaction.amount.toLocaleString()}`
-                            : `-${currencySymbol}${transaction.amount.toLocaleString()}`}
+                            ? `+${selectedAccount.currency}${Math.abs(transaction.amount).toLocaleString()}`
+                            : `-${selectedAccount.currency}${Math.abs(transaction.amount).toLocaleString()}`}
                         </div>
                       </div>
                     </div>
