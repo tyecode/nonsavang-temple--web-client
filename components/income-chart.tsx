@@ -12,8 +12,17 @@ type IncomeChartProps = {
 }
 
 export default function IncomeChart({ data, currency }: IncomeChartProps) {
-  const valueFormatter = (number: number) =>
-    `+${currency}${Intl.NumberFormat('us').format(number).toString()}`
+  const valueFormatter = (number: number) => {
+    const formattedNumber = Intl.NumberFormat('us')
+      .format(Math.abs(number))
+      .toString()
+    const sign = number < 0 ? '-' : '+'
+    return `${sign}${currency}${formattedNumber}`
+  }
+  const totalAmount = data.reduce(
+    (total, item) => total + Math.abs(item.amount),
+    0
+  )
 
   return (
     <>
@@ -32,11 +41,10 @@ export default function IncomeChart({ data, currency }: IncomeChartProps) {
         <div className='flex-center h-full w-full flex-col'>
           <div className='flex flex-col gap-1'>
             {data.map((item, index) => (
-              <Legend
-                key={index}
-                categories={[item.name]}
-                colors={[item.color]}
-              />
+              <div key={index} className='flex items-center'>
+                <Legend categories={[item.name]} colors={[item.color]} />
+                <span className='text-center'>{`(${((Math.abs(item.amount) / totalAmount) * 100).toFixed(0)}%)`}</span>
+              </div>
             ))}
           </div>
         </div>

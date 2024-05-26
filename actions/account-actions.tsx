@@ -1,16 +1,9 @@
 'use server'
 
-import {
-  Account,
-  AccountCreationData,
-  AccountModificationData,
-} from '@/types/account'
-import { createClient } from '@supabase/supabase-js'
+import { AccountCreationData, AccountModificationData } from '@/types/account'
+import { createClient } from '@/utils/supabase/client'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!
-)
+const supabase = createClient()
 
 export const getAccount = async () => {
   try {

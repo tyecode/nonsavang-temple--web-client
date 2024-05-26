@@ -77,6 +77,7 @@ export function DataTableRowActions<TData extends Income>({
         <DropdownMenuItem
           onClick={() => handleDeleteIncome(current.id)}
           className='text-danger transition-none focus:text-danger'
+          disabled={current.status === 'APPROVED'}
         >
           ລຶບຂໍ້ມູນ
         </DropdownMenuItem>

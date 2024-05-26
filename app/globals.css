@@ -53,21 +53,70 @@
   }
 }
 
+
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
+
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: hsl(var(--background));
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: hsl(var(--muted));
+      border-radius: 50px;
+    }
   }
+
   body {
-    @apply flex h-screen w-screen overflow-hidden bg-background font-noto-lao text-foreground;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Noto Sans Lao', 'sans-serif';
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--background));
   }
+
   img {
     user-select: none;
     -webkit-user-drag: none;
     -moz-user-select: none;
   }
+
   th, td {
-    @apply !whitespace-nowrap;
+    white-space: nowrap !important;
   }
+}
+
+@media print {
+  html, body {
+    height: initial !important;
+    overflow: initial !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+  
+  table {
+    width: 100vw !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border-width: 1px 0 0 1px !important;
+  }
+  
+  th, td {
+    border: 1px solid hsl(var(--border)) !important;
+    border-width: 0 1px 1px 0 !important;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 10mm;
 }
 
 @layer components {

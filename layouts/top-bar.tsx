@@ -47,16 +47,16 @@ const TopBar = () => {
   }, [pathname, setUser, user])
 
   return (
-    <section className='sticky top-0 z-50 w-full border bg-background'>
-      <div className='container flex h-20 items-center justify-between md:container'>
-        {pathname !== '/' && pathname !== '/dashboard' ? (
-          <span className='text-2xl font-bold capitalize text-foreground/80'>
-            {getTextFromPathname(pathname)}
+    <section className='sticky top-0 z-50 w-full border-b bg-background'>
+      <div className='container flex h-16 items-center justify-between md:container'>
+        {pathname !== '/' ? (
+          <span className='text-xl font-bold capitalize text-foreground/80'>
+            {pathname && getTextFromPathname(pathname)}
           </span>
         ) : (
-          <div className='flex flex-col text-xs font-normal capitalize'>
-            ຍິນດີຕ້ອນຮັບ,{' '}
-            <span className='text-xl font-semibold'>
+          <div className='flex flex-col'>
+            <span className='-mb-1 text-xs font-medium'>ຍິນດີຕ້ອນຮັບ,</span>
+            <span className='text-lg font-semibold'>
               {!isPending ? (
                 <span>{user.display_name}</span>
               ) : (

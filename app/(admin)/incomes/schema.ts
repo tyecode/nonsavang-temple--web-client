@@ -14,8 +14,11 @@ export const incomeSchema = z.object({
     })
     .or(z.number().min(1, 'ກະລຸນາປ້ອນຈຳນວນເງິນ.')),
   currency: z.string().min(1, 'ກະລຸນາເລືອກສະກຸນເງິນ.'),
-  donator: z.string().refine((value) => value !== 'donate', {
-    message: 'ກະລຸນາເລືອກຜູ້ບໍລິຈາກ.',
-  }),
+  donator: z
+    .string()
+    .nullable()
+    .refine((value) => value !== 'donate', {
+      message: 'ກະລຸນາເລືອກຜູ້ບໍລິຈາກ.',
+    }),
   remark: z.string(),
 })

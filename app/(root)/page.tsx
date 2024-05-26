@@ -1,10 +1,10 @@
-import OverviewPage from '@/components/pages/overview-page'
+import Overview from '@/components/pages/overview'
 
 const HomePage = () => {
   return (
-    <>
-      <OverviewPage />
-    </>
+    <div className='flex flex-grow'>
+      <Overview />
+    </div>
   )
 }
 

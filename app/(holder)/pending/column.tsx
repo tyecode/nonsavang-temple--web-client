@@ -3,12 +3,10 @@
 import { ColumnDef } from '@tanstack/react-table'
 
 import { Transaction } from '@/types'
-
 import { formatDate } from '@/lib/date-format'
-
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from '@/components/ui/use-toast'
+import { TypeBadge } from '@/components/badges'
 
 import { DataTableRowActions } from './data-table-row-actions'
 
@@ -60,14 +58,7 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: 'transaction_type',
     header: 'ປະເພດລາຍການ',
     cell: ({ row }) => (
-      <Badge
-        className='flex-center w-16'
-        variant={
-          row.original.transaction_type === 'income' ? 'success' : 'danger'
-        }
-      >
-        {row.original.transaction_type === 'income' ? 'ລາຍຮັບ' : 'ລາຍຈ່າຍ'}
-      </Badge>
+      <TypeBadge status={row.original.transaction_type.toUpperCase()} />
     ),
   },
   {

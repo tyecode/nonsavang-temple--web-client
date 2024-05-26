@@ -1,12 +1,9 @@
 'use server'
 
 import { DonatorCreationData, DonatorModificationData } from '@/types/donator'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/utils/supabase/client'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!
-)
+const supabase = createClient()
 
 export const getDonator = async (id?: string) => {
   try {

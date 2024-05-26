@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Spinner } from '@nextui-org/react'
+import { LogOut, Loader2 } from 'lucide-react'
 
 import { User } from '@/types/user'
 import { handleLogout } from '@/actions/auth-actions'
+import { CreateAvatar } from '@/lib/create-avatar'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,9 +15,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { IconsCollection } from '@/components/icons/icons-collection'
-
-import { CreateAvatar } from '@/lib/create-avatar'
 
 const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -37,7 +35,7 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
           <Skeleton className='h-10 w-10 rounded-full' />
         )}
       </PopoverTrigger>
-      <PopoverContent className='flex-center mx-6 my-2 w-80 flex-col gap-4 p-6'>
+      <PopoverContent className='flex-center mx-6 my-2 w-80 flex-col gap-4 p-4'>
         <div className='flex-center flex-col gap-4 py-4'>
           {!loading ? (
             <CreateAvatar
@@ -63,34 +61,28 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
             ) : (
               <Skeleton className='h-4 w-48' />
             )}
+            {!loading ? (
+              <p className='text-xs mt-1 font-normal text-foreground/60'>
+                {user.role}
+              </p>
+            ) : (
+              <Skeleton className='h-4 mt-1 w-24' />
+            )}
           </div>
         </div>
         <ul className='flex w-full flex-col border-t pt-4'>
-          {/* <li className={user?.role === 'ADMIN' ? 'block' : 'hidden'}>
-            <Button
-              variant={'ghost'}
-              className='w-full justify-start gap-4 text-sm font-normal'
-              disabled={isPending}
-              onClick={() => {
-                setIsOpen(false)
-                router.push('/dashboard/users')
-              }}
-            >
-              <IconsCollection icon={'grid-icon'} />
-              ໜ້າຈັດການ
-            </Button>
-          </li> */}
           <li>
             <Button
               variant={'ghost'}
-              className='w-full justify-start gap-4 text-sm font-normal text-danger hover:text-danger'
+              size={'sm'}
+              className='w-full justify-start text-sm font-normal text-danger hover:text-danger'
               onClick={() => startTransition(() => handleLogout())}
               disabled={isPending}
             >
               {!isPending ? (
-                <IconsCollection icon={'logout-icon'} />
+                <LogOut className='mr-2 h-4 w-4' />
               ) : (
-                <Spinner size='sm' color='danger' labelColor='danger' />
+                <Loader2 className='mr-2 h-4 w-4 animate-spin text-danger' />
               )}
               ອອກຈາກລະບົບ
             </Button>

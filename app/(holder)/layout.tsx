@@ -1,7 +1,6 @@
 'use client'
 
-import LeftBar from '@/components/left-bar'
-import TopBar from '@/components/top-bar'
+import { LeftBar, TopBar } from '@/layouts'
 import { Toaster } from '@/components/ui/toaster'
 
 const HolderPageLayout = ({ children }: { children: React.ReactNode }) => {

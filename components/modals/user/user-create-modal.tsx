@@ -141,7 +141,7 @@ const UserCreateModal = () => {
                       </FormControl>
                     </PopoverTrigger>
                     <FormMessage />
-                    <PopoverContent className='w-[390px] p-0'>
+                    <PopoverContent className='w-[375px] p-0'>
                       <Command>
                         <CommandGroup className='max-h-[200px] overflow-y-scroll'>
                           {USER_TITLES.map(
