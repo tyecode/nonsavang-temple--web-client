@@ -1,4 +1,4 @@
-import Overview from '@/pages/overview'
+import Overview from '@/components/pages/overview'
 
 const HomePage = () => {
   return (

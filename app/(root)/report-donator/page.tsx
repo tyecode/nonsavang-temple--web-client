@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
 import { Button } from '@/components/ui/button'
-import { DonatorReport } from '@/pages/donator-report'
+import { DonatorReport } from '@/components/pages/donator-report'
 import { AccountSelector } from '@/components/account-selector'
 import { CalendarDateRangePicker } from '@/components/date-range-picker'
 import { getIncome } from '@/actions/income-actions'

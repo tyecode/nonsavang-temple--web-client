@@ -12,18 +12,14 @@ import {
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
-import {
-  useExpenseStore,
-  useIncomeStore,
-} from '@/stores'
+import { useExpenseStore, useIncomeStore } from '@/stores'
 import { Donator, Expense, Income, User } from '@/types'
 import { useEffect, useState } from 'react'
-import IncomeChart from '../components/income-chart'
+import IncomeChart from '../income-chart'
 import { useFetchDonator, useFetchExpense, useFetchIncome } from '@/hooks'
 
-import LatestTransactionSkeleton from '../components/latest-transaction-skeleton'
-import PieChartSkeleton from '../components/pie-chart-skeleton'
-import { useTransactionStore } from '@/stores/useTransactionStore'
+import LatestTransactionSkeleton from '../latest-transaction-skeleton'
+import PieChartSkeleton from '../pie-chart-skeleton'
 import { Box, CreditCard, TrendingDown, TrendingUp } from 'lucide-react'
 import { BarChart, PieChart } from 'react-feather'
 

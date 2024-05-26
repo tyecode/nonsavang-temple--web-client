@@ -5,7 +5,7 @@ import { useReactToPrint } from 'react-to-print'
 
 import { Button } from '@/components/ui/button'
 import { getAccount } from '@/actions/account-actions'
-import { AccountReport } from '@/pages/account-report'
+import { AccountReport } from '@/components/pages/account-report'
 
 const ReportDonatorPage = () => {
   const [accountData, setAccountData] = useState<any[]>([])

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
 import { Button } from '@/components/ui/button'
-import { IncomeExpenseReport } from '@/pages/income-expense-report'
+import { IncomeExpenseReport } from '@/components/pages/income-expense-report'
 import { getTransactions } from '@/actions/transaction-action'
 import { AccountSelector } from '@/components/account-selector'
 import { CalendarDateRangePicker } from '@/components/date-range-picker'
