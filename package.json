@@ -1,4 +1,13 @@
 {
+  "name": "nonsavang-temple--web-client",
+  "version": "1.0.0",
+  "description": "Nonsavang Temple Website for Managing Expenses and Incomes",
+  "author": "Sengphachanh Chanthavong <sengphachanh.dev@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tyecode/nonsavang-temple--web-client"
+  },
+  "license": "MIT",
   "private": false,
   "scripts": {
     "dev": "next dev -p 8000",
