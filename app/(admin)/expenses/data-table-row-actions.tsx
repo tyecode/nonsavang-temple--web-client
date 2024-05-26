@@ -92,6 +92,7 @@ export function DataTableRowActions<TData extends Expense>({
         <DropdownMenuItem
           onClick={() => handleDeleteExpense(current.id)}
           className='text-danger transition-none focus:text-danger'
+          disabled={current.status === 'APPROVED'}
         >
           ລຶບຂໍ້ມູນ
         </DropdownMenuItem>

@@ -5,9 +5,7 @@ import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 
 import { Account } from '@/types/account'
 import { cn } from '@/lib/utils'
-import { formatDate } from '@/lib/date-format'
 import { getAccount } from '@/actions/account-actions'
-import { useAccountStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {

@@ -108,6 +108,16 @@ export function DataTable<TData, TValue>({
   }, [table, pagination])
 
   const handleDeleteSelected = async (items: Expense[]) => {
+    const isApproved = items.map((item) => item.status).includes('APPROVED')
+
+    if (isApproved) {
+      toast({
+        variant: 'destructive',
+        description: 'ມີຂໍ້ຜິດພາດ! ບໍ່ສາມາດລຶບຂໍ້ມູນທີ່ຖືກຍອມຮັບແລ້ວໄດ້.',
+      })
+      return
+    }
+    
     startTransition(async () => {
       try {
         const res = await Promise.all(

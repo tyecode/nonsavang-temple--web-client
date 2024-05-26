@@ -4,12 +4,9 @@ import {
   CurrencyCreationData,
   CurrencyModificationData,
 } from '@/types/currency'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/utils/supabase/client'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!
-)
+const supabase = createClient()
 
 export const getCurrency = async (id?: string) => {
   try {
