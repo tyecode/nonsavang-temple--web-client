@@ -13,26 +13,19 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import {
-  useDonatorStore,
   useExpenseStore,
   useIncomeStore,
-  useUserStore,
 } from '@/stores'
 import { Donator, Expense, Income, User } from '@/types'
 import { useEffect, useState } from 'react'
 import IncomeChart from '../components/income-chart'
 import { useFetchDonator, useFetchExpense, useFetchIncome } from '@/hooks'
-import {
-  INCOME_COLOR_PALETTE,
-  EXPENSE_COLOR_PALETTE,
-} from '@/constants/color-palette'
-import ExpenseChart from '../components/expense-chart'
+
 import LatestTransactionSkeleton from '../components/latest-transaction-skeleton'
 import PieChartSkeleton from '../components/pie-chart-skeleton'
 import { useTransactionStore } from '@/stores/useTransactionStore'
 import { Box, CreditCard, TrendingDown, TrendingUp } from 'lucide-react'
 import { BarChart, PieChart } from 'react-feather'
-import { DatePickerWithRange } from '@/components/date-picker-with-range'
 
 export default function Overview() {
   const [selectedAccount, setSelectedAccount] = useState({
@@ -47,21 +40,14 @@ export default function Overview() {
   const [totalIncomeAmount, setTotalIncomeAmount] = useState(0)
   const [totalExpenseAmount, setTotalExpenseAmount] = useState(0)
 
-  // const donators = useDonatorStore((state) => state.donators)
-  // const setDonators = useDonatorStore((state) => state.setDonators)
-
   const incomes = useIncomeStore((state) => state.incomes)
   const setIncomes = useIncomeStore((state) => state.setIncomes)
 
   const expenses = useExpenseStore((state) => state.expenses)
   const setExpenses = useExpenseStore((state) => state.setExpenses)
 
-  const users = useUserStore((state) => state.users)
-  const setUsers = useUserStore((state) => state.setUsers)
-
   const { data: fetchIncome, loading: incomePending } = useFetchIncome()
   const { data: fetchExpense, loading: expensePending } = useFetchExpense()
-  const { data: fetchDonator, loading: donatorPending } = useFetchDonator()
 
   useEffect(() => {
     if (incomes.length > 0) return
@@ -160,55 +146,6 @@ export default function Overview() {
     )
     .slice(0, 5)
 
-  const summedIncomes = filteredIncomes
-    .reduce((acc: { name: string; amount: number }[], income) => {
-      const existingCategory = acc.find(
-        (item) => item.name === income.category.name
-      )
-
-      if (existingCategory) {
-        existingCategory.amount += income.amount
-      } else {
-        acc.push({
-          name: income.category.name,
-          amount: Number(income.amount),
-        })
-      }
-
-      return acc
-    }, [])
-    .sort((a, b) => b.amount - a.amount)
-    .map((income, index) => ({
-      ...income,
-      color: INCOME_COLOR_PALETTE[index % INCOME_COLOR_PALETTE.length],
-    }))
-
-  const summedExpenses = filteredExpenses
-    .reduce((acc: { name: string; amount: number }[], expense) => {
-      const existingCategory = acc.find(
-        (item) => item.name === expense.category.name
-      )
-
-      if (existingCategory) {
-        existingCategory.amount += expense.amount
-      } else {
-        acc.push({
-          name: expense.category.name,
-          amount: Number(expense.amount),
-        })
-      }
-
-      return acc
-    }, [])
-    .sort((a, b) => b.amount - a.amount)
-    .map((expense, index) => ({
-      ...expense,
-      color: EXPENSE_COLOR_PALETTE[index % EXPENSE_COLOR_PALETTE.length],
-    }))
-
-  console.log(fetchIncome)
-  console.log(summedIncomes)
-
   return (
     <div className='flex-1 space-y-4 p-4 pt-6 md:p-8'>
       <div className='flex items-center justify-between'>
@@ -264,7 +201,7 @@ export default function Overview() {
               title='ຈຳນວນຜູ້ບໍລິຈາກ'
               icon={Box}
               amount={`${filteredDonators?.length}` || '0'}
-              isPending={donatorPending}
+              isPending={incomePending}
             />
           </div>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7'>
@@ -276,7 +213,7 @@ export default function Overview() {
                       <TabsTrigger value='pie-chart'>
                         <PieChart size={20} />
                       </TabsTrigger>
-                      <TabsTrigger value='bar-chart'>
+                      <TabsTrigger disabled value='bar-chart'>
                         <BarChart size={20} />
                       </TabsTrigger>
                     </TabsList>
@@ -286,31 +223,32 @@ export default function Overview() {
                   <TabsContent value='pie-chart' className='space-y-4'>
                     {incomePending || expensePending ? (
                       <PieChartSkeleton />
-                    ) : summedIncomes && summedIncomes.length > 0 ? (
+                    ) : totalIncomeAmount > 0 || totalExpenseAmount > 0 ? (
                       <IncomeChart
-                        data={summedIncomes}
+                        data={[
+                          {
+                            name: 'ລາຍຮັບ',
+                            amount: totalIncomeAmount,
+                            color: 'green',
+                          },
+                          {
+                            name: 'ລາຍຈ່າຍ',
+                            amount: totalExpenseAmount,
+                            color: 'red',
+                          },
+                        ]}
                         currency={selectedAccount.currency}
                       />
                     ) : (
                       <div className='flex-center mt-3 h-28 w-full rounded-md border border-dashed text-foreground/50'>
-                        ບໍ່ມີຂໍ້ມູນລາຍຮັບ
+                        ບໍ່ມີຂໍ້ມູນລາຍຮັບ-ລາຍຈ່າຍ
                       </div>
                     )}
                   </TabsContent>
-                  <TabsContent value='bar-chart' className='space-y-4'>
-                    {incomePending || expensePending ? (
-                      <PieChartSkeleton />
-                    ) : summedExpenses && summedExpenses.length > 0 ? (
-                      <ExpenseChart
-                        data={summedExpenses}
-                        currency={selectedAccount.currency}
-                      />
-                    ) : (
-                      <div className='flex-center mt-3 h-28 w-full rounded-md border border-dashed text-foreground/50'>
-                        ບໍ່ມີຂໍ້ມູນລາຍຈ່າຍ
-                      </div>
-                    )}
-                  </TabsContent>
+                  <TabsContent
+                    value='bar-chart'
+                    className='space-y-4'
+                  ></TabsContent>
                 </CardContent>
               </Tabs>
             </Card>
