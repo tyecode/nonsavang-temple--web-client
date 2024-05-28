@@ -13,10 +13,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { useExpenseStore, useIncomeStore } from '@/stores'
-import { Donator, Expense, Income, User } from '@/types'
+import { Expense, Income } from '@/types'
 import { useEffect, useState } from 'react'
 import IncomeChart from '../income-chart'
-import { useFetchDonator, useFetchExpense, useFetchIncome } from '@/hooks'
+import { useFetchExpense, useFetchIncome } from '@/hooks'
 
 import LatestTransactionSkeleton from '../latest-transaction-skeleton'
 import PieChartSkeleton from '../pie-chart-skeleton'
