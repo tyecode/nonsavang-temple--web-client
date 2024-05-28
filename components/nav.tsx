@@ -1,12 +1,13 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 import { LucideIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
 
 interface NavProps {
   links: {
@@ -19,25 +20,32 @@ interface NavProps {
 
 export function Nav({ links }: NavProps) {
   const pathname = usePathname()
+  const router = useRouter()
+
+  useEffect(() => {
+    router.prefetch(pathname)
+  }, [pathname])
 
   return (
     <div className='group flex flex-col gap-4 py-2'>
       <nav className='grid gap-1 px-2'>
         {links.map((link, index) => (
-          <Link
+          <Button
             key={index}
-            href={link.href}
+            variant={'ghost'}
+            size={'sm'}
             className={cn(
-              buttonVariants({ variant: 'ghost', size: 'sm' }),
               pathname === link.href && 'bg-accent',
               'justify-start text-sm'
             )}
-            prefetch={false}
+            onClick={() => {
+              router.push(link.href)
+            }}
           >
             <link.icon className='mr-2 h-4 w-4' />
             {link.title}
             {link.label && <span className='ml-auto'>{link.label}</span>}
-          </Link>
+          </Button>
         ))}
       </nav>
     </div>

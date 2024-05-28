@@ -18,7 +18,6 @@ export const metadata = {
     images: '/og-image.png',
   },
 }
-export const dynamic = 'force-dynamic'
 
 export default function RootLayout({
   children,

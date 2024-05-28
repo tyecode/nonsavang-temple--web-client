@@ -62,11 +62,11 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
               <Skeleton className='h-4 w-48' />
             )}
             {!loading ? (
-              <p className='text-xs mt-1 font-normal text-foreground/60'>
+              <p className='mt-1 text-xs font-normal text-foreground/60'>
                 {user.role}
               </p>
             ) : (
-              <Skeleton className='h-4 mt-1 w-24' />
+              <Skeleton className='mt-1 h-4 w-24' />
             )}
           </div>
         </div>

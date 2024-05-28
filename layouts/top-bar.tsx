@@ -15,21 +15,20 @@ import { useAuthStore } from '@/stores'
 
 const TopBar = () => {
   const [isPending, startTransition] = useTransition()
+  const pathname = usePathname()
+  const cookies = useCookies()
 
   const setUser = useAuthStore((state) => state.setAuth)
   const user = useAuthStore((state) => state.auth)
 
-  const pathname = usePathname()
-  const cookies = useCookies()
+  const cookieName = process.env.NEXT_PUBLIC_SUPABASE_AUTH_COOKIE_NAME!
+  const cookieData = cookies.get(cookieName) ?? ''
+  const session = JSON.parse(cookieData)
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         startTransition(async () => {
-          const cookieName = process.env.NEXT_PUBLIC_SUPABASE_AUTH_COOKIE_NAME!
-          const cookieData = cookies.get(cookieName) ?? ''
-          const session = JSON.parse(cookieData)
-
           if (!session?.user?.id) return
 
           const { data } = await getUser(session.user.id)
@@ -41,10 +40,8 @@ const TopBar = () => {
       }
     }
 
-    if (user.display_name !== undefined) return
-
     fetchUser()
-  }, [pathname, setUser, user])
+  }, [])
 
   return (
     <section className='sticky top-0 z-50 w-full border-b bg-background'>
