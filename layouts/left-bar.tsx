@@ -51,7 +51,7 @@ const LeftBar = () => {
   }
 
   return (
-    <div className='h-screen w-full overflow-y-auto'>
+    <div className='relative h-screen w-full overflow-y-auto'>
       <div className='flex-center mb-4 w-full pt-4'>
         <Image
           src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`}

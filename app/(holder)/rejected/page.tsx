@@ -2,8 +2,7 @@
 
 import { useEffect, useTransition } from 'react'
 
-import { getTransactions } from '@/actions/transaction-action'
-import { usePendingStore, useRejectedTransactionStore } from '@/stores'
+import { useRejectedTransactionStore } from '@/stores'
 
 import { columns } from './column'
 import { DataTable } from './data-table'
@@ -18,37 +17,58 @@ const AdminRejected = () => {
     (state) => state.setTransactions
   )
 
-  const setPending = usePendingStore((state) => state.setPending)
+  const fetchIncomes = async () => {
+    const res = await fetch('/incomes/api', {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+      cache: 'no-store',
+      next: {
+        revalidate: 0,
+      },
+    })
+
+    if (!res.ok) return
+
+    const response = await res.json()
+    return response?.data
+  }
+
+  const fetchExpenses = async () => {
+    const res = await fetch('/expenses/api', {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+      cache: 'no-store',
+      next: {
+        revalidate: 0,
+      },
+    })
+
+    if (!res.ok) return
+
+    const response = await res.json()
+    return response?.data
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getTransactions()
+    startTransition(async () => {
+      const [incomes, expenses] = await Promise.all([
+        fetchIncomes(),
+        fetchExpenses(),
+      ])
 
-        if (res?.error || !res?.data) return
-
-        setTransactions(
-          res.data.filter(
-            (transaction) => transaction.status.toLowerCase() === 'rejected'
-          )
-        )
-      } catch (error) {
-        console.error('Error fetching transactions: ', error)
-      }
-    }
-
-    if (transactions.length > 0) return
-
-    startTransition(() => fetchData())
+      setTransactions(
+        [...incomes, ...expenses].filter((t) => t.status === 'REJECTED')
+      )
+    })
   }, [])
-
-  useEffect(() => {
-    setPending(isPending)
-  }, [isPending])
 
   return (
     <section className='container py-6'>
-      <DataTable columns={columns} data={transactions} />
+      <DataTable columns={columns} data={transactions} isPending={isPending} />
     </section>
   )
 }

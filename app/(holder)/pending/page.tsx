@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 
 import { getTransactions } from '@/actions/transaction-action'
 import { useTransactionStore } from '@/stores/useTransactionStore'
@@ -12,6 +12,7 @@ import {
 
 import { columns } from './column'
 import { DataTable } from './data-table'
+import { Transaction } from '@/types'
 
 const AdminPending = () => {
   const transactions = useTransactionStore((state) => state.transactions)
@@ -23,49 +24,66 @@ const AdminPending = () => {
     (state) => state.setTransactions
   )
 
-  const setPending = usePendingStore((state) => state.setPending)
-
   const [isPending, startTransition] = useTransition()
 
+  const fetchIncomes = async () => {
+    const res = await fetch('/incomes/api', {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+      cache: 'no-store',
+      next: {
+        revalidate: 0,
+      },
+    })
+
+    if (!res.ok) return
+
+    const response = await res.json()
+    return response?.data
+  }
+
+  const fetchExpenses = async () => {
+    const res = await fetch('/expenses/api', {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+      cache: 'no-store',
+      next: {
+        revalidate: 0,
+      },
+    })
+
+    if (!res.ok) return
+
+    const response = await res.json()
+    return response?.data
+  }
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getTransactions()
+    startTransition(async () => {
+      const [incomes, expenses] = await Promise.all([
+        fetchIncomes(),
+        fetchExpenses(),
+      ])
 
-        if (res?.error || !res?.data) return
-
-        setTransactions(
-          res.data.filter(
-            (transaction) => transaction.status.toLowerCase() === 'pending'
-          )
-        )
-        setApprovedTransactions(
-          res.data.filter(
-            (transaction) => transaction.status.toLowerCase() === 'approved'
-          )
-        )
-        setRejectedTransactions(
-          res.data.filter(
-            (transaction) => transaction.status.toLowerCase() === 'rejected'
-          )
-        )
-      } catch (error) {
-        console.error('Error fetching transactions', error)
-      }
-    }
-
-    if (transactions.length > 0) return
-
-    startTransition(() => fetchData())
+      setTransactions(
+        [...incomes, ...expenses].filter((t) => t.status === 'PENDING')
+      )
+      setApprovedTransactions(
+        [...incomes, ...expenses].filter((t) => t.status === 'APPROVED')
+      )
+      setRejectedTransactions(
+        [...incomes, ...expenses].filter((t) => t.status === 'REJECTED')
+      )
+    })
   }, [])
-
-  useEffect(() => {
-    setPending(isPending)
-  }, [isPending])
 
   return (
     <section className='container py-6'>
-      <DataTable columns={columns} data={transactions} />
+      <DataTable columns={columns} data={transactions} isPending={isPending} />
     </section>
   )
 }

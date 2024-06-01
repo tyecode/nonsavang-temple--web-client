@@ -1,22 +1,28 @@
 'use server'
 
 import { sst } from '@/lib/select-string'
-import { Income } from '@/types'
 import { createClient } from '@/utils/supabase/client'
 
 const supabase = createClient()
 
-export async function GET() {
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  const body = await req.json()
+
   const { data, error } = await supabase
-    .from('income')
+    .from('expense')
+    .update(body)
+    .eq('id', params.id)
     .select(
       sst([
         '*',
         'category: category_id (*)',
+        'currency: currency_id (*)',
         'user: user_id (*)',
         'account: account_id (*, currency: currency_id (*))',
-        'currency: currency_id (*)',
-        'donator: donator_id (*)',
+        'drawer: drawer_id (*)',
       ])
     )
 
@@ -25,7 +31,7 @@ export async function GET() {
       {
         success: false,
         message:
-          error?.message || 'Failed to retrieve incomes. Please try again.',
+          error?.message || 'Failed to update expense. Please try again.',
         data: null,
       },
       {
@@ -37,8 +43,8 @@ export async function GET() {
   return Response.json(
     {
       success: true,
-      message: 'Incomes retrieval was successful.',
-      data: data.map((item: any) => ({ ...item, __typename: 'Income' })),
+      message: 'Expense update was successful.',
+      data,
     },
     {
       status: 200,
@@ -46,28 +52,19 @@ export async function GET() {
   )
 }
 
-export async function POST(req: Request) {
-  const body = await req.json()
-
+export async function DELETE({ params }: { params: { id: string } }) {
   const { data, error } = await supabase
-    .from('income')
-    .insert(body)
-    .select(
-      sst([
-        '*',
-        'category: category_id (*)',
-        'user: user_id (*)',
-        'account: account_id (*, currency: currency_id (*))',
-        'currency: currency_id (*)',
-        'donator: donator_id (*)',
-      ])
-    )
+    .from('expense')
+    .delete()
+    .eq('id', params.id)
+    .select()
 
   if (error || !data) {
     return Response.json(
       {
         success: false,
-        message: error?.message || 'Failed to create income. Please try again.',
+        message:
+          error?.message || 'Failed to delete expense. Please try again.',
         data: null,
       },
       {
@@ -79,7 +76,7 @@ export async function POST(req: Request) {
   return Response.json(
     {
       success: true,
-      message: 'Income creation was successful.',
+      message: 'Expense deletion was successful.',
       data,
     },
     {

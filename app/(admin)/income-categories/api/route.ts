@@ -1,14 +1,11 @@
 'use server'
 
-import { sst } from '@/lib/select-string'
 import { createClient } from '@/utils/supabase/client'
 
 const supabase = createClient()
 
 export async function GET() {
-  const { data, error } = await supabase
-    .from('account')
-    .select(sst(['*', 'user: user_id (*)', 'currency: currency_id (*)']))
+  const { data, error } = await supabase.from('income_category').select('*')
 
   if (error || !data) {
     return Response.json(
@@ -26,7 +23,7 @@ export async function GET() {
   return Response.json(
     {
       success: true,
-      message: 'Accounts retrieval was successful.',
+      message: 'Income categories retrieval was successful.',
       data,
     },
     {

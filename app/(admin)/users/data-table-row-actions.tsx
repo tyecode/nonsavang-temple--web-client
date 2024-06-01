@@ -409,7 +409,11 @@ export function DataTableRowActions<TData extends User>({
                       <Command>
                         <CommandGroup className='max-h-[200px] overflow-y-scroll'>
                           {USER_ROLES.map(
-                            (role: { id: number; title: string, label: string }) => (
+                            (role: {
+                              id: number
+                              title: string
+                              label: string
+                            }) => (
                               <CommandItem
                                 key={role.id}
                                 value={role.title}

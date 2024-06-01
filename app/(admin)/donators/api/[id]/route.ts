@@ -1,36 +1,23 @@
 'use server'
 
-import { sst } from '@/lib/select-string'
 import { createClient } from '@/utils/supabase/client'
 
+const supabase = createClient()
+
 export async function GET(
-  req: Response,
+  req: Request,
   { params }: { params: { id: string } }
 ) {
-  const supabase = createClient()
-
   const { data, error } = await supabase
-    .from('user')
-    .select(
-      sst([
-        'id',
-        'email',
-        'role',
-        'title',
-        'first_name',
-        'last_name',
-        'image',
-        'created_at',
-        'updated_at',
-      ])
-    )
+    .from('donator')
+    .select('*')
     .eq('id', params.id)
 
   if (error || !data) {
     return Response.json(
       {
         success: false,
-        message: 'Failed to retrieve user. Please try again.',
+        message: error?.message,
         data: null,
       },
       {
@@ -42,7 +29,7 @@ export async function GET(
   return Response.json(
     {
       success: true,
-      message: 'User retrieval was successful.',
+      message: 'Donator retrieval was successful.',
       data,
       revalidated: 30,
     },

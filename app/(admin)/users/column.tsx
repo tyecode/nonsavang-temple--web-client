@@ -49,7 +49,7 @@ export const columns: ColumnDef<User>[] = [
         <div className='relative min-w-10'>
           <CreateAvatar
             src={row.original.image}
-            seed={row.original.display_name || ''}
+            seed={`${row.original.first_name} ${row.original.last_name}` || ''}
           />
         </div>
         {row.original.display_name}

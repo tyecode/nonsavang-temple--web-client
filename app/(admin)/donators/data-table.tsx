@@ -41,16 +41,17 @@ import {
 import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DonatorCreateModal } from '@/components/modals/donator'
-import { useFetchDonator } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isPending: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isPending,
 }: DataTableProps<TData, TValue>) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [globalFilter, setGlobalFilters] = useState<string>('')
@@ -63,7 +64,6 @@ export function DataTable<TData, TValue>({
   const setDonators = useDonatorStore((state) => state.setDonators)
   const donators = useDonatorStore((state) => state.donators)
 
-  const { data: fetchData, loading: isPending } = useFetchDonator()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -86,12 +86,6 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
-
-  useEffect(() => {
-    if (donators.length > 0) return
-
-    setDonators(fetchData as Donator[])
-  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

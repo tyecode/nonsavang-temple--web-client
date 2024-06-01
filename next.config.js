@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const packageJson = require('./package.json')
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -7,6 +8,9 @@ const nextConfig = {
         hostname: 'brsqcdlrwftfrrfdanov.supabase.co',
       },
     ],
+  },
+  env: {
+    APP_VERSION: packageJson.version,
   },
 }
 

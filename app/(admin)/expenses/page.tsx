@@ -25,12 +25,9 @@ const AdminCurrencies = () => {
 
     if (!res.ok) return
 
-    const expenses = await res.json()
-
-    setExpenses(expenses?.data)
+    const response = await res.json()
+    setExpenses(response?.data)
   }
-
-  console.log(expenses)
 
   useEffect(() => {
     startTransition(async () => {

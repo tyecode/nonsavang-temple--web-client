@@ -40,7 +40,7 @@ export const columns: ColumnDef<Transaction>[] = [
     header: 'ID',
   },
   {
-    accessorKey: 'account.name',
+    accessorFn: (row) => row.account?.name,
     header: 'ຊື່ບັນຊີ',
     cell: ({ row }) => (
       <span
@@ -55,14 +55,12 @@ export const columns: ColumnDef<Transaction>[] = [
     ),
   },
   {
-    accessorKey: 'transaction_type',
+    accessorKey: '__typename',
     header: 'ປະເພດລາຍການ',
-    cell: ({ row }) => (
-      <TypeBadge status={row.original.transaction_type.toUpperCase()} />
-    ),
+    cell: ({ row }) => <TypeBadge status={row.original.__typename} />,
   },
   {
-    accessorKey: 'category.name',
+    accessorFn: (row) => row.category?.name,
     header: 'ປະເພດລາຍຮັບ/ລາຍຈ່າຍ',
     cell: ({ row }) => (
       <span
@@ -77,7 +75,7 @@ export const columns: ColumnDef<Transaction>[] = [
     ),
   },
   {
-    accessorKey: 'participant.display_name',
+    accessorFn: (row) => row.participant?.display_name,
     header: 'ຜູ້ບໍລິຈາກ/ຜູ້ເບີກຈ່າຍ',
     cell: ({ row }) => {
       const current = row.original

@@ -29,7 +29,7 @@ const TopBar = () => {
       headers: {
         'content-type': 'application/json',
       },
-      cache: 'no-cache',
+      cache: 'no-store',
       next: {
         revalidate: 0,
       },
@@ -37,16 +37,16 @@ const TopBar = () => {
 
     if (!res.ok) return
 
-    const user = await res.json()
+    const response = await res.json()
 
-    setUser(user?.data[0])
+    setUser(response?.data[0])
   }
 
   useEffect(() => {
     if (!token?.user?.id || user?.id === token?.user?.id) return
 
     startTransition(async () => {
-      fetchUser()
+      await fetchUser()
     })
   }, [])
 

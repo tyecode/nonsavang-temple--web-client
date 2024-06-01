@@ -16,6 +16,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 
+import { USER_ROLES } from '@/constants/user-role'
+
 const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -30,7 +32,10 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger>
         {!loading ? (
-          <CreateAvatar src={user?.image} seed={`${user?.display_name}`} />
+          <CreateAvatar
+            src={user?.image}
+            seed={`${user?.first_name} ${user?.last_name}`}
+          />
         ) : (
           <Skeleton className='h-10 w-10 rounded-full' />
         )}
@@ -40,7 +45,7 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
           {!loading ? (
             <CreateAvatar
               src={user?.image}
-              seed={`${user?.display_name}`}
+              seed={`${user?.first_name} ${user?.last_name}`}
               className='h-20 w-20'
             />
           ) : (
@@ -63,7 +68,9 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
             )}
             {!loading ? (
               <p className='mt-1 text-xs font-normal text-foreground/60'>
-                {user.role}
+                {user.role === 'SUPER_ADMIN'
+                  ? 'Super Admin'
+                  : USER_ROLES.find((role) => role.title === user.role)?.label}
               </p>
             ) : (
               <Skeleton className='mt-1 h-4 w-24' />

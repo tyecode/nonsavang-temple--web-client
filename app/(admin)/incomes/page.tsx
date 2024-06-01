@@ -25,9 +25,8 @@ const AdminCurrencies = () => {
 
     if (!res.ok) return
 
-    const incomes = await res.json()
-
-    setIncomes(incomes?.data)
+    const response = await res.json()
+    setIncomes(response?.data)
   }
 
   useEffect(() => {

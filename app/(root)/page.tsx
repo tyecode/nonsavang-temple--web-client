@@ -15,16 +15,17 @@ const HomePage = () => {
       headers: {
         'content-type': 'application/json',
       },
+      cache: 'no-store',
       next: {
-        revalidate: 30,
+        revalidate: 0,
       },
     })
 
     if (!res.ok) return
 
-    const incomes = await res.json()
+    const response = await res.json()
 
-    setIncomes(incomes?.data)
+    setIncomes(response?.data)
   }
 
   const fetchExpense = async () => {
@@ -33,16 +34,17 @@ const HomePage = () => {
       headers: {
         'content-type': 'application/json',
       },
+      cache: 'no-store',
       next: {
-        revalidate: 30,
+        revalidate: 0,
       },
     })
 
     if (!res.ok) return
 
-    const expenses = await res.json()
+    const response = await res.json()
 
-    setExpenses(expenses?.data)
+    setExpenses(response?.data)
   }
 
   useEffect(() => {

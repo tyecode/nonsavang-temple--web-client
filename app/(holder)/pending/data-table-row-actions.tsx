@@ -50,13 +50,13 @@ export function DataTableRowActions<TData extends Transaction>({
   const { toast } = useToast()
 
   const handleUpdateTransaction = async (
+    __typename: string,
     id: string,
-    transaction_type: string,
     status: string
   ) => {
     try {
       const handleTransaction = async (
-        transaction_type: string,
+        __typename: string,
         updateFunction: Function
       ) => {
         const dateField = status === 'APPROVED' ? 'approved_at' : 'rejected_at'
@@ -82,9 +82,9 @@ export function DataTableRowActions<TData extends Transaction>({
           (transaction: Transaction) => {
             return {
               ...transaction,
+              __typename,
               [dateField]: new Date(),
               status,
-              transaction_type,
             }
           }
         )
@@ -109,12 +109,12 @@ export function DataTableRowActions<TData extends Transaction>({
         })
       }
 
-      if (transaction_type === 'income') {
-        await handleTransaction('income', updateIncome)
+      if (__typename === 'Income') {
+        await handleTransaction('Income', updateIncome)
       }
 
-      if (transaction_type === 'expense') {
-        await handleTransaction('expense', updateExpense)
+      if (__typename === 'Expense') {
+        await handleTransaction('Expense', updateExpense)
       }
     } catch (error) {
       console.error('Error updating transaction: ', error)
@@ -141,11 +141,7 @@ export function DataTableRowActions<TData extends Transaction>({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() =>
-            handleUpdateTransaction(
-              current.id,
-              current.transaction_type,
-              'APPROVED'
-            )
+            handleUpdateTransaction(current.__typename, current.id, 'APPROVED')
           }
           className='text-success transition-none focus:text-success'
         >
@@ -153,11 +149,7 @@ export function DataTableRowActions<TData extends Transaction>({
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() =>
-            handleUpdateTransaction(
-              current.id,
-              current.transaction_type,
-              'REJECTED'
-            )
+            handleUpdateTransaction(current.__typename, current.id, 'REJECTED')
           }
           className='text-danger transition-none focus:text-danger'
         >

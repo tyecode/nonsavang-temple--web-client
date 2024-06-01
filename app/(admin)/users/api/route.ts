@@ -1,17 +1,33 @@
 'use server'
 
+import { sst } from '@/lib/select-string'
 import { createClient } from '@/utils/supabase/client'
 
 export async function GET() {
   const supabase = createClient()
 
-  const { data, error } = await supabase.from('user').select('*')
+  const { data, error } = await supabase
+    .from('user')
+    .select(
+      sst([
+        'id',
+        'email',
+        'role',
+        'title',
+        'first_name',
+        'last_name',
+        'image',
+        'created_at',
+        'updated_at',
+      ])
+    )
 
   if (error || !data) {
     return Response.json(
       {
         success: false,
-        message: 'Failed to retrieve users. Please try again.',
+        message:
+          error?.message || 'Failed to retrieve users. Please try again.',
         data: null,
       },
       {
@@ -25,7 +41,6 @@ export async function GET() {
       success: true,
       message: 'Users retrieval was successful.',
       data,
-      revalidated: 30,
     },
     {
       status: 200,

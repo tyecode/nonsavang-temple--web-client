@@ -13,9 +13,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { Transaction, Income } from '@/types'
+import { Transaction } from '@/types'
 
-import { usePendingStore } from '@/stores'
 import { useTransactionStore } from '@/stores/useTransactionStore'
 import { useApprovedTransactionStore } from '@/stores/useApprovedTransactionStore'
 import { useRejectedTransactionStore } from '@/stores/useRejectedTransactionStore'
@@ -25,7 +24,6 @@ import { updateExpense } from '@/actions/expense-actions'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToast } from '@/components/ui/use-toast'
 import {
   DropdownMenu,
@@ -48,11 +46,13 @@ import { DataTablePagination } from '@/components/data-table-pagination'
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isPending: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isPending,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilters] = useState<string>('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -62,8 +62,6 @@ export function DataTable<TData, TValue>({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [statusProcess, setStatusProcess] = useState('APPROVED')
   const [isLoading, startTransition] = useTransition()
-
-  const isPending = usePendingStore((state) => state.isPending)
 
   const transactions = useTransactionStore((state) => state.transactions)
   const setTransactions = useTransactionStore((state) => state.setTransactions)
@@ -123,16 +121,16 @@ export function DataTable<TData, TValue>({
       try {
         const { incomeItems, expenseItems } = splitItemsByType(items)
         const incomeProcess = await processTransactions(
+          'Income',
           incomeItems,
-          updateIncome,
-          'income',
-          status
+          status,
+          updateIncome
         )
         const expenseProcess = await processTransactions(
+          'Expense',
           expenseItems,
-          updateExpense,
-          'expense',
-          status
+          status,
+          updateExpense
         )
 
         const newTransactions = filterOutProcessedTransactions(
@@ -172,10 +170,10 @@ export function DataTable<TData, TValue>({
 
   const splitItemsByType = (items: Transaction[]) => {
     const incomeItems = items.filter(
-      (item: any) => item.transaction_type === 'income'
+      (item: any) => item.__typename === 'Income'
     )
     const expenseItems = items.filter(
-      (item: any) => item.transaction_type === 'expense'
+      (item: any) => item.__typename === 'Expense'
     )
     return { incomeItems, expenseItems }
   }
@@ -190,10 +188,10 @@ export function DataTable<TData, TValue>({
   }
 
   const processTransactions = async (
+    __typename: string,
     filterArray: any[],
-    updateFunction: Function,
-    transaction_type: string,
-    status: string
+    status: string,
+    updateFunction: Function
   ) => {
     if (filterArray.length > 0) {
       await Promise.all(
@@ -205,9 +203,9 @@ export function DataTable<TData, TValue>({
         const dateField = status === 'APPROVED' ? 'approved_at' : 'rejected_at'
         return {
           ...transaction,
+          __typename,
           [dateField]: new Date(),
           status,
-          transaction_type,
         }
       })
     }
