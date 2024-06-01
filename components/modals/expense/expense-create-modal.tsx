@@ -12,7 +12,6 @@ import { Currency } from '@/types/currency'
 import { Expense } from '@/types/expense'
 import { User } from '@/types/user'
 
-import { createExpense } from '@/actions/expense-actions'
 import { getAccount } from '@/actions/account-actions'
 import { getExpenseCategory } from '@/actions/expense-category-actions'
 import { getSession } from '@/actions/auth-actions'
@@ -149,9 +148,16 @@ const ExpenseCreateModal = () => {
         remark: values.remark,
       }
 
-      const res = await createExpense(expenseData)
+      const res = await fetch('/expenses/api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-cache',
+        body: JSON.stringify(expenseData),
+      })
 
-      if (res.error || !res.data) {
+      if (!res.ok) {
         toast({
           variant: 'destructive',
           description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນລາຍຈ່າຍບໍ່ສຳເລັດ.',
@@ -159,7 +165,8 @@ const ExpenseCreateModal = () => {
         return
       }
 
-      const newExpenses: Expense[] = [...expenses, ...res.data]
+      const response = await res.json()
+      const newExpenses: Expense[] = [...expenses, ...response.data]
 
       setExpenses(newExpenses as Expense[])
       toast({

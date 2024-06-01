@@ -22,7 +22,6 @@ import { useExpenseStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToast } from '@/components/ui/use-toast'
 import {
   DropdownMenu,
@@ -42,16 +41,17 @@ import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import { ExpenseCreateModal } from '@/components/modals/expense'
-import { useFetchExpense } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isPending?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isPending,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilters] = useState<string>('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -64,7 +64,6 @@ export function DataTable<TData, TValue>({
   const setExpenses = useExpenseStore((state) => state.setExpenses)
   const expenses = useExpenseStore((state) => state.expenses)
 
-  const { data: fetchData, loading: isPending } = useFetchExpense()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -89,12 +88,6 @@ export function DataTable<TData, TValue>({
   })
 
   useEffect(() => {
-    if (expenses.length > 0) return
-
-    setExpenses(fetchData)
-  }, [fetchData])
-
-  useEffect(() => {
     const selectedItems: TData[] = table
       .getRowModel()
       .rows.filter((row) => row.getIsSelected())
@@ -117,7 +110,7 @@ export function DataTable<TData, TValue>({
       })
       return
     }
-    
+
     startTransition(async () => {
       try {
         const res = await Promise.all(

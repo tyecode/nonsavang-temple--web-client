@@ -40,16 +40,17 @@ import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import { IncomeCreateModal } from '@/components/modals/income'
-import { useFetchIncome } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isPending?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isPending,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilters] = useState<string>('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -62,7 +63,6 @@ export function DataTable<TData, TValue>({
   const setIncomes = useIncomeStore((state) => state.setIncomes)
   const incomes = useIncomeStore((state) => state.incomes)
 
-  const { data: fetchData, loading: isPending } = useFetchIncome()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -85,12 +85,6 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
-
-  useEffect(() => {
-    if (incomes.length > 0) return
-
-    setIncomes(fetchData as Income[])
-  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table
