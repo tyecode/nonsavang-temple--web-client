@@ -10,7 +10,7 @@ type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware
 const middlewares: MiddlewareFactory[] = [
   supabaseMiddleware,
   authenticateMiddleware,
-  authorizationMiddleware
+  authorizationMiddleware,
 ]
 
 export default stackMiddleware(middlewares)
