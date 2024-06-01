@@ -52,7 +52,10 @@ export async function PUT(
   )
 }
 
-export async function DELETE({ params }: { params: { id: string } }) {
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   const { data, error } = await supabase
     .from('expense')
     .delete()

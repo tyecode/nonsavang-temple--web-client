@@ -4,7 +4,7 @@ import { sst } from '@/lib/select-string'
 import { createClient } from '@/utils/supabase/client'
 
 export async function GET(
-  req: Response,
+  req: Request,
   { params }: { params: { id: string } }
 ) {
   const supabase = createClient()
