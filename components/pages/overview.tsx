@@ -15,15 +15,14 @@ import { cn } from '@/lib/utils'
 import { useExpenseStore, useIncomeStore } from '@/stores'
 import { Expense, Income } from '@/types'
 import { useEffect, useState } from 'react'
-import IncomeChart from '../income-chart'
-import { useFetchExpense, useFetchIncome } from '@/hooks'
 
 import LatestTransactionSkeleton from '../latest-transaction-skeleton'
 import PieChartSkeleton from '../pie-chart-skeleton'
 import { Box, CreditCard, TrendingDown, TrendingUp } from 'lucide-react'
 import { BarChart, PieChart } from 'react-feather'
+import { PieChartData } from '@/components/pie-chart-data'
 
-export default function Overview() {
+export default function Overview({ isPending }: { isPending: boolean }) {
   const [selectedAccount, setSelectedAccount] = useState({
     id: '',
     balance: 0,
@@ -37,54 +36,60 @@ export default function Overview() {
   const [totalExpenseAmount, setTotalExpenseAmount] = useState(0)
 
   const incomes = useIncomeStore((state) => state.incomes)
-  const setIncomes = useIncomeStore((state) => state.setIncomes)
-
   const expenses = useExpenseStore((state) => state.expenses)
-  const setExpenses = useExpenseStore((state) => state.setExpenses)
 
-  const { data: fetchIncome, loading: incomePending } = useFetchIncome()
-  const { data: fetchExpense, loading: expensePending } = useFetchExpense()
+  const filterTransactions = (
+    transactions: (Income | Expense)[],
+    account: string,
+    range: any
+  ) => {
+    return transactions.filter((transaction) => {
+      const createdAt = new Date(transaction.created_at).getTime()
+      const from = new Date(range?.from ?? -Infinity).getTime()
+      const to = range?.to
+        ? new Date(range.to).setHours(23, 59, 59, 999)
+        : Infinity
+
+      return (
+        transaction.account.id === account &&
+        createdAt >= from &&
+        createdAt <= to &&
+        transaction.status === 'APPROVED'
+      )
+    })
+  }
 
   useEffect(() => {
-    if (incomes.length > 0) return
-    setIncomes(fetchIncome as Income[])
-  }, [fetchIncome])
-
-  useEffect(() => {
-    if (expenses.length > 0) return
-    setExpenses(fetchExpense as Expense[])
-  }, [fetchExpense])
-
-  useEffect(() => {
-    const filterTransactions = (transactions: (Income | Expense)[]) => {
-      return transactions.filter((transaction) => {
-        const createdAt = new Date(transaction.created_at).getTime()
-        const from = dateRange?.from
-          ? new Date(dateRange.from).getTime()
-          : -Infinity
-        const to = dateRange?.to
-          ? new Date(dateRange.to).setHours(23, 59, 59, 999)
-          : Infinity
-
-        return (
-          transaction.account.id === selectedAccount.id &&
-          createdAt >= from &&
-          createdAt <= to &&
-          transaction.status === 'APPROVED'
-        )
-      })
-    }
-
     if (selectedAccount.id && dateRange?.from && dateRange?.to) {
-      const filteredIncomes = filterTransactions(incomes)
+      const filteredIncomes = filterTransactions(
+        incomes,
+        selectedAccount.id,
+        dateRange
+      )
       const filteredDonators = filteredIncomes.filter(
         (item: any) => item.donator !== null
       )
       setFilteredIncomes(filteredIncomes as Income[])
       setFilteredDonators(filteredDonators as Income[])
 
-      const filteredExpenses = filterTransactions(expenses)
+      const filteredExpenses = filterTransactions(
+        expenses,
+        selectedAccount.id,
+        dateRange
+      )
       setFilteredExpenses(filteredExpenses as Expense[])
+
+      const totalIncome = filteredIncomes.reduce(
+        (acc, income) => acc + income.amount,
+        0
+      )
+      setTotalIncomeAmount(totalIncome)
+
+      const totalExpense = filteredExpenses.reduce(
+        (acc, expense) => acc + expense.amount,
+        0
+      )
+      setTotalExpenseAmount(totalExpense)
     } else {
       setFilteredIncomes([])
       setFilteredExpenses([])
@@ -96,11 +101,7 @@ export default function Overview() {
     balance: number
     currency: string
   }) => {
-    if (
-      newState.id !== selectedAccount.id ||
-      newState.balance !== selectedAccount.balance ||
-      newState.currency !== selectedAccount.currency
-    ) {
+    if (JSON.stringify(newState) !== JSON.stringify(selectedAccount)) {
       setSelectedAccount(newState)
     }
   }
@@ -109,31 +110,10 @@ export default function Overview() {
     setDateRange(state)
   }
 
-  useEffect(() => {
-    const totalIncome = filteredIncomes.reduce(
-      (acc, income) => acc + income.amount,
-      0
-    )
-    setTotalIncomeAmount(totalIncome)
-
-    const totalExpense = filteredExpenses.reduce(
-      (acc, expense) => acc + expense.amount,
-      0
-    )
-    setTotalExpenseAmount(totalExpense)
-  }, [filteredIncomes, filteredExpenses])
-
-  const typedIncomes = filteredIncomes.map((income) => ({
-    ...income,
-    type: 'income',
-  }))
-
-  const typedExpenses = filteredExpenses.map((expense) => ({
-    ...expense,
-    type: 'expense',
-  }))
-
-  const combinedTransactions = [...typedIncomes, ...typedExpenses]
+  const combinedTransactions = [
+    ...filteredIncomes.map((income) => ({ ...income, type: 'income' })),
+    ...filteredExpenses.map((expense) => ({ ...expense, type: 'expense' })),
+  ]
 
   const latestTransactions = combinedTransactions
     .sort(
@@ -172,7 +152,7 @@ export default function Overview() {
               className={
                 totalIncomeAmount > 0 ? 'text-success' : 'text-foreground'
               }
-              isPending={incomePending}
+              isPending={isPending}
             />
             <TotalStatusCard
               title='ລາຍຈ່າຍ'
@@ -185,19 +165,19 @@ export default function Overview() {
               className={
                 totalExpenseAmount < 0 ? 'text-danger' : 'text-foreground'
               }
-              isPending={expensePending}
+              isPending={isPending}
             />
             <TotalStatusCard
               title='ຍອດເງິນໃນບັນຊີ'
               icon={CreditCard}
               amount={`${selectedAccount.currency}${selectedAccount.balance.toLocaleString()}`}
-              isPending={incomePending && expensePending}
+              isPending={isPending}
             />
             <TotalStatusCard
               title='ຈຳນວນຜູ້ບໍລິຈາກ'
               icon={Box}
               amount={`${filteredDonators?.length}` || '0'}
-              isPending={incomePending}
+              isPending={isPending}
             />
           </div>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7'>
@@ -217,10 +197,10 @@ export default function Overview() {
                 </CardHeader>
                 <CardContent>
                   <TabsContent value='pie-chart' className='space-y-4'>
-                    {incomePending || expensePending ? (
+                    {isPending ? (
                       <PieChartSkeleton />
                     ) : totalIncomeAmount > 0 || totalExpenseAmount > 0 ? (
-                      <IncomeChart
+                      <PieChartData
                         data={[
                           {
                             name: 'ລາຍຮັບ',
@@ -256,7 +236,7 @@ export default function Overview() {
                 </CardDescription>
               </CardHeader>
               <CardContent className='h-auto'>
-                {incomePending || expensePending ? (
+                {isPending ? (
                   <LatestTransactionSkeleton />
                 ) : latestTransactions.length > 0 ? (
                   latestTransactions.map((transaction) => (

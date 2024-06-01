@@ -4,8 +4,6 @@ import { useEffect, useTransition } from 'react'
 import { usePathname } from 'next/navigation'
 import { useCookies } from 'next-client-cookies'
 
-import { getUser } from '@/actions/user-actions'
-
 import UserAvatar from '@/components/user-avatar'
 import { ModeToggle } from '@/components/mode-toggle'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -17,30 +15,39 @@ const TopBar = () => {
   const [isPending, startTransition] = useTransition()
   const pathname = usePathname()
   const cookies = useCookies()
+  const getToken = cookies.get(
+    process.env.NEXT_PUBLIC_SUPABASE_AUTH_COOKIE_NAME!
+  )
+  const token = getToken ? JSON.parse(getToken) : null
 
   const setUser = useAuthStore((state) => state.setAuth)
   const user = useAuthStore((state) => state.auth)
 
-  const cookieName = process.env.NEXT_PUBLIC_SUPABASE_AUTH_COOKIE_NAME!
-  const cookieData = cookies.get(cookieName) ?? ''
-  const session = JSON.parse(cookieData)
+  const fetchUser = async () => {
+    const res = await fetch(`/users/api/${token?.user?.id}`, {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+      cache: 'no-store',
+      next: {
+        revalidate: 0,
+      },
+    })
+
+    if (!res.ok) return
+
+    const response = await res.json()
+
+    setUser(response?.data[0])
+  }
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        startTransition(async () => {
-          if (!session?.user?.id) return
+    if (!token?.user?.id || user?.id === token?.user?.id) return
 
-          const { data } = await getUser(session.user.id)
-
-          if (data) setUser(data[0])
-        })
-      } catch (error) {
-        console.error('Error fetching user:', error)
-      }
-    }
-
-    fetchUser()
+    startTransition(async () => {
+      await fetchUser()
+    })
   }, [])
 
   return (

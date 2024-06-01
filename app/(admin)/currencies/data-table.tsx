@@ -40,16 +40,17 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import { useFetchCurrency } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isPending: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isPending,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilters] = useState<string>('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -62,7 +63,6 @@ export function DataTable<TData, TValue>({
   const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
   const currencies = useCurrencyStore((state) => state.currencies)
 
-  const { data: fetchData, loading: isPending } = useFetchCurrency()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -85,12 +85,6 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
-
-  useEffect(() => {
-    if (currencies.length > 0) return
-
-    setCurrencies(fetchData as Currency[])
-  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

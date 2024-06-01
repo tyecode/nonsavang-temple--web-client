@@ -57,7 +57,7 @@ export const supabaseMiddleware = (middleware: NextMiddleware) => {
       }
     )
 
-    await supabase.auth.getUser()
+    await supabase.auth.getSession()
 
     return middleware(request, event)
   }

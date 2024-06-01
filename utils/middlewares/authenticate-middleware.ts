@@ -6,18 +6,17 @@ export const authenticateMiddleware = (middleware: NextMiddleware) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
     const response = NextResponse.next()
     const supabase = createMiddlewareClient({ req: request, res: response })
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession()
+    const { data, error } = await supabase.auth.getUser()
 
-    if (error || !session) {
-      response.cookies.delete(
-        process.env.NEXT_PUBLIC_SUPABASE_AUTH_COOKIE_NAME!
-      )
-    }
+    console.log('session', error)
 
-    if (!session && !request.nextUrl.pathname.startsWith('/login')) {
+    // if (error || !session) {
+    //   response.cookies.delete(
+    //     process.env.NEXT_PUBLIC_SUPABASE_AUTH_COOKIE_NAME!
+    //   )
+    // }
+
+    if (!data && !request.nextUrl.pathname.startsWith('/login')) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 

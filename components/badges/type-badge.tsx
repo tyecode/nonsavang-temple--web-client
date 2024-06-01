@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 
-type Type = 'INCOME' | 'EXPENSE'
+type Type = 'Income' | 'Expense'
 
 type TypeProps = {
   status: Type | string
@@ -15,11 +15,11 @@ type TypeMap = {
 }
 
 const typeMap: TypeMap = {
-  INCOME: {
+  Income: {
     text: 'ລາຍຮັບ',
     className: 'border-success text-success bg-success bg-opacity-10',
   },
-  EXPENSE: {
+  Expense: {
     text: 'ລາຍຈ່າຍ',
     className: 'border-danger text-danger bg-danger bg-opacity-10',
   },

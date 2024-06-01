@@ -41,16 +41,17 @@ import {
 import { useToast } from '@/components/ui/use-toast'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { LoadingButton } from '@/components/buttons'
-import { useFetchAccount } from '@/hooks'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isPending: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isPending,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilters] = useState<string>('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -63,7 +64,6 @@ export function DataTable<TData, TValue>({
   const setAccounts = useAccountStore((state) => state.setAccounts)
   const accounts = useAccountStore((state) => state.accounts)
 
-  const { data: fetchData, loading: isPending } = useFetchAccount()
   const { toast } = useToast()
 
   const table = useReactTable({
@@ -86,12 +86,6 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   })
-
-  useEffect(() => {
-    if (accounts.length > 0) return
-
-    setAccounts(fetchData as Account[])
-  }, [fetchData])
 
   useEffect(() => {
     const selectedItems: TData[] = table

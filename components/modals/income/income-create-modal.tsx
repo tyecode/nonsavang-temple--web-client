@@ -12,7 +12,6 @@ import { Currency } from '@/types/currency'
 import { Donator } from '@/types/donator'
 import { Income } from '@/types/income'
 
-import { createIncome } from '@/actions/income-actions'
 import { getAccount } from '@/actions/account-actions'
 import { getDonator } from '@/actions/donator-actions'
 import { getIncomeCategory } from '@/actions/income-category-actions'
@@ -134,19 +133,28 @@ const IncomeCreateModal = () => {
     userId: string
   ) => {
     try {
-      const incomeData = {
-        user_id: userId,
-        account_id: values.account,
-        category_id: values.category,
-        amount: Number(values.amount),
-        currency_id: values.currency,
-        donator_id: values.donator ? values.donator : undefined,
-        remark: values.remark,
-      }
+      const incomeData = [
+        {
+          user_id: userId,
+          account_id: values.account,
+          category_id: values.category,
+          amount: Number(values.amount),
+          currency_id: values.currency,
+          donator_id: values.donator ? values.donator : undefined,
+          remark: values.remark,
+        },
+      ]
 
-      const res = await createIncome(incomeData)
+      const res = await fetch('/incomes/api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-cache',
+        body: JSON.stringify(incomeData),
+      })
 
-      if (res.error || !res.data) {
+      if (!res.ok) {
         toast({
           variant: 'destructive',
           description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນລາຍຮັບບໍ່ສຳເລັດ.',
@@ -154,7 +162,8 @@ const IncomeCreateModal = () => {
         return
       }
 
-      const newIncomes: Income[] = [...incomes, ...res.data]
+      const response = await res.json()
+      const newIncomes: Income[] = [...incomes, ...response.data]
 
       setIncomes(newIncomes as Income[])
       toast({

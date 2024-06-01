@@ -5,7 +5,6 @@ import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 
 import { Account } from '@/types/account'
 import { cn } from '@/lib/utils'
-import { getAccount } from '@/actions/account-actions'
 import { Button } from '@/components/ui/button'
 import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
@@ -28,29 +27,33 @@ export function AccountSelector({
   const [accounts, setAccounts] = useState<Account[]>([])
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getAccount()
+    const fetchAccounts = async () => {
+      const res = await fetch('/accounts/api', {
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json',
+        },
+        cache: 'no-cache',
+        next: {
+          revalidate: false,
+        },
+      })
 
-        if (res.error || !res.data) return
+      if (!res.ok) return
 
-        setAccounts(res.data)
-      } catch (error) {
-        console.error('Error fetching accounts: ', error)
-      }
+      const accounts = await res.json()
+
+      setAccounts(accounts?.data)
+      setValue(accounts?.data[0]?.id)
     }
-    fetchData()
-  }, [setAccounts])
 
-  useEffect(() => {
-    if (accounts?.length > 0) {
-      setValue(accounts[0]?.id)
-    }
-  }, [accounts])
+    fetchAccounts()
+  }, [])
 
   useEffect(() => {
     if (onStateChange) {
       const selectedAccount = accounts?.find((account) => account?.id === value)
+
       if (selectedAccount) {
         onStateChange({
           id: selectedAccount.id,
