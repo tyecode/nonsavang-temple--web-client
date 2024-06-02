@@ -1,17 +1,7 @@
 {
   "name": "nonsavang-temple--web-client",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Nonsavang Temple Website for Managing Expenses and Incomes",
-  "author": "tyecode <sengphachanh.dev@gmail.com>",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tyecode/nonsavang-temple--web-client"
-  },
-  "git": {
-    "deploymentEnabled": {
-      "dev": false
-    }
-  },
   "license": "GPL-3.0-only",
   "private": true,
   "scripts": {
