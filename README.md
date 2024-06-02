@@ -1,6 +1,4 @@
-<center>
-  <img alt="Nonsavang Temple Logo" src="https://brsqcdlrwftfrrfdanov.supabase.co/storage/v1/object/public/images/logo.png" width="84">
-</center>
+<img align="center" width="84" alt="Nonsavang Temple Logo" src="https://brsqcdlrwftfrrfdanov.supabase.co/storage/v1/object/public/images/logo.png">
 <h1 align="center">Nonsavang Temple V1</h1>
 
 <p align="center">
