@@ -5,32 +5,6 @@ import { createClient } from '@/utils/supabase/client'
 
 const supabase = createClient()
 
-export const getDonator = async (id?: string) => {
-  try {
-    let query: any = supabase.from('donator')
-
-    if (id) {
-      query = query.select('*').eq('id', id)
-    } else {
-      query = query.select('*')
-    }
-
-    const { data } = await query
-
-    return {
-      data,
-      error: null,
-      message: `Donator${id ? '' : 's'} retrieval was successful.`,
-    }
-  } catch (error) {
-    return {
-      data: null,
-      error,
-      message: `Failed to retrieve donator${id ? '' : 's'}. Please try again.`,
-    }
-  }
-}
-
 export const createDonator = async (object: DonatorCreationData) => {
   try {
     const { data } = await supabase.from('donator').insert(object).select()

@@ -5,11 +5,11 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { Category } from '@/types/category'
+import { Currency } from '@/types/currency'
 
-import { createExpenseCategory } from '@/actions/expense-category-actions'
+import { createCurrency } from '@/actions/currency-actions'
 
-import { useExpenseCategoryStore } from '@/stores'
+import { useCurrencyStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,47 +31,51 @@ import {
 } from '@/components/ui/form'
 import { useToast } from '@/components/ui/use-toast'
 
-import { expenseCategorySchema } from '@/app/(admin)/expense-categories/schema'
+import { currencySchema } from './schema'
 
-const CategoryCreateModal = () => {
+export const CurrencyCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const categories = useExpenseCategoryStore((state) => state.categories)
-  const setCategories = useExpenseCategoryStore((state) => state.setCategories)
+  const currencies = useCurrencyStore((state) => state.currencies)
+  const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
 
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof expenseCategorySchema>>({
-    resolver: zodResolver(expenseCategorySchema),
+  const form = useForm<z.infer<typeof currencySchema>>({
+    resolver: zodResolver(currencySchema),
     defaultValues: {
+      code: '',
       name: '',
+      symbol: '',
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof expenseCategorySchema>) => {
+  const onSubmit = async (values: z.infer<typeof currencySchema>) => {
     startTransition(async () => {
       try {
-        const res = await createExpenseCategory({
+        const res = await createCurrency({
+          code: values.code,
           name: values.name,
+          symbol: values.symbol,
         })
 
         if (res.error || !res.data) {
           toast({
             variant: 'destructive',
-            description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນປະເພດລາຍຈ່າຍບໍ່ສຳເລັດ.',
+            description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນສະກຸນເງິນບໍ່ສຳເລັດ.',
           })
           return
         }
 
-        const newCategories: Category[] = [...categories, ...res.data]
+        const newCurrencies: Currency[] = [...currencies, ...res.data]
 
-        setCategories(newCategories as Category[])
+        setCurrencies(newCurrencies as Currency[])
         toast({
-          description: 'ເພີ່ມຂໍ້ມູນປະເພດລາຍຈ່າຍສຳເລັດແລ້ວ.',
+          description: 'ເພີ່ມຂໍ້ມູນສະກຸນເງິນສຳເລັດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Failed to create expense category: ', error)
+        console.error('Failed to create currency: ', error)
       } finally {
         setIsOpen(false)
         form.reset()
@@ -90,7 +94,7 @@ const CategoryCreateModal = () => {
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>ເພິ່ມຂໍ້ມູນປະເພດລາຍຈ່າຍ</DialogTitle>
+          <DialogTitle>ເພິ່ມຂໍ້ມູນສະກຸນເງິນ</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -99,11 +103,48 @@ const CategoryCreateModal = () => {
           >
             <FormField
               control={form.control}
+              name='code'
+              render={({ field: { onChange, value, ...rest } }) => (
+                <FormItem className='flex-1'>
+                  <FormLabel className='pointer-events-none'>
+                    ລະຫັດສະກຸນເງິນ
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isPending}
+                      onChange={(e) => onChange(e.target.value.toUpperCase())}
+                      value={value.toUpperCase()}
+                      {...rest}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name='name'
               render={({ field }) => (
                 <FormItem className='flex-1'>
                   <FormLabel className='pointer-events-none'>
-                    ຊື່ປະເພດລາຍຈ່າຍ
+                    ຊື່ສະກຸນເງິນ
+                  </FormLabel>
+                  <FormControl>
+                    <Input disabled={isPending} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='symbol'
+              render={({ field }) => (
+                <FormItem className='flex-1'>
+                  <FormLabel className='pointer-events-none'>
+                    ສັນຍາລັກ
                   </FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
@@ -128,5 +169,3 @@ const CategoryCreateModal = () => {
     </Dialog>
   )
 }
-
-export default CategoryCreateModal

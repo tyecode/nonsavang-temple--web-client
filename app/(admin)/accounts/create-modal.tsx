@@ -10,7 +10,6 @@ import { Account } from '@/types/account'
 import { Currency } from '@/types/currency'
 
 import { createAccount } from '@/actions/account-actions'
-import { getCurrency } from '@/actions/currency-actions'
 import { getSession } from '@/actions/auth-actions'
 
 import { useAccountStore } from '@/stores'
@@ -45,9 +44,26 @@ import {
 } from '@/components/ui/popover'
 import { toast } from '@/components/ui/use-toast'
 
-import { accountSchema } from '@/app/(admin)/accounts/schema'
+import { accountSchema } from './schema'
 
-const AccountCreateModal = () => {
+const fetchCurrency = async () => {
+  const res = await fetch('/currencies/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
+export const AccountCreateModal = () => {
   const [currencies, setCurrencies] = useState<Currency[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -67,27 +83,20 @@ const AccountCreateModal = () => {
   })
 
   useEffect(() => {
-    const getCurrencyData = async () => {
-      if (currencies.length > 0) return
+    const fetchData = async () => {
+      const res = await fetchCurrency()
 
-      try {
-        const res = await getCurrency()
+      const sortedData = res.data.sort(
+        (a: { code: string }, b: { code: string }) =>
+          a.code.localeCompare(b.code)
+      )
 
-        if (res.error || !res.data) return
-
-        const sortedData = res.data.sort(
-          (a: { code: string }, b: { code: string }) =>
-            a.code.localeCompare(b.code)
-        )
-        setCurrencies(sortedData)
-        form.setValue('currency', sortedData[0].id)
-      } catch (error) {
-        console.error('Error fetching currency: ', error)
-      }
+      setCurrencies(sortedData)
+      form.setValue('currency', sortedData[0].id)
     }
 
-    getCurrencyData()
-  }, [currencies.length, form])
+    fetchData()
+  }, [form])
 
   const createNewAccount = async (
     values: z.infer<typeof accountSchema>,
@@ -292,5 +301,3 @@ const AccountCreateModal = () => {
     </Dialog>
   )
 }
-
-export default AccountCreateModal

@@ -5,48 +5,6 @@ import { createClient } from '@/utils/supabase/client'
 
 const supabase = createClient()
 
-export const getExpense = async (id?: string) => {
-  try {
-    let query: any = supabase.from('expense')
-
-    if (id) {
-      query = query
-        .select(
-          `*, 
-          category: category_id (*), 
-          currency: currency_id (*), 
-          user: user_id (*), 
-          account: account_id (*, currency: currency_id (*)), 
-          drawer: drawer_id (*)`
-        )
-        .eq('id', id)
-    } else {
-      query = query.select(
-        `*, 
-        category: category_id (*), 
-        currency: currency_id (*), 
-        user: user_id (*), 
-        account: account_id (*, currency: currency_id (*)), 
-        drawer: drawer_id (*)`
-      )
-    }
-
-    const { data } = await query
-
-    return {
-      data,
-      error: null,
-      message: `Expense${id ? '' : 's'} retrieval was successful.`,
-    }
-  } catch (error) {
-    return {
-      data: null,
-      error,
-      message: `Failed to retrieve expense${id ? '' : 's'}. Please try again.`,
-    }
-  }
-}
-
 export const createExpense = async (object: ExpenseCreationData) => {
   try {
     const { data } = await supabase

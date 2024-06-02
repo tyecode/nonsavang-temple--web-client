@@ -7,6 +7,40 @@ import { useApprovedTransactionStore } from '@/stores'
 import { columns } from './column'
 import { DataTable } from './data-table'
 
+const fetchIncome = async () => {
+  const res = await fetch('/incomes/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
+const fetchExpense = async () => {
+  const res = await fetch('/expenses/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
 const AdminApproved = () => {
   const [isPending, startTransition] = useTransition()
 
@@ -17,51 +51,17 @@ const AdminApproved = () => {
     (state) => state.setTransactions
   )
 
-  const fetchIncomes = async () => {
-    const res = await fetch('/incomes/api', {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-      cache: 'no-store',
-      next: {
-        revalidate: 0,
-      },
-    })
-
-    if (!res.ok) return
-
-    const response = await res.json()
-    return response?.data
-  }
-
-  const fetchExpenses = async () => {
-    const res = await fetch('/expenses/api', {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-      cache: 'no-store',
-      next: {
-        revalidate: 0,
-      },
-    })
-
-    if (!res.ok) return
-
-    const response = await res.json()
-    return response?.data
-  }
-
   useEffect(() => {
     startTransition(async () => {
       const [incomes, expenses] = await Promise.all([
-        fetchIncomes(),
-        fetchExpenses(),
+        fetchIncome(),
+        fetchExpense(),
       ])
 
       setTransactions(
-        [...incomes, ...expenses].filter((t) => t.status === 'APPROVED')
+        [...incomes.data, ...expenses.data].filter(
+          (t) => t.status === 'APPROVED'
+        )
       )
     })
   }, [])

@@ -40,7 +40,8 @@ import {
 } from '@/components/ui/table'
 import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
-import { DonatorCreateModal } from '@/components/modals/donator'
+
+import { DonatorCreateModal } from './create-modal'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

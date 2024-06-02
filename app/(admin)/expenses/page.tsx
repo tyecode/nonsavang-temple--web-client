@@ -1,37 +1,40 @@
 'use client'
 
+import { useEffect, useTransition } from 'react'
+
 import { useExpenseStore } from '@/stores'
 
 import { DataTable } from './data-table'
 import { columns } from './column'
-import { useEffect, useTransition } from 'react'
+
+const fetchExpense = async () => {
+  const res = await fetch('/expenses/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
 
 const AdminCurrencies = () => {
   const expenses = useExpenseStore((state) => state.expenses)
   const setExpenses = useExpenseStore((state) => state.setExpenses)
+
   const [isPending, startTransition] = useTransition()
-
-  const fetchExpenses = async () => {
-    const res = await fetch('/expenses/api', {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-      cache: 'no-store',
-      next: {
-        revalidate: 0,
-      },
-    })
-
-    if (!res.ok) return
-
-    const response = await res.json()
-    setExpenses(response?.data)
-  }
 
   useEffect(() => {
     startTransition(async () => {
-      await fetchExpenses()
+      const res = await fetchExpense()
+
+      setExpenses(res.data)
     })
   }, [])
 

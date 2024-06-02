@@ -39,7 +39,8 @@ import {
 import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
-import { CategoryCreateModal } from '@/components/modals/income-category'
+
+import { IncomeCategoryCreateModal } from './create-modal'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -159,7 +160,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         <div className='flex gap-4'>
-          <CategoryCreateModal />
+          <IncomeCategoryCreateModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size={'sm'} className='ml-auto'>

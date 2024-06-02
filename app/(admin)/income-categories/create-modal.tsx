@@ -31,9 +31,9 @@ import {
 } from '@/components/ui/form'
 import { useToast } from '@/components/ui/use-toast'
 
-import { incomeCategorySchema } from '@/app/(admin)/income-categories/schema'
+import { incomeCategorySchema } from './schema'
 
-const CategoryCreateModal = () => {
+export const IncomeCategoryCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -128,5 +128,3 @@ const CategoryCreateModal = () => {
     </Dialog>
   )
 }
-
-export default CategoryCreateModal

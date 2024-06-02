@@ -20,7 +20,6 @@ import { deleteAccount } from '@/actions/account-actions'
 
 import { useAccountStore } from '@/stores'
 
-import { AccountCreateModal } from '@/components/modals/account'
 import { Button } from '@/components/ui/button'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import {
@@ -41,6 +40,8 @@ import {
 import { useToast } from '@/components/ui/use-toast'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { LoadingButton } from '@/components/buttons'
+
+import { AccountCreateModal } from './create-modal'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

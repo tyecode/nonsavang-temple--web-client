@@ -5,48 +5,6 @@ import { createClient } from '@/utils/supabase/client'
 
 const supabase = createClient()
 
-export const getIncome = async (id?: string) => {
-  try {
-    let query: any = supabase.from('income')
-
-    if (id) {
-      query = query
-        .select(
-          `*, 
-          category: category_id (*), 
-          user: user_id (*), 
-          account: account_id (*, currency: currency_id (*)), 
-          currency: currency_id (*), 
-          donator: donator_id (*)`
-        )
-        .eq('id', id)
-    } else {
-      query = query.select(
-        `*, 
-        category: category_id (*), 
-        user: user_id (*), 
-        account: account_id (*, currency: currency_id (*)), 
-        currency: currency_id (*), 
-        donator: donator_id (*)`
-      )
-    }
-
-    const { data } = await query
-
-    return {
-      data,
-      error: null,
-      message: `Income${id ? '' : 's'} retrieval was successful.`,
-    }
-  } catch (error) {
-    return {
-      data: null,
-      error,
-      message: `Failed to retrieve income${id ? '' : 's'}. Please try again.`,
-    }
-  }
-}
-
 export const createIncome = async (object: IncomeCreationData) => {
   try {
     const { data, error } = await supabase

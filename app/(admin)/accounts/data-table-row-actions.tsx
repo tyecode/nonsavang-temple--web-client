@@ -15,7 +15,6 @@ import { Account } from '@/types/account'
 import { Currency } from '@/types/currency'
 
 import { deleteAccount, updateAccount } from '@/actions/account-actions'
-import { getCurrency } from '@/actions/currency-actions'
 
 import { useAccountStore } from '@/stores'
 
@@ -54,10 +53,28 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { LoadingButton } from '@/components/buttons'
+
 import { accountSchema } from './schema'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
+}
+
+const fetchCurrency = async () => {
+  const res = await fetch('/currencies/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
 }
 
 export function DataTableRowActions<TData extends Account>({
@@ -89,26 +106,19 @@ export function DataTableRowActions<TData extends Account>({
   }, [current, form])
 
   useEffect(() => {
-    const getCurrencyData = async () => {
-      if (currencies.length > 0) return
+    const fetchData = async () => {
+      const res = await fetchCurrency()
 
-      try {
-        const res = await getCurrency()
+      const sortedData = res.data.sort(
+        (a: { code: string }, b: { code: string }) =>
+          a.code.localeCompare(b.code)
+      )
 
-        if (res.error || !res.data) return
-
-        const sortedData = res.data.sort(
-          (a: { code: string }, b: { code: string }) =>
-            a.code.localeCompare(b.code)
-        )
-        setCurrencies(sortedData)
-      } catch (error) {
-        console.error('Error fetching currency: ', error)
-      }
+      setCurrencies(sortedData)
     }
 
-    getCurrencyData()
-  }, [currencies.length, form])
+    fetchData()
+  }, [form])
 
   const onSubmit = (values: z.infer<typeof accountSchema>) => {
     startTransition(async () => {

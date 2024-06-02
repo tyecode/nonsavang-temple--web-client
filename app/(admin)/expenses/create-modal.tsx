@@ -9,13 +9,10 @@ import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { Account } from '@/types/account'
 import { Category } from '@/types/category'
 import { Currency } from '@/types/currency'
-import { Expense } from '@/types/expense'
+import { Expense, ExpenseCreationData } from '@/types/expense'
 import { User } from '@/types/user'
 
-import { getAccount } from '@/actions/account-actions'
-import { getExpenseCategory } from '@/actions/expense-category-actions'
 import { getSession } from '@/actions/auth-actions'
-import { getUser } from '@/actions/user-actions'
 import { uploadExpenseImage } from '@/actions/image-actions'
 
 import { useExpenseStore, useUserStore } from '@/stores'
@@ -55,9 +52,72 @@ import {
 } from '@/components/ui/popover'
 import { toast } from '@/components/ui/use-toast'
 import MonetaryInput from '@/components/monetary-input'
-import { expenseSchema } from '@/app/(admin)/expenses/schema'
 
-const ExpenseCreateModal = () => {
+import { expenseSchema } from './schema'
+
+const fetchAccount = async () => {
+  const res = await fetch('/accounts/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  return await res.json()
+}
+
+const fetchUser = async () => {
+  const res = await fetch('/users/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
+const fetchExpenseCategory = async () => {
+  const res = await fetch('/expense-categories/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
+const createExpense = async (data: ExpenseCreationData) => {
+  const res = await fetch('/expenses/api', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-cache',
+    body: JSON.stringify(data),
+  })
+
+  return await res.json()
+}
+
+export const ExpenseCreateModal = () => {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [currencies, setCurrencies] = useState<Currency[]>([])
@@ -89,53 +149,26 @@ const ExpenseCreateModal = () => {
   })
 
   useEffect(() => {
-    const fetchAccount = async () => {
-      if (accounts.length > 0) return
+    const fetchData = async () => {
+      const [resAccounts, resUsers, resCategories] = await Promise.all([
+        fetchAccount(),
+        fetchUser(),
+        fetchExpenseCategory(),
+      ])
 
-      const res = await getAccount()
-
-      if (res.error || !res.data) return
-
-      setAccounts(res.data)
+      setAccounts(resAccounts.data)
+      setUsers(resUsers.data)
+      setCategories(resCategories.data)
     }
-
-    fetchAccount()
-  }, [accounts.length])
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      if (categories.length > 0) return
-
-      const res = await getExpenseCategory()
-
-      if (res.error || !res.data) return
-
-      setCategories(res.data)
-    }
-
-    fetchCategories()
-  }, [categories.length])
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (users.length > 0) return
-
-      const res = await getUser()
-
-      if (res.error || !res.data) return
-
-      setUsers(res.data)
-    }
-
-    fetchUsers()
-  }, [users.length, setUsers])
+    fetchData()
+  }, [])
 
   const createNewExpense = async (
     values: z.infer<typeof expenseSchema>,
     userId: string
   ) => {
     try {
-      const expenseData = {
+      const object = {
         user_id: userId,
         account_id: values.account,
         category_id: values.category,
@@ -148,16 +181,9 @@ const ExpenseCreateModal = () => {
         remark: values.remark,
       }
 
-      const res = await fetch('/expenses/api', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        cache: 'no-cache',
-        body: JSON.stringify(expenseData),
-      })
+      const res = await createExpense(object)
 
-      if (!res.ok) {
+      if (!res.success) {
         toast({
           variant: 'destructive',
           description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນລາຍຈ່າຍບໍ່ສຳເລັດ.',
@@ -165,8 +191,7 @@ const ExpenseCreateModal = () => {
         return
       }
 
-      const response = await res.json()
-      const newExpenses: Expense[] = [...expenses, ...response.data]
+      const newExpenses: Expense[] = [...expenses, ...res.data]
 
       setExpenses(newExpenses as Expense[])
       toast({
@@ -561,5 +586,3 @@ const ExpenseCreateModal = () => {
     </Dialog>
   )
 }
-
-export default ExpenseCreateModal

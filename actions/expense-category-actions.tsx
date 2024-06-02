@@ -8,32 +8,6 @@ import { createClient } from '@/utils/supabase/client'
 
 const supabase = createClient()
 
-export const getExpenseCategory = async (id?: string) => {
-  try {
-    let query: any = supabase.from('expense_category')
-
-    if (id) {
-      query = query.select('*').eq('id', id)
-    } else {
-      query = query.select('*')
-    }
-
-    const { data } = await query
-
-    return {
-      data,
-      error: null,
-      message: `Expense category${id ? '' : 's'} retrieval was successful.`,
-    }
-  } catch (error) {
-    return {
-      data: null,
-      error,
-      message: `Failed to retrieve expense category${id ? '' : 's'}. Please try again.`,
-    }
-  }
-}
-
 export const createExpenseCategory = async (object: CategoryCreationData) => {
   try {
     const { data } = await supabase

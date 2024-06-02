@@ -1,14 +1,33 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useTransition } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
 import { Button } from '@/components/ui/button'
-import { getAccount } from '@/actions/account-actions'
 import { AccountReport } from '@/components/pages/account-report'
+import { useAccountStore } from '@/stores'
+
+const fetchAccounts = async () => {
+  const res = await fetch('/accounts/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
 
 const ReportDonatorPage = () => {
-  const [accountData, setAccountData] = useState<any[]>([])
+  const setAccounts = useAccountStore((state) => state.setAccounts)
+  const accounts = useAccountStore((state) => state.accounts)
+  const [isPending, startTransition] = useTransition()
 
   const componentRef = useRef(null)
 
@@ -18,21 +37,15 @@ const ReportDonatorPage = () => {
   })
 
   const currencyData = [
-    ...new Set(accountData.map((item) => JSON.stringify(item.currency))),
+    ...new Set(accounts.map((item) => JSON.stringify(item.currency))),
   ].map((item) => JSON.parse(item))
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await getAccount()
+    startTransition(async () => {
+      const res = await fetchAccounts()
 
-      if (res.error || !res.data) return
-
-      setAccountData(res.data)
-    }
-
-    if (accountData.length > 0) return
-
-    fetchData()
+      setAccounts(res.data)
+    })
   }, [])
 
   return (
@@ -53,7 +66,11 @@ const ReportDonatorPage = () => {
         <div className='mt-4 flex w-full justify-between'>
           <div className='flex gap-1 text-sm'></div>
         </div>
-        <AccountReport data={accountData} currency={currencyData} />
+        <AccountReport
+          data={accounts}
+          currency={currencyData}
+          isPending={isPending}
+        />
       </div>
     </div>
   )

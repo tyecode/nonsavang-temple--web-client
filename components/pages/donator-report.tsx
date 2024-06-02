@@ -11,8 +11,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatDate } from '@/lib/date-format'
+import { Skeleton } from '../ui/skeleton'
 
-export function DonatorReport({ data }: { data: any[] }) {
+export function DonatorReport({
+  data,
+  isPending,
+}: {
+  data: any[]
+  isPending: boolean
+}) {
   return (
     <Table className='w-full border-collapse border-spacing-0 border'>
       <TableHeader>
@@ -35,7 +42,33 @@ export function DonatorReport({ data }: { data: any[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data && data.length > 0 ? (
+        {isPending ? (
+          [...Array(4)].map((_, index) => (
+            <TableRow key={index}>
+              <TableCell className='!w-14 border text-center'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='!w-28 border text-center'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border font-medium'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border text-right'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+            </TableRow>
+          ))
+        ) : data && data.length > 0 ? (
           data.map((item, index) => (
             <TableRow key={item.id}>
               <TableCell className='!w-14 border text-center'>{`${index + 1}.`}</TableCell>
@@ -67,9 +100,13 @@ export function DonatorReport({ data }: { data: any[] }) {
             ລວມທັງໝົດ
           </TableCell>
           <TableCell className='border text-right'>
-            {data && data[0]?.currency.symbol
-              ? `${data[0]?.currency.symbol}${data.reduce((acc, item) => acc + item.amount, 0).toLocaleString()}`
-              : 'N/A'}
+            {isPending ? (
+              <Skeleton className='h-4 w-full py-1' />
+            ) : data && data[0]?.currency.symbol ? (
+              `${data[0]?.currency.symbol}${data.reduce((acc, item) => acc + item.amount, 0).toLocaleString()}`
+            ) : (
+              'N/A'
+            )}
           </TableCell>
         </TableRow>
       </TableFooter>
