@@ -1,20 +1,55 @@
 // page.tsx
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
 import { Button } from '@/components/ui/button'
 import { IncomeExpenseReport } from '@/components/pages/income-expense-report'
-import { getTransactions } from '@/actions/transaction-action'
 import { AccountSelector } from '@/components/account-selector'
 import { CalendarDateRangePicker } from '@/components/date-range-picker'
+import { Skeleton } from '@/components/ui/skeleton'
+
+const fetchIncomes = async () => {
+  const res = await fetch('/incomes/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
+const fetchExpenses = async () => {
+  const res = await fetch('/expenses/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
 
 const ReportIncomeExpensePage = () => {
   const [transactions, setTransactions] = useState<any[]>([])
   const [filteredTransactions, setFilteredTransactions] = useState<any[]>([])
   const [accountId, setAccountId] = useState<string>('')
   const [dateRange, setDateRange] = useState<any>(null)
+  const [isPending, startTransition] = useTransition()
 
   const componentRef = useRef(null)
 
@@ -39,21 +74,22 @@ const ReportIncomeExpensePage = () => {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await getTransactions()
+    startTransition(async () => {
+      const [incomes, expenses] = await Promise.all([
+        fetchIncomes(),
+        fetchExpenses(),
+      ])
 
-      if (res?.error || !res?.data) return
-
-      const approvedTransactions = res.data.filter(
+      const mergedTransitions = [
+        ...(incomes.data || []),
+        ...(expenses.data || []),
+      ]
+      const approvedTransactions = mergedTransitions.filter(
         (item) => item.status === 'APPROVED'
       )
 
       setTransactions(approvedTransactions)
-    }
-
-    if (transactions.length > 0) return
-
-    fetchData()
+    })
   }, [])
 
   useEffect(() => {
@@ -101,20 +137,28 @@ const ReportIncomeExpensePage = () => {
         </div>
         <div className='my-4 flex w-full justify-between'>
           <div className='flex flex-col gap-2 text-sm'>
-            <div className='flex gap-2'>
+            <div className='flex items-center gap-2'>
               <span>{`ເລກບັນຊີ:`}</span>
               <span className='font-medium'>
-                {filteredTransactions[0]?.account.id
-                  ? `${filteredTransactions[0]?.account.id}`
-                  : 'N/A'}
+                {isPending ? (
+                  <Skeleton className='h-4 w-80' />
+                ) : filteredTransactions[0]?.account.id ? (
+                  `${filteredTransactions[0]?.account.id}`
+                ) : (
+                  'N/A'
+                )}
               </span>
             </div>
-            <div className='flex gap-2'>
+            <div className='flex items-center gap-2'>
               <span>{`ຊື່ບັນຊີ:`}</span>
               <span className='font-medium'>
-                {filteredTransactions[0]?.account.name
-                  ? `${filteredTransactions[0]?.account.name}`
-                  : 'N/A'}
+                {isPending ? (
+                  <Skeleton className='h-4 w-36' />
+                ) : filteredTransactions[0]?.account.name ? (
+                  `${filteredTransactions[0]?.account.name}`
+                ) : (
+                  'N/A'
+                )}
               </span>
             </div>
           </div>
@@ -123,7 +167,7 @@ const ReportIncomeExpensePage = () => {
               <div>{`ວັນທີ່:`}</div>
               <div className='flex gap-1 font-medium'>
                 {!dateRange?.from || !dateRange?.to ? (
-                  'ບໍ່ລະບຸວັນທີ່'
+                  'ກະລຸນາເລືອກວັນທີ່'
                 ) : (
                   <>
                     <span>{formatDate(dateRange?.from)}</span>
@@ -135,7 +179,7 @@ const ReportIncomeExpensePage = () => {
             </div>
           </div>
         </div>
-        <IncomeExpenseReport data={filteredTransactions} />
+        <IncomeExpenseReport data={filteredTransactions} isPending={isPending} />
       </div>
     </div>
   )

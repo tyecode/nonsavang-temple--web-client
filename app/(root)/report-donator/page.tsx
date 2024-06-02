@@ -1,19 +1,37 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
 import { Button } from '@/components/ui/button'
 import { DonatorReport } from '@/components/pages/donator-report'
 import { AccountSelector } from '@/components/account-selector'
 import { CalendarDateRangePicker } from '@/components/date-range-picker'
-import { getIncome } from '@/actions/income-actions'
+import { Skeleton } from '@/components/ui/skeleton'
+
+const fetchIncomes = async () => {
+  const res = await fetch('/incomes/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
 
 const ReportDonatorPage = () => {
   const [donatorData, setDonatorData] = useState<any[]>([])
   const [filteredDonators, setFilteredDonators] = useState<any[]>([])
   const [accountId, setAccountId] = useState<string>('')
   const [dateRange, setDateRange] = useState<any>(null)
+  const [isPending, startTransition] = useTransition()
 
   const componentRef = useRef(null)
 
@@ -38,21 +56,15 @@ const ReportDonatorPage = () => {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await getIncome()
+    startTransition(async () => {
+      const res = await fetchIncomes()
 
-      if (res.error || !res.data) return
-
-      const filteredDonatorData = res.data.filter(
+      const filteredDonator = res.data.filter(
         (item: any) => item.status === 'APPROVED' && item.donator !== null
       )
 
-      setDonatorData(filteredDonatorData)
-    }
-
-    if (donatorData.length > 0) return
-
-    fetchData()
+      setDonatorData(filteredDonator)
+    })
   }, [])
 
   useEffect(() => {
@@ -100,20 +112,28 @@ const ReportDonatorPage = () => {
         </div>
         <div className='my-4 flex w-full justify-between'>
           <div className='flex flex-col gap-2 text-sm'>
-            <div className='flex gap-2'>
+            <div className='flex items-center gap-2'>
               <span>{`ເລກບັນຊີ:`}</span>
               <span className='font-medium'>
-                {filteredDonators[0]?.account.id
-                  ? `${filteredDonators[0]?.account.id}`
-                  : 'N/A'}
+                {isPending ? (
+                  <Skeleton className='h-4 w-80' />
+                ) : filteredDonators[0]?.account.id ? (
+                  `${filteredDonators[0]?.account.id}`
+                ) : (
+                  'N/A'
+                )}
               </span>
             </div>
-            <div className='flex gap-2'>
+            <div className='flex items-center gap-2'>
               <span>{`ຊື່ບັນຊີ:`}</span>
               <span className='font-medium'>
-                {filteredDonators[0]?.account.name
-                  ? `${filteredDonators[0]?.account.name}`
-                  : 'N/A'}
+                {isPending ? (
+                  <Skeleton className='h-4 w-36' />
+                ) : filteredDonators[0]?.account.name ? (
+                  `${filteredDonators[0]?.account.name}`
+                ) : (
+                  'N/A'
+                )}
               </span>
             </div>
           </div>
@@ -122,7 +142,7 @@ const ReportDonatorPage = () => {
               <div>{`ວັນທີ່:`}</div>
               <div className='flex gap-1 font-medium'>
                 {!dateRange?.from || !dateRange?.to ? (
-                  'ບໍ່ລະບຸວັນທີ່'
+                  'ກະລຸນາເລືອກວັນທີ່'
                 ) : (
                   <>
                     <span>{formatDate(dateRange?.from)}</span>
@@ -134,7 +154,7 @@ const ReportDonatorPage = () => {
             </div>
           </div>
         </div>
-        <DonatorReport data={filteredDonators} />
+        <DonatorReport data={filteredDonators} isPending={isPending} />
       </div>
     </div>
   )

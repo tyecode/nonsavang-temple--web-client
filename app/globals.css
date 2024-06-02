@@ -53,7 +53,6 @@
   }
 }
 
-
 @layer base {
   * {
     border-color: hsl(var(--border));
@@ -89,26 +88,34 @@
     -moz-user-select: none;
   }
 
-  th, td {
+  th,
+  td {
     white-space: nowrap !important;
   }
 }
 
 @media print {
-  html, body {
+  html,
+  body {
     height: initial !important;
     overflow: initial !important;
     -webkit-print-color-adjust: exact !important;
   }
-  
+
+  header,
+  footer {
+    display: none !important;
+  }
+
   table {
     width: 100vw !important;
     border-collapse: separate !important;
     border-spacing: 0 !important;
     border-width: 1px 0 0 1px !important;
   }
-  
-  th, td {
+
+  th,
+  td {
     border: 1px solid hsl(var(--border)) !important;
     border-width: 0 1px 1px 0 !important;
   }

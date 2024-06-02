@@ -10,8 +10,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatDate } from '@/lib/date-format'
+import { Skeleton } from '../ui/skeleton'
 
-export function IncomeExpenseReport({ data }: { data: any[] }) {
+export function IncomeExpenseReport({
+  data,
+  isPending,
+}: {
+  data: any[]
+  isPending: boolean
+}) {
   return (
     <Table className='w-full border-collapse border-spacing-0 border'>
       <TableHeader>
@@ -28,7 +35,33 @@ export function IncomeExpenseReport({ data }: { data: any[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data && data.length > 0 ? (
+        {isPending ? (
+          [...Array(4)].map((_, index) => (
+            <TableRow key={index}>
+              <TableCell className='!w-14 border text-center'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='!w-28 border text-center'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border text-end'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border text-end'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+              <TableCell className='border text-end'>
+                <Skeleton className='h-4 w-full py-1' />
+              </TableCell>
+            </TableRow>
+          ))
+        ) : data && data.length > 0 ? (
           data.map((item, index) => (
             <TableRow key={item.id}>
               <TableCell className='!w-14 border text-center'>{`${index + 1}.`}</TableCell>
@@ -38,12 +71,12 @@ export function IncomeExpenseReport({ data }: { data: any[] }) {
               <TableCell className='border'>{item.category.name}</TableCell>
               <TableCell className='border'>{item.remark}</TableCell>
               <TableCell className='border text-end'>
-                {item.transaction_type === 'income'
+                {item.__typename === 'Income'
                   ? `${item.currency.symbol}${Math.abs(item.amount).toLocaleString()}`
                   : '-'}
               </TableCell>
               <TableCell className='border text-end'>
-                {item.transaction_type === 'expense'
+                {item.__typename === 'Expense'
                   ? `-${item.currency.symbol}${Math.abs(item.amount).toLocaleString()}`
                   : '-'}
               </TableCell>
@@ -68,35 +101,47 @@ export function IncomeExpenseReport({ data }: { data: any[] }) {
             ລວມທັງໝົດ
           </TableCell>
           <TableCell className='border text-end'>
-            {data.length > 0
-              ? `${data[0]?.currency.symbol}` +
+            {isPending ? (
+              <Skeleton className='h-4 w-full py-1' />
+            ) : data.length > 0 ? (
+              `${data[0]?.currency.symbol}` +
+              data
+                .filter((item) => item.__typename === 'Income')
+                .reduce((acc, item) => acc + item.amount, 0)
+                .toLocaleString()
+            ) : (
+              'N/A'
+            )}
+          </TableCell>
+          <TableCell className='border text-end'>
+            {isPending ? (
+              <Skeleton className='h-4 w-full py-1' />
+            ) : data.length > 0 ? (
+              `-${data[0]?.currency.symbol}` +
+              Math.abs(
                 data
-                  .filter((item) => item.transaction_type === 'income')
+                  .filter((item) => item.__typename === 'Expense')
                   .reduce((acc, item) => acc + item.amount, 0)
-                  .toLocaleString()
-              : 'N/A'}
+              ).toLocaleString()
+            ) : (
+              'N/A'
+            )}
           </TableCell>
           <TableCell className='border text-end'>
-            {data.length > 0
-              ? `-${data[0]?.currency.symbol}` +
-                Math.abs(
-                  data
-                    .filter((item) => item.transaction_type === 'expense')
-                    .reduce((acc, item) => acc + item.amount, 0)
-                ).toLocaleString()
-              : 'N/A'}
-          </TableCell>
-          <TableCell className='border text-end'>
-            {data.length > 0
-              ? (() => {
-                  const sum = data.reduce((acc, item) => acc + item.amount, 0)
-                  const symbol = data[0]?.currency.symbol
-                  return (
-                    (sum < 0 ? `-${symbol}` : symbol) +
-                    Math.abs(sum).toLocaleString()
-                  )
-                })()
-              : 'N/A'}
+            {isPending ? (
+              <Skeleton className='h-4 w-full py-1' />
+            ) : data.length > 0 ? (
+              (() => {
+                const sum = data.reduce((acc, item) => acc + item.amount, 0)
+                const symbol = data[0]?.currency.symbol
+                return (
+                  (sum < 0 ? `-${symbol}` : symbol) +
+                  Math.abs(sum).toLocaleString()
+                )
+              })()
+            ) : (
+              'N/A'
+            )}
           </TableCell>
         </TableRow>
       </TableFooter>
