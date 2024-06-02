@@ -1,5 +1,7 @@
-<img align="center" width="84" alt="Nonsavang Temple Logo" src="https://brsqcdlrwftfrrfdanov.supabase.co/storage/v1/object/public/images/logo.png">
-<h1 align="center">Nonsavang Temple V1</h1>
+<p align="center">
+  <img width="84" alt="Nonsavang Temple Logo" src="https://brsqcdlrwftfrrfdanov.supabase.co/storage/v1/object/public/images/logo-compressed.png">
+  <h1 align="center">Nonsavang Temple V1</h1>
+</p>
 
 <p align="center">
  The Income & Expense management website for Nonsavang Temple.
