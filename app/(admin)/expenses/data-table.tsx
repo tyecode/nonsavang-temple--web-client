@@ -40,7 +40,8 @@ import {
 import { LoadingButton } from '@/components/buttons'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
-import { ExpenseCreateModal } from '@/components/modals/expense'
+
+import { ExpenseCreateModal } from './create-modal'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

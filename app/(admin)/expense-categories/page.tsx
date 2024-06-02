@@ -7,32 +7,34 @@ import { useExpenseCategoryStore } from '@/stores'
 import { columns } from './column'
 import { DataTable } from './data-table'
 
+const fetchExpenseCategory = async () => {
+  const res = await fetch('/expense-categories/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
 const AdminExpenseCategory = () => {
   const categories = useExpenseCategoryStore((state) => state.categories)
   const setCategories = useExpenseCategoryStore((state) => state.setCategories)
+
   const [isPending, startTransition] = useTransition()
-
-  const fetchCategories = async () => {
-    const res = await fetch('/expense-categories/api', {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-      cache: 'no-store',
-      next: {
-        revalidate: 0,
-      },
-    })
-
-    if (!res.ok) return
-
-    const response = await res.json()
-    setCategories(response?.data)
-  }
 
   useEffect(() => {
     startTransition(async () => {
-      await fetchCategories()
+      const res = await fetchExpenseCategory()
+
+      setCategories(res.data)
     })
   }, [])
 

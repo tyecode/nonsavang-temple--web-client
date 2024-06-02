@@ -10,11 +10,8 @@ import { Account } from '@/types/account'
 import { Category } from '@/types/category'
 import { Currency } from '@/types/currency'
 import { Donator } from '@/types/donator'
-import { Income } from '@/types/income'
+import { Income, IncomeCreationData } from '@/types/income'
 
-import { getAccount } from '@/actions/account-actions'
-import { getDonator } from '@/actions/donator-actions'
-import { getIncomeCategory } from '@/actions/income-category-actions'
 import { getSession } from '@/actions/auth-actions'
 
 import { useDonatorStore, useIncomeStore } from '@/stores'
@@ -52,12 +49,74 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { toast } from '@/components/ui/use-toast'
-
-import { DonatorCreateModal } from '@/components/modals/donator'
 import MonetaryInput from '@/components/monetary-input'
-import { incomeSchema } from '@/app/(admin)/incomes/schema'
 
-const IncomeCreateModal = () => {
+import { DonatorCreateModal } from '../donators/create-modal'
+import { incomeSchema } from './schema'
+
+const fetchAccount = async () => {
+  const res = await fetch('/accounts/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  return await res.json()
+}
+
+const fetchDonator = async () => {
+  const res = await fetch('/donators/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
+const fetchIncomeCategory = async () => {
+  const res = await fetch('/income-categories/api', {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+    next: {
+      revalidate: 0,
+    },
+  })
+
+  if (!res.ok) return
+
+  return await res.json()
+}
+
+const createIncome = async (data: IncomeCreationData) => {
+  const res = await fetch('/incomes/api', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-cache',
+    body: JSON.stringify(data),
+  })
+
+  return await res.json()
+}
+
+export const IncomeCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [openAccount, setOpenAccount] = useState(false)
@@ -87,74 +146,38 @@ const IncomeCreateModal = () => {
   })
 
   useEffect(() => {
-    const fetchAccount = async () => {
-      if (accounts.length > 0) return
+    const fetchData = async () => {
+      const [resAccounts, resDonators, resCategories] = await Promise.all([
+        fetchAccount(),
+        fetchDonator(),
+        fetchIncomeCategory(),
+      ])
 
-      const res = await getAccount()
-
-      if (res.error || !res.data) return
-
-      setAccounts(res.data)
+      setAccounts(resAccounts.data)
+      setDonators(resDonators.data)
+      setCategories(resCategories.data)
     }
-
-    fetchAccount()
-  }, [accounts.length])
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      if (categories.length > 0) return
-
-      const res = await getIncomeCategory()
-
-      if (res.error || !res.data) return
-
-      setCategories(res.data)
-    }
-
-    fetchCategories()
-  }, [categories.length])
-
-  useEffect(() => {
-    const fetchDonators = async () => {
-      if (donators.length > 0) return
-
-      const res = await getDonator()
-
-      if (res.error || !res.data) return
-
-      setDonators(res.data)
-    }
-
-    fetchDonators()
-  }, [donators, setDonators])
+    fetchData()
+  }, [])
 
   const createNewIncome = async (
     values: z.infer<typeof incomeSchema>,
     userId: string
   ) => {
     try {
-      const incomeData = [
-        {
-          user_id: userId,
-          account_id: values.account,
-          category_id: values.category,
-          amount: Number(values.amount),
-          currency_id: values.currency,
-          donator_id: values.donator ? values.donator : undefined,
-          remark: values.remark,
-        },
-      ]
+      const object = {
+        user_id: userId,
+        account_id: values.account,
+        category_id: values.category,
+        amount: Number(values.amount),
+        currency_id: values.currency,
+        donator_id: values.donator ? values.donator : undefined,
+        remark: values.remark,
+      }
 
-      const res = await fetch('/incomes/api', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        cache: 'no-cache',
-        body: JSON.stringify(incomeData),
-      })
+      const res = await createIncome(object)
 
-      if (!res.ok) {
+      if (!res.success) {
         toast({
           variant: 'destructive',
           description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນລາຍຮັບບໍ່ສຳເລັດ.',
@@ -162,8 +185,7 @@ const IncomeCreateModal = () => {
         return
       }
 
-      const response = await res.json()
-      const newIncomes: Income[] = [...incomes, ...response.data]
+      const newIncomes: Income[] = [...incomes, ...res.data]
 
       setIncomes(newIncomes as Income[])
       toast({
@@ -528,5 +550,3 @@ const IncomeCreateModal = () => {
     </Dialog>
   )
 }
-
-export default IncomeCreateModal

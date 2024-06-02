@@ -6,6 +6,7 @@ export const authenticateMiddleware = (middleware: NextMiddleware) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
     const response = NextResponse.next()
     const supabase = createMiddlewareClient({ req: request, res: response })
+    
     const { data, error } = await supabase.auth.getUser()
 
     console.log('session', error)

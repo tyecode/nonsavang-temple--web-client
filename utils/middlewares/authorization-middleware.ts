@@ -2,7 +2,6 @@ import { NextRequest } from 'next/server'
 import { NextResponse, NextMiddleware, NextFetchEvent } from 'next/server'
 import { createClient } from '@/utils/supabase/client'
 
-import { getUser } from '@/actions/user-actions'
 import { User } from '@/types'
 
 const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN']

@@ -5,20 +5,19 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 
-import { Donator } from '@/types/donator'
+import { User } from '@/types/user'
 
-import { createDonator } from '@/actions/donator-actions'
+import { createUser } from '@/actions/user-actions'
 
-import { useDonatorStore } from '@/stores'
-
-import { cn } from '@/lib/utils'
-import { DONATOR_TITLES } from '@/constants/title-name'
+import { UserState, useUserStore } from '@/stores/useUserStore'
 
 import { Button } from '@/components/ui/button'
+import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import { Input } from '@/components/ui/input'
 import { LoadingButton } from '@/components/buttons'
-import { Command, CommandGroup, CommandItem } from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -40,58 +39,55 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { useToast } from '@/components/ui/use-toast'
-import { donatorSchema } from '@/app/(admin)/donators/schema'
+import { cn } from '@/lib/utils'
+import { USER_TITLES } from '@/constants/title-name'
 
-const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
-  const [isPending, startTransition] = useTransition()
+import { userCreateSchema } from './schema'
+
+export const UserCreateModal = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [isShow, setIsShow] = useState(false)
   const [openTitle, setOpenTitle] = useState(false)
 
-  const donators = useDonatorStore((state) => state.donators)
-  const setDonators = useDonatorStore((state) => state.setDonators)
+  const [isPending, startTransition] = useTransition()
+
+  const users = useUserStore((state: UserState) => state.users)
+  const setUsers = useUserStore((state: UserState) => state.setUsers)
 
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof donatorSchema>>({
-    resolver: zodResolver(donatorSchema),
+  const form = useForm<z.infer<typeof userCreateSchema>>({
+    resolver: zodResolver(userCreateSchema),
     defaultValues: {
-      title: DONATOR_TITLES[0].title,
+      title: 'ພຣະ',
       first_name: '',
       last_name: '',
-      village: '',
-      district: '',
-      province: '',
+      email: '',
+      password: '',
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof donatorSchema>) => {
+  const onSubmit = async (values: z.infer<typeof userCreateSchema>) => {
     startTransition(async () => {
       try {
-        const res = await createDonator({
-          title: values.title,
-          first_name: values.first_name,
-          last_name: values.last_name,
-          village: values.village,
-          district: values.district,
-          province: values.province,
-        })
+        const res = await createUser(values)
 
         if (res.error || !res.data) {
           toast({
             variant: 'destructive',
-            description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນຜູ້ບໍລິຈາກບໍ່ສຳເລັດ.',
+            description: 'ມີຂໍ້ຜິດພາດ! ເພີ່ມຂໍ້ມູນຜູ້ໃຊ້ໃໝ່ບໍ່ສຳເລັດ.',
           })
           return
         }
 
-        const newDonators: Donator[] = [...donators, ...res.data]
+        const newUsers = [...users, ...res.data]
 
-        setDonators(newDonators as Donator[])
+        setUsers(newUsers as User[])
         toast({
-          description: 'ເພີ່ມຂໍ້ມູນຜູ້ບໍລິຈາກສຳເລັດແລ້ວ.',
+          description: 'ເພີ່ມຂໍ້ມູນຜູ້ໃຊ້ໃໝ່ສຳເລັດແລ້ວ.',
         })
       } catch (error) {
-        console.error('Failed to create donator', error)
+        console.error('Failed to create user: ', error)
       } finally {
         setIsOpen(false)
         form.reset()
@@ -102,25 +98,15 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {asChild ? (
-          <Button
-            type='submit'
-            variant={'outline'}
-            size={'sm'}
-            className='w-full'
-            onClick={() => setIsOpen(true)}
-          >
-            {'ເພິ່ມຂໍ້ມູນຜູ້ບໍລິຈາກ'}
-          </Button>
-        ) : isPending ? (
+        {isPending ? (
           <LoadingButton>ເພິ່ມຂໍ້ມູນ</LoadingButton>
         ) : (
           <Button size={'sm'}>ເພິ່ມຂໍ້ມູນ</Button>
         )}
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[450px]'>
+      <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>ເພິ່ມຂໍ້ມູນຜູ້ບໍລິຈາກ</DialogTitle>
+          <DialogTitle>ເພິ່ມຂໍ້ມູນຜູ້ໃຊ້</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -146,7 +132,7 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
                           className='w-full justify-between'
                         >
                           {field.value
-                            ? DONATOR_TITLES.find(
+                            ? USER_TITLES.find(
                                 (option: { id: number; title: string }) =>
                                   option.title === field.value
                               )?.title
@@ -156,10 +142,10 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
                       </FormControl>
                     </PopoverTrigger>
                     <FormMessage />
-                    <PopoverContent className='w-[400px] p-0'>
+                    <PopoverContent className='w-[375px] p-0'>
                       <Command>
                         <CommandGroup className='max-h-[200px] overflow-y-scroll'>
-                          {DONATOR_TITLES.map(
+                          {USER_TITLES.map(
                             (option: { id: number; title: string }) => (
                               <CommandItem
                                 key={option.id}
@@ -189,7 +175,7 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
               )}
             />
 
-            <div className='grid grid-cols-2 gap-4'>
+            <div className='flex gap-4'>
               <FormField
                 control={form.control}
                 name='first_name'
@@ -223,10 +209,10 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
 
             <FormField
               control={form.control}
-              name='village'
+              name='email'
               render={({ field }) => (
                 <FormItem className='flex-1'>
-                  <FormLabel className='pointer-events-none'>ບ້ານ</FormLabel>
+                  <FormLabel className='pointer-events-none'>ອີເມວ</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} {...field} />
                   </FormControl>
@@ -237,27 +223,39 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
 
             <FormField
               control={form.control}
-              name='district'
+              name='password'
               render={({ field }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel className='pointer-events-none'>ເມືອງ</FormLabel>
+                <FormItem className='group relative flex-1'>
+                  <FormLabel className='pointer-events-none'>
+                    ລະຫັດຜ່ານ
+                  </FormLabel>
                   <FormControl>
-                    <Input disabled={isPending} {...field} />
+                    <Input
+                      disabled={isPending}
+                      type={isShow ? 'text' : 'password'}
+                      className='pr-12'
+                      {...field}
+                    />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='province'
-              render={({ field }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel className='pointer-events-none'>ແຂວງ</FormLabel>
-                  <FormControl>
-                    <Input disabled={isPending} {...field} />
-                  </FormControl>
+                  <span className='absolute right-4 top-8 cursor-pointer opacity-0 duration-200 group-hover:opacity-100'>
+                    {isShow ? (
+                      <FontAwesomeIcon
+                        icon={faEye}
+                        width={20}
+                        height={20}
+                        className='text-foreground/50'
+                        onClick={() => setIsShow(!isShow)}
+                      />
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={faEyeSlash}
+                        width={20}
+                        height={20}
+                        className='text-foreground/50'
+                        onClick={() => setIsShow(!isShow)}
+                      />
+                    )}
+                  </span>
                   <FormMessage />
                 </FormItem>
               )}
@@ -278,5 +276,3 @@ const DonatorCreateModal = ({ asChild }: { asChild?: boolean }) => {
     </Dialog>
   )
 }
-
-export default DonatorCreateModal

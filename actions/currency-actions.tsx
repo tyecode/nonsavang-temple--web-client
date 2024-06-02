@@ -8,32 +8,6 @@ import { createClient } from '@/utils/supabase/client'
 
 const supabase = createClient()
 
-export const getCurrency = async (id?: string) => {
-  try {
-    let query: any = supabase.from('currency')
-
-    if (id) {
-      query = query.select('*').eq('id', id)
-    } else {
-      query = query.select('*')
-    }
-
-    const { data } = await query
-
-    return {
-      data,
-      error: null,
-      message: `Currency${id ? '' : 's'} retrieval was successful.`,
-    }
-  } catch (error) {
-    return {
-      data: null,
-      error,
-      message: `Failed to retrieve currency${id ? '' : 's'}. Please try again.`,
-    }
-  }
-}
-
 export const createCurrency = async (object: CurrencyCreationData) => {
   try {
     const { data } = await supabase.from('currency').insert(object).select()

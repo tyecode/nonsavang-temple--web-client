@@ -5,26 +5,6 @@ import { createClient } from '@/utils/supabase/client'
 
 const supabase = createClient()
 
-export const getAccount = async () => {
-  try {
-    const { data } = await supabase
-      .from('account')
-      .select('*, user: user_id (*), currency: currency_id (*)')
-
-    return {
-      data,
-      error: null,
-      message: 'Account retrieval was successful.',
-    }
-  } catch (error) {
-    return {
-      data: null,
-      error,
-      message: 'Failed to retrieve account. Please try again.',
-    }
-  }
-}
-
 export const createAccount = async (object: AccountCreationData) => {
   try {
     const { data } = await supabase

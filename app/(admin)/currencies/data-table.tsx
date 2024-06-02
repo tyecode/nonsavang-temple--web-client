@@ -20,7 +20,6 @@ import { deleteCurrency } from '@/actions/currency-actions'
 import { useCurrencyStore } from '@/stores'
 
 import { Button } from '@/components/ui/button'
-import { CurrencyCreateModal } from '@/components/modals/currency'
 import DataTableSkeleton from '@/components/data-table-skeleton'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import {
@@ -40,6 +39,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
+
+import { CurrencyCreateModal } from './create-modal'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

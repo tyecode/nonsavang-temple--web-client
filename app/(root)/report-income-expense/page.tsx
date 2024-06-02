@@ -10,7 +10,7 @@ import { AccountSelector } from '@/components/account-selector'
 import { CalendarDateRangePicker } from '@/components/date-range-picker'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const fetchIncomes = async () => {
+const fetchIncome = async () => {
   const res = await fetch('/incomes/api', {
     method: 'GET',
     headers: {
@@ -27,7 +27,7 @@ const fetchIncomes = async () => {
   return await res.json()
 }
 
-const fetchExpenses = async () => {
+const fetchExpense = async () => {
   const res = await fetch('/expenses/api', {
     method: 'GET',
     headers: {
@@ -76,8 +76,8 @@ const ReportIncomeExpensePage = () => {
   useEffect(() => {
     startTransition(async () => {
       const [incomes, expenses] = await Promise.all([
-        fetchIncomes(),
-        fetchExpenses(),
+        fetchIncome(),
+        fetchExpense(),
       ])
 
       const mergedTransitions = [
@@ -179,7 +179,10 @@ const ReportIncomeExpensePage = () => {
             </div>
           </div>
         </div>
-        <IncomeExpenseReport data={filteredTransactions} isPending={isPending} />
+        <IncomeExpenseReport
+          data={filteredTransactions}
+          isPending={isPending}
+        />
       </div>
     </div>
   )
