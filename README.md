@@ -83,4 +83,4 @@ You can view a fully working demo at [Nonsavang Temple](https://nonsavang-temple
 
 ## License
 
-Licensed under the [GNU GPLv3](https://github.com/tyecode/nonsavang-temple--web-client/blob/main/LICENSE). Please read the terms of this license before making modifications to this project.
+Licensed under the [MIT License](https://github.com/tyecode/nonsavang-temple--web-client/blob/main/LICENSE). Please read the terms of this license before making modifications to this project.
