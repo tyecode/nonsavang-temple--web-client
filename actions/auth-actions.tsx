@@ -1,8 +1,10 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+
+import { createClient } from '@/utils/supabase/server'
+import { sst } from '@/lib/select-string'
 
 export const handleLogin = async (formData: FormData) => {
   const email = formData.get('email') as string
@@ -10,14 +12,30 @@ export const handleLogin = async (formData: FormData) => {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
 
-  if (error) {
+  if (error || !user) {
     return redirect('/login?error=Could not authenticate user')
   }
+
+  const { data } = await supabase
+    .from('user')
+    .select(
+      sst(['id', 'email', 'title', 'first_name', 'last_name', 'role', 'image'])
+    )
+    .eq('id', user.id)
+
+  if (!data || data.length === 0) {
+    return redirect('/login?error=Could not find user')
+  }
+
+  cookieStore.set('nonsavang-user-data', JSON.stringify(data[0]))
 
   return redirect('/')
 }
