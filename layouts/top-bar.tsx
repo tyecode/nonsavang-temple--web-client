@@ -15,40 +15,17 @@ const TopBar = () => {
   const [isPending, startTransition] = useTransition()
   const pathname = usePathname()
   const cookies = useCookies()
-  const getToken = cookies.get(
-    process.env.NEXT_PUBLIC_SUPABASE_AUTH_COOKIE_NAME!
-  )
-  const token = getToken ? JSON.parse(getToken) : null
-
+  const hasCookie = cookies.get('nonsavang-user-data')
   const setUser = useAuthStore((state) => state.setAuth)
   const user = useAuthStore((state) => state.auth)
 
-  const fetchUser = async () => {
-    const res = await fetch(`/users/api/${token?.user?.id}`, {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-      cache: 'no-store',
-      next: {
-        revalidate: 0,
-      },
-    })
-
-    if (!res.ok) return
-
-    const response = await res.json()
-
-    setUser(response?.data[0])
-  }
-
   useEffect(() => {
-    if (!token?.user?.id || user?.id === token?.user?.id) return
-
-    startTransition(async () => {
-      await fetchUser()
-    })
-  }, [])
+    if (hasCookie) {
+      startTransition(async () => {
+        setUser(JSON.parse(hasCookie))
+      })
+    }
+  }, [hasCookie])
 
   return (
     <section className='sticky top-0 z-50 w-full border-b bg-background'>
