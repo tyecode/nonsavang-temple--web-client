@@ -2,10 +2,12 @@
 
 import { sst } from '@/lib/select-string'
 import { createClient } from '@/utils/supabase/client'
+import { cookies } from 'next/headers'
 
 const supabase = createClient()
 
 export async function GET() {
+  const _cookies = cookies()
   const { data, error } = await supabase
     .from('account')
     .select(sst(['*', 'user: user_id (*)', 'currency: currency_id (*)']))

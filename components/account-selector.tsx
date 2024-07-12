@@ -33,10 +33,7 @@ export function AccountSelector({
         headers: {
           'content-type': 'application/json',
         },
-        cache: 'no-cache',
-        next: {
-          revalidate: false,
-        },
+        cache: 'no-store',
       })
 
       if (!res.ok) return

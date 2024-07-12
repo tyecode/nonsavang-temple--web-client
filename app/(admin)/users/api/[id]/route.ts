@@ -44,7 +44,6 @@ export async function GET(
       success: true,
       message: 'User retrieval was successful.',
       data,
-      revalidated: 30,
     },
     {
       status: 200,

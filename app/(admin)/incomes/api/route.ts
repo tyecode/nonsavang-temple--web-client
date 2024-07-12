@@ -1,12 +1,13 @@
 'use server'
 
 import { sst } from '@/lib/select-string'
-import { Income } from '@/types'
 import { createClient } from '@/utils/supabase/client'
+import { cookies } from 'next/headers'
 
 const supabase = createClient()
 
 export async function GET() {
+  const _cookies = cookies()
   const { data, error } = await supabase
     .from('income')
     .select(
