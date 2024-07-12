@@ -53,11 +53,19 @@ export const updateAccount = async (
 
 export const deleteAccount = async (id: string) => {
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('account')
       .delete()
       .eq('id', id)
       .select('*, user: user_id (*), currency: currency_id (*)')
+
+    if (error) {
+      return {
+        data: null,
+        error,
+        message: error.message || 'Failed to delete account. Please try again.',
+      }
+    }
 
     return {
       data,

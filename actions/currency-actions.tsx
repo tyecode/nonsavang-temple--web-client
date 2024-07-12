@@ -53,11 +53,20 @@ export const updateCurrency = async (
 
 export const deleteCurrency = async (id: string) => {
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('currency')
       .delete()
       .eq('id', id)
       .select()
+
+    if (error) {
+      return {
+        data: null,
+        error,
+        message:
+          error.message || 'Failed to delete currency. Please try again.',
+      }
+    }
 
     return {
       data,

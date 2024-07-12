@@ -68,7 +68,15 @@ export const updateUser = async (id: string, object: UserModificationData) => {
 
 export const deleteUser = async (id: string) => {
   try {
-    const { data } = await supabase.auth.admin.deleteUser(id)
+    const { data, error } = await supabase.auth.admin.deleteUser(id)
+
+    if (error) {
+      return {
+        data: null,
+        error,
+        message: error.message || 'Failed to delete user. Please try again.',
+      }
+    }
 
     return {
       data,

@@ -56,11 +56,21 @@ export const updateExpenseCategory = async (
 
 export const deleteExpenseCategory = async (id: string) => {
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('expense_category')
       .delete()
       .eq('id', id)
       .select()
+
+    if (error) {
+      return {
+        data: null,
+        error,
+        message:
+          error.message ||
+          'Failed to delete expense category. Please try again.',
+      }
+    }
 
     return {
       data,

@@ -35,7 +35,10 @@ export const handleLogin = async (formData: FormData) => {
     return redirect('/login?error=Could not find user')
   }
 
-  cookieStore.set('nonsavang-user-data', JSON.stringify(data[0]))
+  cookieStore.set('nonsavang-user-data', JSON.stringify(data[0]), {
+    sameSite: 'lax',
+    secure: true,
+  })
 
   return redirect('/')
 }
