@@ -50,11 +50,19 @@ export const updateDonator = async (
 
 export const deleteDonator = async (id: string) => {
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('donator')
       .delete()
       .eq('id', id)
       .select()
+
+    if (error) {
+      return {
+        data: null,
+        error,
+        message: error.message || 'Failed to delete donator. Please try again.',
+      }
+    }
 
     return {
       data,

@@ -67,11 +67,19 @@ export const updateIncome = async (
 
 export const deleteIncome = async (id: string) => {
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('income')
       .delete()
       .eq('id', id)
       .select('*')
+
+    if (error) {
+      return {
+        data: null,
+        error,
+        message: error.message || 'Failed to delete income. Please try again.',
+      }
+    }
 
     return {
       data,
