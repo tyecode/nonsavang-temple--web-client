@@ -62,9 +62,6 @@ const fetchAccount = async () => {
       'content-type': 'application/json',
     },
     cache: 'no-store',
-    next: {
-      revalidate: 0,
-    },
   })
 
   return await res.json()
@@ -77,9 +74,6 @@ const fetchUser = async () => {
       'content-type': 'application/json',
     },
     cache: 'no-store',
-    next: {
-      revalidate: 0,
-    },
   })
 
   if (!res.ok) return
@@ -94,9 +88,6 @@ const fetchExpenseCategory = async () => {
       'content-type': 'application/json',
     },
     cache: 'no-store',
-    next: {
-      revalidate: 0,
-    },
   })
 
   if (!res.ok) return
@@ -110,7 +101,7 @@ const createExpense = async (data: ExpenseCreationData) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    cache: 'no-cache',
+    cache: 'no-store',
     body: JSON.stringify(data),
   })
 

@@ -1,10 +1,12 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/client'
+import { cookies } from 'next/headers'
 
 const supabase = createClient()
 
 export async function GET() {
+  const _cookies = cookies()
   const { data, error } = await supabase.from('income_category').select('*')
 
   if (error || !data) {

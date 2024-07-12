@@ -31,7 +31,6 @@ export async function GET(
       success: true,
       message: 'Donator retrieval was successful.',
       data,
-      revalidated: 30,
     },
     {
       status: 200,

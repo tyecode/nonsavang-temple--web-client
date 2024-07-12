@@ -61,9 +61,6 @@ const fetchAccount = async () => {
       'content-type': 'application/json',
     },
     cache: 'no-store',
-    next: {
-      revalidate: 0,
-    },
   })
 
   return await res.json()
@@ -76,9 +73,6 @@ const fetchDonator = async () => {
       'content-type': 'application/json',
     },
     cache: 'no-store',
-    next: {
-      revalidate: 0,
-    },
   })
 
   if (!res.ok) return
@@ -93,9 +87,6 @@ const fetchIncomeCategory = async () => {
       'content-type': 'application/json',
     },
     cache: 'no-store',
-    next: {
-      revalidate: 0,
-    },
   })
 
   if (!res.ok) return
@@ -109,7 +100,7 @@ const createIncome = async (data: IncomeCreationData) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    cache: 'no-cache',
+    cache: 'no-store',
     body: JSON.stringify(data),
   })
 
