@@ -10,7 +10,7 @@ export const handleLogin = async (formData: FormData) => {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const {
     data: { user },
@@ -44,8 +44,7 @@ export const handleLogin = async (formData: FormData) => {
 }
 
 export const handleLogout = async () => {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   await supabase.auth.signOut()
 
@@ -53,8 +52,7 @@ export const handleLogout = async () => {
 }
 
 export const getSession = async () => {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   try {
     const { data } = await supabase.auth.getSession()

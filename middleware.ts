@@ -1,19 +1,9 @@
-import { NextMiddleware } from 'next/server'
+import { type NextRequest } from 'next/server'
+import { updateSession } from './utils/middlewares/supabase-middleware'
 
-import { stackMiddleware } from '@/utils/middlewares/stack-middleware'
-import { supabaseMiddleware } from '@/utils/middlewares/supabase-middleware'
-import { authenticateMiddleware } from '@/utils/middlewares/authenticate-middleware'
-import { authorizationMiddleware } from '@/utils/middlewares/authorization-middleware'
-
-type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware
-
-const middlewares: MiddlewareFactory[] = [
-  supabaseMiddleware,
-  authenticateMiddleware,
-  authorizationMiddleware,
-]
-
-export default stackMiddleware(middlewares)
+export async function middleware(request: NextRequest) {
+  return await updateSession(request)
+}
 
 export const config = {
   matcher: [
@@ -24,6 +14,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

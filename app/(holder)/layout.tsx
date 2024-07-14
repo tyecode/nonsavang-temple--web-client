@@ -1,9 +1,26 @@
 'use client'
 
-import { LeftBar, TopBar } from '@/layouts'
-import { Toaster } from '@/components/ui/toaster'
+import { useEffect } from 'react'
+import { redirect } from 'next/navigation'
+import { useCookies } from 'next-client-cookies'
 
-const HolderPageLayout = ({ children }: { children: React.ReactNode }) => {
+import { Toaster } from '@/components/ui/toaster'
+import { LeftBar, TopBar } from '@/layouts'
+
+export default function AdminPageLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const cookies = useCookies()
+  const token = JSON.parse(cookies.get('nonsavang-user-data') || '{}')
+
+  useEffect(() => {
+    if (token && !['HOLDER', 'SUPER_ADMIN'].includes(token.role)) {
+      redirect('/404')
+    }
+  }, [token])
+
   return (
     <>
       <aside className='w-[18rem] border bg-background'>
@@ -18,5 +35,3 @@ const HolderPageLayout = ({ children }: { children: React.ReactNode }) => {
     </>
   )
 }
-
-export default HolderPageLayout
