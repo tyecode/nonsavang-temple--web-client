@@ -1,3 +1,5 @@
+'use client'
+
 import { DonutChart, Legend } from '@tremor/react'
 
 type DataItem = {

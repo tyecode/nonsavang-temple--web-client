@@ -38,7 +38,7 @@ const fetchExpense = async () => {
   return await res.json()
 }
 
-const ReportIncomeExpensePage = () => {
+export default function ReportIncomeExpensePage() {
   const [transactions, setTransactions] = useState<any[]>([])
   const [filteredTransactions, setFilteredTransactions] = useState<any[]>([])
   const [accountId, setAccountId] = useState<string>('')
@@ -181,5 +181,3 @@ const ReportIncomeExpensePage = () => {
     </div>
   )
 }
-
-export default ReportIncomeExpensePage

@@ -21,7 +21,7 @@ const fetchAccounts = async () => {
   return await res.json()
 }
 
-const AdminAccounts = () => {
+export default function AdminAccounts() {
   const accounts = useAccountStore((state) => state.accounts)
   const setAccounts = useAccountStore((state) => state.setAccounts)
 
@@ -41,5 +41,3 @@ const AdminAccounts = () => {
     </section>
   )
 }
-
-export default AdminAccounts

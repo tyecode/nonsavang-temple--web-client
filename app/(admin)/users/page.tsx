@@ -21,7 +21,7 @@ const fetchUser = async () => {
   return await res.json()
 }
 
-const UsersPage = () => {
+export default function UsersPage() {
   const users = useUserStore((state) => state.users)
   const setUsers = useUserStore((state) => state.setUsers)
 
@@ -41,5 +41,3 @@ const UsersPage = () => {
     </section>
   )
 }
-
-export default UsersPage

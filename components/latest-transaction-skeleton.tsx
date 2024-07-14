@@ -1,7 +1,9 @@
+'use client'
+
 import React from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const LatestTransactionSkeleton = () => {
+export default function LatestTransactionSkeleton() {
   return (
     <>
       {[...Array(5)].map((_, index) => (
@@ -24,5 +26,3 @@ const LatestTransactionSkeleton = () => {
     </>
   )
 }
-
-export default LatestTransactionSkeleton

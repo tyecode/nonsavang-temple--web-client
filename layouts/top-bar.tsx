@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { getTextFromPathname } from '@/lib/text-maps'
 import { useAuthStore } from '@/stores'
 
-const TopBar = () => {
+export default function TopBar() {
   const [isPending, startTransition] = useTransition()
   const pathname = usePathname()
   const cookies = useCookies()
@@ -55,5 +55,3 @@ const TopBar = () => {
     </section>
   )
 }
-
-export default TopBar

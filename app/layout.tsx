@@ -1,6 +1,5 @@
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { CookiesProvider } from 'next-client-cookies/server'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 
 import './globals.css'
 
@@ -29,7 +28,6 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body suppressHydrationWarning={true}>
-        <SpeedInsights />
         <ThemeProvider
           attribute='class'
           defaultTheme='light'

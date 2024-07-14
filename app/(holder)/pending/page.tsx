@@ -39,7 +39,7 @@ const fetchExpense = async () => {
   return await res.json()
 }
 
-const AdminPending = () => {
+export default function AdminPending() {
   const transactions = useTransactionStore((state) => state.transactions)
   const setTransactions = useTransactionStore((state) => state.setTransactions)
   const setApprovedTransactions = useApprovedTransactionStore(
@@ -82,5 +82,3 @@ const AdminPending = () => {
     </section>
   )
 }
-
-export default AdminPending

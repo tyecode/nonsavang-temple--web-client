@@ -35,7 +35,7 @@ const fetchExpense = async () => {
   return await res.json()
 }
 
-const AdminApproved = () => {
+export default function AdminApproved() {
   const [isPending, startTransition] = useTransition()
 
   const transactions = useApprovedTransactionStore(
@@ -66,5 +66,3 @@ const AdminApproved = () => {
     </section>
   )
 }
-
-export default AdminApproved

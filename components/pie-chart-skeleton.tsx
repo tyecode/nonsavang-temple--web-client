@@ -1,6 +1,8 @@
+'use client'
+
 import { Skeleton } from './ui/skeleton'
 
-const PieChartSkeleton = () => {
+export default function PieChartSkeleton() {
   return (
     <>
       <div className='grid grid-cols-2 gap-8'>
@@ -17,5 +19,3 @@ const PieChartSkeleton = () => {
     </>
   )
 }
-
-export default PieChartSkeleton
