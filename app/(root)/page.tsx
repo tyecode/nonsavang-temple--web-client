@@ -4,7 +4,7 @@ import Overview from '@/components/pages/overview'
 import { useExpenseStore, useIncomeStore } from '@/stores'
 import { useEffect, useTransition } from 'react'
 
-const HomePage = () => {
+export default function HomePage() {
   const setIncomes = useIncomeStore((state) => state.setIncomes)
   const setExpenses = useExpenseStore((state) => state.setExpenses)
   const [isPending, startTransition] = useTransition()
@@ -53,5 +53,3 @@ const HomePage = () => {
     </div>
   )
 }
-
-export default HomePage

@@ -35,7 +35,7 @@ const fetchExpense = async () => {
   return await res.json()
 }
 
-const AdminRejected = () => {
+export default function AdminRejected() {
   const [isPending, startTransition] = useTransition()
 
   const transactions = useRejectedTransactionStore(
@@ -66,5 +66,3 @@ const AdminRejected = () => {
     </section>
   )
 }
-
-export default AdminRejected

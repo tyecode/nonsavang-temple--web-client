@@ -21,7 +21,7 @@ const fetchCurrency = async () => {
   return await res.json()
 }
 
-const AdminCurrencies = () => {
+export default function AdminCurrencies() {
   const currencies = useCurrencyStore((state) => state.currencies)
   const setCurrencies = useCurrencyStore((state) => state.setCurrencies)
 
@@ -41,5 +41,3 @@ const AdminCurrencies = () => {
     </section>
   )
 }
-
-export default AdminCurrencies

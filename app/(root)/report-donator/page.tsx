@@ -23,7 +23,7 @@ const fetchIncomes = async () => {
   return await res.json()
 }
 
-const ReportDonatorPage = () => {
+export default function ReportDonatorPage() {
   const [donatorData, setDonatorData] = useState<any[]>([])
   const [filteredDonators, setFilteredDonators] = useState<any[]>([])
   const [accountId, setAccountId] = useState<string>('')
@@ -156,5 +156,3 @@ const ReportDonatorPage = () => {
     </div>
   )
 }
-
-export default ReportDonatorPage

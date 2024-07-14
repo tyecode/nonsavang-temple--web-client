@@ -1,7 +1,9 @@
+'use client'
+
 import { TableCell, TableRow } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const DataTableSkeleton = ({ columns }: { columns: number }) => {
+export default function DataTableSkeleton({ columns }: { columns: number }) {
   return (
     <>
       {[...Array(6)].map((_, index) => (
@@ -18,5 +20,3 @@ const DataTableSkeleton = ({ columns }: { columns: number }) => {
     </>
   )
 }
-
-export default DataTableSkeleton

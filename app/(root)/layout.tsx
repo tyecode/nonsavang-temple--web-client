@@ -3,7 +3,11 @@
 import { LeftBar, TopBar } from '@/layouts'
 import { Toaster } from '@/components/ui/toaster'
 
-const HolderPageLayout = ({ children }: { children: React.ReactNode }) => {
+export default function UserPageLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <>
       <aside className='w-[18rem] border bg-background'>
@@ -18,5 +22,3 @@ const HolderPageLayout = ({ children }: { children: React.ReactNode }) => {
     </>
   )
 }
-
-export default HolderPageLayout

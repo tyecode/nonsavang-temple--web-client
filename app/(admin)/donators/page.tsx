@@ -21,7 +21,7 @@ const fetchDonators = async () => {
   return await res.json()
 }
 
-const DonatorsPage = () => {
+export default function DonatorsPage() {
   const donators = useDonatorStore((state) => state.donators)
   const setDonators = useDonatorStore((state) => state.setDonators)
 
@@ -41,5 +41,3 @@ const DonatorsPage = () => {
     </section>
   )
 }
-
-export default DonatorsPage

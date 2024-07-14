@@ -21,7 +21,7 @@ const fetchIncomeCategory = async () => {
   return await res.json()
 }
 
-const AdminIncomeCategory = () => {
+export default function AdminIncomeCategory() {
   const categories = useIncomeCategoryStore((state) => state.categories)
   const setCategories = useIncomeCategoryStore((state) => state.setCategories)
 
@@ -41,5 +41,3 @@ const AdminIncomeCategory = () => {
     </section>
   )
 }
-
-export default AdminIncomeCategory

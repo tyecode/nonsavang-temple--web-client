@@ -24,7 +24,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/stores'
 
-const LeftBar = () => {
+export default function LeftBar() {
   const user = useAuthStore((state) => state.auth)
 
   const rootLinks = [
@@ -150,5 +150,3 @@ const LeftBar = () => {
     </div>
   )
 }
-
-export default LeftBar

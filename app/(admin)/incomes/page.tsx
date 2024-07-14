@@ -21,7 +21,7 @@ const fetchIncomes = async () => {
   return await res.json()
 }
 
-const AdminCurrencies = () => {
+export default function AdminCurrencies() {
   const incomes = useIncomeStore((state) => state.incomes)
   const setIncomes = useIncomeStore((state) => state.setIncomes)
 
@@ -41,5 +41,3 @@ const AdminCurrencies = () => {
     </section>
   )
 }
-
-export default AdminCurrencies

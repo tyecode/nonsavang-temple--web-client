@@ -21,7 +21,7 @@ const fetchExpenseCategory = async () => {
   return await res.json()
 }
 
-const AdminExpenseCategory = () => {
+export default function AdminExpenseCategory() {
   const categories = useExpenseCategoryStore((state) => state.categories)
   const setCategories = useExpenseCategoryStore((state) => state.setCategories)
 
@@ -41,5 +41,3 @@ const AdminExpenseCategory = () => {
     </section>
   )
 }
-
-export default AdminExpenseCategory

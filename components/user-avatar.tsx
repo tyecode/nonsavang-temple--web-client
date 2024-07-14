@@ -18,7 +18,13 @@ import {
 
 import { USER_ROLES } from '@/constants/user-role'
 
-const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
+export default function UserAvatar({
+  user,
+  loading,
+}: {
+  user: User
+  loading: boolean
+}) {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -99,5 +105,3 @@ const UserAvatar = ({ user, loading }: { user: User; loading: boolean }) => {
     </Popover>
   )
 }
-
-export default UserAvatar

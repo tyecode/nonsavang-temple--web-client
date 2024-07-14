@@ -21,7 +21,7 @@ const fetchAccounts = async () => {
   return await res.json()
 }
 
-const ReportDonatorPage = () => {
+export default function ReportDonatorPage() {
   const setAccounts = useAccountStore((state) => state.setAccounts)
   const accounts = useAccountStore((state) => state.accounts)
   const [isPending, startTransition] = useTransition()
@@ -72,5 +72,3 @@ const ReportDonatorPage = () => {
     </div>
   )
 }
-
-export default ReportDonatorPage
