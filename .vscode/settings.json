@@ -1,5 +1,7 @@
 {
-  "nuxt.isNuxtApp": false,
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
   "cSpell.words": [
     "Abbeyard",
     "brsqcdlrwftfrrfdanov",
@@ -222,5 +224,11 @@
     "ຮູບພາບ",
     "ຮູບພາບຕ້ອງມີຂະໜາດບໍ່ເກີນ",
     "າຂອງບັນຊີ"
-  ]
+  ],
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": true,
+  "nuxt.isNuxtApp": false
 }
