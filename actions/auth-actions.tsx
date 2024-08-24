@@ -20,8 +20,16 @@ export const handleLogin = async (formData: FormData) => {
     password,
   })
 
-  if (error || !user) {
-    return redirect('/login?error=Could not authenticate user')
+  if (error?.status === 0) {
+    return redirect('/login?error=Server connection failed')
+  }
+
+  if (error) {
+    return redirect(`/login?error=${encodeURIComponent(error.message)}`)
+  }
+
+  if (!user) {
+    return redirect('/login?error=Authentication failed')
   }
 
   const { data } = await supabase
@@ -32,7 +40,7 @@ export const handleLogin = async (formData: FormData) => {
     .eq('id', user.id)
 
   if (!data || data.length === 0) {
-    return redirect('/login?error=Could not find user')
+    return redirect('/login?error=User not found')
   }
 
   cookieStore.set('nonsavang-user-data', JSON.stringify(data[0]), {

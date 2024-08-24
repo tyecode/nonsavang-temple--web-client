@@ -22,6 +22,12 @@ import { LoadingButton } from '@/components/buttons'
 import { handleLogin } from '@/actions/auth-actions'
 import { ModeToggle } from '@/components/mode-toggle'
 
+const errorMessages: { [key: string]: string } = {
+  'Server connection failed': 'ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບເຊີບເວີໄດ້',
+  'Authentication failed': 'ບໍ່ມີບັນຊີຜູ້ໃຊ້ນີ້ໃນລະບົບ',
+  'Invalid login credentials': 'ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ',
+}
+
 export default function Login({
   searchParams,
 }: {
@@ -29,6 +35,11 @@ export default function Login({
 }) {
   const [isPending, startTransition] = useTransition()
   const [isOpen, setIsOpen] = useState(false)
+  const [src, setSrc] = useState('/logo.png')
+
+  const handleError = () => {
+    setSrc(`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`)
+  }
 
   return (
     <div className='absolute left-1/2 top-1/2 w-[27rem] -translate-x-1/2 -translate-y-1/2 p-6'>
@@ -41,12 +52,13 @@ export default function Login({
           <CardHeader className='mb-4 space-y-3'>
             <CardTitle className='flex-center relative flex-col text-center text-3xl'>
               <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_PATH}/logo.png`}
+                src={src}
                 alt='logo'
                 width={84}
                 height={84}
                 draggable={false}
                 priority
+                onError={handleError}
               />
               <span className='mt-4 text-2xl font-bold'>ວັດໂນນສະຫວ່າງ</span>
               <div className='absolute right-0 top-0'>
@@ -110,9 +122,9 @@ export default function Login({
               <LoadingButton className='w-full'>ເຂົ້າສູ່ລະບົບ</LoadingButton>
             )}
           </CardFooter>
-          {searchParams.error && (
+          {errorMessages[searchParams.error] && (
             <p className='py- mb-5 w-full text-center font-noto-lao text-sm text-danger'>
-              {'ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ'}
+              {errorMessages[searchParams.error]}
             </p>
           )}
         </Card>
